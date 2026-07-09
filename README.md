@@ -6,7 +6,7 @@ Todo Capsule 是一个 macOS 桌面边缘待办胶囊。它用 SwiftUI + AppKit 
 
 下载最新版 DMG：
 
-[todo-capsule-v1.0.2.dmg](https://github.com/Seth360/todo-capsule/releases/download/v1.0.2/todo-capsule-v1.0.2.dmg)
+[todo-capsule-v1.0.3.dmg](https://github.com/Seth360/todo-capsule/releases/download/v1.0.3/todo-capsule-v1.0.3.dmg)
 
 所有版本见 [GitHub Releases](https://github.com/Seth360/todo-capsule/releases)。
 
@@ -66,6 +66,11 @@ code/
   Sources/TodoCapsule/   # SwiftUI + AppKit app
   Resources/             # Info.plist, icon
 docs/                    # 产品、研究和工程文档
+vercel-proxy/            # 内置预设模型的 Vercel 服务端代理模板
 ```
 
 更多开发细节见 `code/README.md`。
+
+## 预设模型代理
+
+App 内置的“预设”模型会请求 `https://fuxc.team/api/summary`，真实模型 Key 不会打包进 App。代理函数模板在 `vercel-proxy/`，部署前需要在 Vercel 项目里配置 `AI_PROXY_API_KEY` 等环境变量。

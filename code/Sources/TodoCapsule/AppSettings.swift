@@ -1,6 +1,7 @@
 import Foundation
 
 let defaultChecklistId = "todo"
+let summaryPromptCharacterLimit = 2000
 
 struct Checklist: Identifiable, Codable, Equatable {
     var id: String
@@ -66,7 +67,10 @@ struct ModelConfig: Identifiable, Codable, Equatable {
     var supportsRouting: Bool = true
 
     var isAppPreset: Bool {
-        id == Self.appPresetId || providerName == "FX共享" || baseURL.localizedCaseInsensitiveContains("firstshare.cn")
+        id == Self.appPresetId ||
+        providerName == "FX共享" ||
+        baseURL.localizedCaseInsensitiveContains("firstshare.cn") ||
+        baseURL.localizedCaseInsensitiveContains("fuxc.team")
     }
 
     var displayTitle: String {
@@ -81,7 +85,8 @@ struct ModelConfig: Identifiable, Codable, Equatable {
     }
 
     static let appPresetId = "fx-shared-preset"
-    static let appPreset = ModelConfig(id: appPresetId, title: "预设", providerName: "FX共享", baseURL: "https://aihub.firstshare.cn/v1", apiKey: "", modelName: "", supportsRouting: true)
+    static let appPresetProxyURL = "https://fuxc.team/api/summary"
+    static let appPreset = ModelConfig(id: appPresetId, title: "预设", providerName: "FX共享", baseURL: appPresetProxyURL, apiKey: "", modelName: "", supportsRouting: false)
 
     static let defaults: [ModelConfig] = [
         appPreset,
@@ -195,6 +200,10 @@ struct AppSettings: Codable, Equatable {
         if !summaryTemplates.contains(where: { $0.id == activeSummaryTemplateId }) {
             activeSummaryTemplateId = summaryTemplates.first?.id ?? "weekly-summary"
         }
+        summaryTemplate = String(summaryTemplate.prefix(summaryPromptCharacterLimit))
+        for index in summaryTemplates.indices {
+            summaryTemplates[index].prompt = String(summaryTemplates[index].prompt.prefix(summaryPromptCharacterLimit))
+        }
     }
 
     var activeModel: ModelConfig? {
@@ -226,8 +235,11 @@ struct AppSettings: Codable, Equatable {
         preset.id = ModelConfig.appPresetId
         preset.title = "预设"
         preset.providerName = "FX共享"
-        preset.baseURL = preset.baseURL.isEmpty ? ModelConfig.appPreset.baseURL : preset.baseURL
-        preset.supportsRouting = true
+        preset.baseURL = ModelConfig.appPresetProxyURL
+        preset.apiKey = ""
+        preset.modelName = ""
+        preset.customHeaders = ""
+        preset.supportsRouting = false
 
         for index in presetIndexes.reversed() {
             models.remove(at: index)

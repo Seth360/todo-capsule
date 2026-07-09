@@ -2,30 +2,66 @@ import Foundation
 
 enum SummaryServiceError: LocalizedError {
     case missingConfiguration
+    case missingPresetProxy
     case badURL
     case emptyResponse
     case modelNotFound(String)
+    case weeklyLimitReached(PresetQuota)
     case http(Int, String)
 
     var errorDescription: String? {
         switch self {
         case .missingConfiguration:
             return "请先在设置里配置模型 Base URL 和 API Key"
+        case .missingPresetProxy:
+            return "预设模型服务地址无效，请联系应用维护者"
         case .badURL:
             return "模型 API 地址无效"
         case .emptyResponse:
             return "模型没有返回总结内容"
         case .modelNotFound(let model):
             return "模型不存在：\(model)。请在设置里点击“自动获取模型”，选择可用模型后保存"
+        case .weeklyLimitReached(let quota):
+            return "本周预设模型总结次数已用完，将在 \(quota.resetText) 重置"
         case .http(let code, let body):
             return "模型请求失败（\(code)）：\(body.prefix(120))"
         }
     }
 }
 
+struct SummaryResult {
+    let text: String
+    let quota: PresetQuota?
+}
+
+struct PresetQuota: Codable, Equatable {
+    let used: Int
+    let limit: Int
+    let remaining: Int
+    let resetAt: Date
+
+    var progress: Double {
+        guard limit > 0 else { return 0 }
+        return min(1, max(0, Double(used) / Double(limit)))
+    }
+
+    var resetText: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
+        formatter.dateFormat = "M月d日 HH:mm"
+        return formatter.string(from: resetAt)
+    }
+}
+
 enum SummaryService {
-    static func summarize(settings: AppSettings, prompt: String, completion: @escaping (Result<String, Error>) -> Void) {
+    static func summarize(settings: AppSettings, prompt: String, completion: @escaping (Result<SummaryResult, Error>) -> Void) {
         let config = settings.activeModel
+        if config?.isAppPreset == true {
+            summarizeWithPresetProxy(endpoint: config?.baseURL ?? ModelConfig.appPresetProxyURL, prompt: prompt, completion: completion)
+            return
+        }
+
         let base = (config?.baseURL ?? settings.modelBaseURL).trimmingCharacters(in: .whitespacesAndNewlines)
         let key = (config?.apiKey ?? settings.modelAPIKey).trimmingCharacters(in: .whitespacesAndNewlines)
         let model = effectiveModelName(config: config, fallback: settings.modelName)
@@ -74,11 +110,102 @@ enum SummaryService {
             if let data, let decoded = try? JSONDecoder().decode(ChatResponse.self, from: data),
                let text = decoded.choices.first?.message.content.trimmingCharacters(in: .whitespacesAndNewlines),
                !text.isEmpty {
-                completion(.success(text))
+                completion(.success(SummaryResult(text: text, quota: nil)))
             } else {
                 completion(.failure(SummaryServiceError.emptyResponse))
             }
         }.resume()
+    }
+
+    static func fetchPresetQuota(completion: @escaping (Result<PresetQuota, Error>) -> Void) {
+        presetProxyRequest(method: "GET") { data, response, error in
+            if let error {
+                completion(.failure(error))
+                return
+            }
+            let http = response as? HTTPURLResponse
+            let status = http?.statusCode ?? 0
+            let raw = String(data: data ?? Data(), encoding: .utf8) ?? ""
+            guard (200..<300).contains(status) else {
+                completion(.failure(SummaryServiceError.http(status, raw)))
+                return
+            }
+            if let data,
+               let decoded = try? presetDecoder.decode(PresetQuotaEnvelope.self, from: data),
+               let quota = decoded.quota {
+                completion(.success(quota))
+            } else {
+                completion(.failure(SummaryServiceError.emptyResponse))
+            }
+        }
+    }
+
+    private static func summarizeWithPresetProxy(endpoint: String, prompt: String, completion: @escaping (Result<SummaryResult, Error>) -> Void) {
+        let trimmed = endpoint.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, let url = URL(string: trimmed) else {
+            completion(.failure(SummaryServiceError.missingPresetProxy))
+            return
+        }
+
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.setValue("TodoCapsule-macOS", forHTTPHeaderField: "X-Todo-Capsule-Client")
+        if let appToken = ProxyAppToken.current {
+            req.setValue(appToken, forHTTPHeaderField: "X-Todo-Capsule-Token")
+        }
+        req.setValue(PresetProxyIdentity.userId, forHTTPHeaderField: "X-Todo-Capsule-User")
+        req.httpBody = try? JSONEncoder().encode(PresetSummaryRequest(prompt: prompt))
+
+        URLSession.shared.dataTask(with: req) { data, response, error in
+            if let error {
+                completion(.failure(error))
+                return
+            }
+            let http = response as? HTTPURLResponse
+            let status = http?.statusCode ?? 0
+            let raw = String(data: data ?? Data(), encoding: .utf8) ?? ""
+            guard (200..<300).contains(status) else {
+                if status == 429,
+                   let data,
+                   let decoded = try? presetDecoder.decode(PresetSummaryResponse.self, from: data),
+                   let quota = decoded.quota {
+                    completion(.failure(SummaryServiceError.weeklyLimitReached(quota)))
+                    return
+                }
+                completion(.failure(SummaryServiceError.http(status, raw)))
+                return
+            }
+            if let data,
+               let decoded = try? presetDecoder.decode(PresetSummaryResponse.self, from: data),
+               let text = decoded.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !text.isEmpty {
+                completion(.success(SummaryResult(text: text, quota: decoded.quota)))
+            } else {
+                completion(.failure(SummaryServiceError.emptyResponse))
+            }
+        }.resume()
+    }
+
+    private static var presetDecoder: JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return decoder
+    }
+
+    private static func presetProxyRequest(method: String, completion: @escaping (Data?, URLResponse?, Error?) -> Void) {
+        guard let url = URL(string: ModelConfig.appPresetProxyURL) else {
+            completion(nil, nil, SummaryServiceError.missingPresetProxy)
+            return
+        }
+        var req = URLRequest(url: url)
+        req.httpMethod = method
+        req.setValue("TodoCapsule-macOS", forHTTPHeaderField: "X-Todo-Capsule-Client")
+        req.setValue(PresetProxyIdentity.userId, forHTTPHeaderField: "X-Todo-Capsule-User")
+        if let appToken = ProxyAppToken.current {
+            req.setValue(appToken, forHTTPHeaderField: "X-Todo-Capsule-Token")
+        }
+        URLSession.shared.dataTask(with: req, completionHandler: completion).resume()
     }
 
     private static func effectiveModelName(config: ModelConfig?, fallback: String) -> String {
@@ -117,6 +244,32 @@ enum SummaryService {
             guard parts.count == 2, !parts[0].isEmpty, !parts[1].isEmpty else { return nil }
             return (parts[0], parts[1])
         }
+    }
+}
+
+private enum ProxyAppToken {
+    static var current: String? {
+        let bundled = (Bundle.main.object(forInfoDictionaryKey: "TCProxyAppToken") as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !bundled.isEmpty { return bundled }
+
+        let environment = (ProcessInfo.processInfo.environment["TC_PROXY_APP_TOKEN"] ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return environment.isEmpty ? nil : environment
+    }
+}
+
+private enum PresetProxyIdentity {
+    private static let key = "todoCapsule.presetProxyUserId.v1"
+
+    static var userId: String {
+        if let existing = UserDefaults.standard.string(forKey: key),
+           !existing.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return existing
+        }
+        let value = UUID().uuidString
+        UserDefaults.standard.set(value, forKey: key)
+        return value
     }
 }
 
@@ -192,6 +345,19 @@ private struct ChatRequest: Codable {
     let model: String
     let messages: [ChatMessage]
     let temperature: Double
+}
+
+private struct PresetSummaryRequest: Codable {
+    let prompt: String
+}
+
+private struct PresetSummaryResponse: Codable {
+    let text: String?
+    let quota: PresetQuota?
+}
+
+private struct PresetQuotaEnvelope: Codable {
+    let quota: PresetQuota?
 }
 
 private struct ChatMessage: Codable {

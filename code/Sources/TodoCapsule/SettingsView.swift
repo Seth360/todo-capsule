@@ -60,6 +60,12 @@ struct SettingsView: View {
             )
             .frame(width: 380, height: 230)
         }
+        .onAppear {
+            if section == .model { state.refreshPresetQuota() }
+        }
+        .onChange(of: section) { _, newSection in
+            if newSection == .model { state.refreshPresetQuota() }
+        }
     }
 
     private var versionLabel: some View {
@@ -342,6 +348,10 @@ struct SettingsView: View {
     private var modelSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             ForEach(state.settings.models) { model in
+                if model.isAppPreset && state.settings.activeModelId == model.id {
+                    PresetQuotaView(quota: state.presetQuota, status: state.presetQuotaStatus)
+                        .onAppear { state.refreshPresetQuota() }
+                }
                 ModelCard(
                     model: model,
                     active: state.settings.activeModelId == model.id,
@@ -393,6 +403,9 @@ struct SettingsView: View {
 
     private func enableModel(_ id: String) {
         state.updateSettings { $0.activeModelId = id }
+        if state.settings.models.first(where: { $0.id == id })?.isAppPreset == true {
+            state.refreshPresetQuota()
+        }
     }
 
     private func duplicateModel(_ model: ModelConfig) {
@@ -443,15 +456,17 @@ struct SettingsView: View {
 
     private func saveSummaryTemplate(_ template: SummaryTemplateConfig) {
         state.updateSettings { settings in
+            var saved = template
+            saved.prompt = String(saved.prompt.prefix(summaryPromptCharacterLimit))
             if let i = settings.summaryTemplates.firstIndex(where: { $0.id == template.id }) {
-                settings.summaryTemplates[i] = template
+                settings.summaryTemplates[i] = saved
             } else {
-                settings.summaryTemplates.append(template)
+                settings.summaryTemplates.append(saved)
             }
-            if template.isEnabled {
-                settings.activeSummaryTemplateId = template.id
+            if saved.isEnabled {
+                settings.activeSummaryTemplateId = saved.id
                 for i in settings.summaryTemplates.indices {
-                    settings.summaryTemplates[i].isEnabled = settings.summaryTemplates[i].id == template.id
+                    settings.summaryTemplates[i].isEnabled = settings.summaryTemplates[i].id == saved.id
                 }
             }
         }
@@ -658,7 +673,7 @@ private struct ModelCard: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text(model.displayTitle).font(.tc(17, weight: .semibold))
                 if protected {
-                    Text("模型用量有限，随时可能失效，请及时更换自有模型API。")
+                    Text("经由服务端代理调用共享模型，不会在 App 内置明文 Key。")
                         .font(.tc(12))
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
@@ -691,6 +706,50 @@ private struct ModelCard: View {
         .padding(18)
         .background(RoundedRectangle(cornerRadius: 10).fill(active ? activeGreen.opacity(0.08) : Color.clear))
         .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(active ? activeGreen.opacity(0.75) : Color.secondary.opacity(0.22), lineWidth: active ? 1.5 : 1))
+    }
+}
+
+private struct PresetQuotaView: View {
+    let quota: PresetQuota?
+    let status: String?
+    private let activeGreen = Color(hex: 0x32D158)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline) {
+                Label("预设模型额度", systemImage: "gauge.with.dots.needle.67percent")
+                    .font(.tc(14, weight: .semibold))
+                Spacer()
+                Text(quotaText)
+                    .font(.tc(13, weight: .semibold))
+                    .foregroundStyle(activeGreen)
+            }
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.secondary.opacity(0.16))
+                    Capsule()
+                        .fill(activeGreen)
+                        .frame(width: max(8, proxy.size.width * CGFloat(quota?.progress ?? 0)))
+                }
+            }
+            .frame(height: 8)
+            Text(detailText)
+                .font(.tc(12))
+                .foregroundStyle(.secondary)
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 8).fill(Color.primary.opacity(0.04)))
+        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.secondary.opacity(0.14)))
+    }
+
+    private var quotaText: String {
+        guard let quota else { return status ?? "获取中..." }
+        return "已用 \(quota.used)/\(quota.limit)"
+    }
+
+    private var detailText: String {
+        guard let quota else { return status ?? "仅预设模型受每周次数限制，自建模型不受限制。" }
+        return "剩余 \(quota.remaining) 次 · 每周五 24:00 重置（\(quota.resetText)）"
     }
 }
 
@@ -956,6 +1015,7 @@ private struct SummaryTemplateEditorView: View {
     @State private var template: SummaryTemplateConfig
     let lists: [Checklist]
     let onSave: (SummaryTemplateConfig) -> Void
+    private let promptLimit = summaryPromptCharacterLimit
 
     init(initial: SummaryTemplateConfig, lists: [Checklist], onSave: @escaping (SummaryTemplateConfig) -> Void) {
         _template = State(initialValue: initial)
@@ -980,12 +1040,17 @@ private struct SummaryTemplateEditorView: View {
                 }
                 VStack(alignment: .leading, spacing: 8) {
                     Text("总结模板（提示词）")
-                    TextEditor(text: $template.prompt)
+                    TextEditor(text: promptBinding)
                         .font(.tc(12))
                         .frame(height: 180)
-                    Text("使用 {{content}} 作为待办内容占位符。")
-                        .font(.tc(11))
-                        .foregroundStyle(.secondary)
+                    HStack {
+                        Text("使用 {{content}} 作为待办内容占位符。")
+                        Spacer()
+                        Text("\(template.prompt.count)/\(promptLimit)")
+                            .foregroundStyle(template.prompt.count >= promptLimit ? .red : .secondary)
+                    }
+                    .font(.tc(11))
+                    .foregroundStyle(.secondary)
                 }
             }
             .formStyle(.grouped)
@@ -993,6 +1058,7 @@ private struct SummaryTemplateEditorView: View {
                 Spacer()
                 Button("取消") { dismiss() }
                 Button("保存") {
+                    template.prompt = String(template.prompt.prefix(promptLimit))
                     onSave(template)
                     dismiss()
                 }
@@ -1012,6 +1078,13 @@ private struct SummaryTemplateEditorView: View {
                     template.listIds.removeAll { $0 == id }
                 }
             }
+        )
+    }
+
+    private var promptBinding: Binding<String> {
+        Binding(
+            get: { template.prompt },
+            set: { template.prompt = String($0.prefix(promptLimit)) }
         )
     }
 }

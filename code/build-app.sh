@@ -13,6 +13,18 @@ cp .build/release/TodoCapsule "$APP/Contents/MacOS/TodoCapsule"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
+PROXY_APP_TOKEN="${TC_PROXY_APP_TOKEN:-}"
+if [[ -z "$PROXY_APP_TOKEN" ]]; then
+  PROXY_APP_TOKEN="$(security find-generic-password -s "todo-capsule-proxy-app-token" -a "${USER}" -w 2>/dev/null || true)"
+fi
+if [[ -n "$PROXY_APP_TOKEN" ]]; then
+  /usr/libexec/PlistBuddy -c "Delete :TCProxyAppToken" "$APP/Contents/Info.plist" 2>/dev/null || true
+  /usr/libexec/PlistBuddy -c "Add :TCProxyAppToken string ${PROXY_APP_TOKEN}" "$APP/Contents/Info.plist"
+  echo "==> 已注入预设模型 App Token"
+else
+  echo "==> 未设置 TC_PROXY_APP_TOKEN，发布包将无法调用受保护的预设模型代理"
+fi
+
 SPARKLE_FRAMEWORK=".build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 if [[ -d "$SPARKLE_FRAMEWORK" ]]; then
   cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/"

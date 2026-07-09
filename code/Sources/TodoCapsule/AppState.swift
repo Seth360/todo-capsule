@@ -50,6 +50,8 @@ final class AppState: ObservableObject {
     @Published var summaries: [SummaryRecord] = []
     @Published var updateInfo: AppUpdateInfo?
     @Published var dismissedUpdateBannerVersion: String?
+    @Published var presetQuota: PresetQuota?
+    @Published var presetQuotaStatus: String?
     @Published var settings: AppSettings = AppSettingsStore.load() {
         didSet {
             AppSettingsStore.save(settings)
@@ -644,9 +646,13 @@ final class AppState: ObservableObject {
             DispatchQueue.main.async {
                 guard let self else { return }
                 switch result {
-                case .success(let text):
-                    self.copyToClipboard(text)
-                    self.summaries.insert(SummaryRecord(text: text), at: 0)
+                case .success(let result):
+                    if let quota = result.quota {
+                        self.presetQuota = quota
+                        self.presetQuotaStatus = nil
+                    }
+                    self.copyToClipboard(result.text)
+                    self.summaries.insert(SummaryRecord(text: result.text), at: 0)
                     SummaryRecordStore.save(self.summaries)
                     self.summaryStatus = nil
                     self.showSummaryToast("总结已复制到剪贴板", autoHideAfter: 3)
@@ -654,6 +660,26 @@ final class AppState: ObservableObject {
                 case .failure(let error):
                     self.summaryStatus = nil
                     self.showSummaryToast(error.localizedDescription, autoHideAfter: 5)
+                }
+            }
+        }
+    }
+
+    func refreshPresetQuota() {
+        guard settings.activeModel?.isAppPreset == true else {
+            presetQuotaStatus = nil
+            return
+        }
+        presetQuotaStatus = "正在获取预设模型额度..."
+        SummaryService.fetchPresetQuota { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                switch result {
+                case .success(let quota):
+                    self.presetQuota = quota
+                    self.presetQuotaStatus = nil
+                case .failure:
+                    self.presetQuotaStatus = "暂时无法获取预设模型额度"
                 }
             }
         }

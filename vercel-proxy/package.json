@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "todo-capsule-vercel-proxy",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy"
+  },
+  "devDependencies": {
+    "vercel": "^46.0.0"
+  }
+}

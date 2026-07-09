@@ -24,3 +24,9 @@ code/.sparkle-private/
 # Node dependencies, if temporary tooling is added locally
 node_modules/
 code/**/node_modules/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+!**/.env.example

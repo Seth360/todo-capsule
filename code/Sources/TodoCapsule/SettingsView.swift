@@ -103,13 +103,11 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
             Spacer()
-            ZStack(alignment: .bottomLeading) {
+            if state.shouldShowSettingsUpdateNotice {
+                settingsUpdateNotice
+            } else {
                 versionLabel
-                if state.shouldShowSettingsUpdateNotice {
-                    settingsUpdateNotice
-                }
             }
-            .frame(maxWidth: .infinity, minHeight: 70, alignment: .bottomLeading)
         }
         .padding(12)
         .frame(width: 180)
@@ -124,12 +122,19 @@ struct SettingsView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.down.circle.fill")
                         .foregroundStyle(Color(hex: 0x32D158))
-                    Text(settingsUpdateTitle)
+                    Text("发现新版本")
                         .font(.tc(14, weight: .semibold))
                     Spacer(minLength: 0)
                 }
+                if let version = settingsUpdateVersion {
+                    Text(version)
+                        .font(.tc(11, weight: .medium))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
-            .padding(10)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 11)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
@@ -143,9 +148,9 @@ struct SettingsView: View {
         .buttonStyle(.plain)
     }
 
-    private var settingsUpdateTitle: String {
-        guard let info = state.updateInfo, !info.version.isEmpty else { return "发现新版本" }
-        return "发现新版本 \(info.version)"
+    private var settingsUpdateVersion: String? {
+        guard let info = state.updateInfo, !info.version.isEmpty else { return nil }
+        return "版本 \(info.version)"
     }
 
     @ViewBuilder

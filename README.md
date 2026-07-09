@@ -2,6 +2,16 @@
 
 Todo Capsule 是一个 macOS 桌面边缘待办胶囊。它用 SwiftUI + AppKit `NSPanel` 实现，常驻屏幕边缘，无 Dock 图标，适合工作时快速记一条、扫一眼、勾掉。
 
+## 下载安装
+
+下载最新版 DMG：
+
+[todo-capsule-v0.1.0.dmg](https://github.com/Seth360/todo-capsule/releases/download/v0.1.0/todo-capsule-v0.1.0.dmg)
+
+所有版本见 [GitHub Releases](https://github.com/Seth360/todo-capsule/releases)。
+
+提示：当前安装包未做 Apple Developer ID 公证。首次打开如果被 macOS 拦截，请右键 App 选择“打开”。
+
 ## 功能
 
 - 全局热键快速记录待办

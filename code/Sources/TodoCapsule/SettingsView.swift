@@ -19,18 +19,24 @@ struct SettingsView: View {
         HStack(spacing: 0) {
             sidebar
             Divider()
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    HStack {
-                        Text(section.title)
-                            .font(.tc(24, weight: .semibold))
-                        Spacer()
-                        headerAction
+            ZStack(alignment: .bottomTrailing) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        HStack {
+                            Text(section.title)
+                                .font(.tc(24, weight: .semibold))
+                            Spacer()
+                            headerAction
+                        }
+                        sectionBody
                     }
-                    sectionBody
+                    .padding(24)
+                    .padding(.bottom, 34)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(24)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                versionLabel
+                    .padding(.trailing, 24)
+                    .padding(.bottom, 16)
             }
         }
         .frame(minWidth: 760, minHeight: 520)
@@ -43,6 +49,27 @@ struct SettingsView: View {
             SummaryTemplateEditorView(initial: template, lists: state.lists, onSave: saveSummaryTemplate)
                 .frame(width: 560, height: 600)
         }
+    }
+
+    private var versionLabel: some View {
+        Text(appVersionText)
+            .font(.tc(11, weight: .medium))
+            .foregroundStyle(.secondary.opacity(0.78))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(Color(nsColor: .windowBackgroundColor).opacity(0.72))
+            )
+            .allowsHitTesting(false)
+    }
+
+    private var appVersionText: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        let displayVersion = if let version, !version.isEmpty { version } else { "未知" }
+        guard let build, !build.isEmpty else { return "版本 \(displayVersion)" }
+        return "版本 \(displayVersion) (\(build))"
     }
 
     private var sidebar: some View {

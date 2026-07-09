@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>todo-capsule · 高保真原型 (Stage 1)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    /* ===== design-brief §6/§9 深色 Granola 视觉 token ===== */
+    --cap:#1E1E20; --panel:#232326; --panel-2:#2A2A2E;
+    --stroke:rgba(255,255,255,.08); --stroke-strong:rgba(255,255,255,.14);
+    --shadow:0 8px 28px rgba(0,0,0,.42), 0 2px 6px rgba(0,0,0,.3);
+    --txt:#F2F2F4; --txt-2:#9B9BA1; --txt-3:#6E6E74;
+    --accent:#34C75A; --accent-dim:rgba(52,199,90,.16);
+    --row-hover:rgba(255,255,255,.055);
+    --r-pill:26px; --r-panel:16px;
+    --spring:cubic-bezier(.34,1.42,.5,1);
+    --t:.22s;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;
+    overflow:hidden; color:var(--txt);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== 仿 macOS 桌面（卖"胶囊常驻在桌面右缘"的概念）===== */
+  .desktop{
+    position:fixed; inset:0;
+    background:
+      radial-gradient(120% 90% at 70% 18%, #ffd9a8 0%, #f6b98a 26%, #e9a78f 48%, #c9a7ad 72%, #9a9bbf 100%);
+  }
+  .desktop::after{ /* 远处岩层质感的柔光，呼应参照截图 */
+    content:""; position:absolute; inset:0;
+    background:
+      radial-gradient(80% 50% at 30% 95%, rgba(255,255,255,.18), transparent 60%),
+      linear-gradient(180deg, transparent 55%, rgba(120,110,120,.22) 100%);
+    pointer-events:none;
+  }
+  .menubar{
+    position:absolute; top:0; left:0; right:0; height:26px;
+    background:rgba(30,28,32,.28); backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    display:flex; align-items:center; gap:18px; padding:0 14px;
+    font-size:12.5px; font-weight:500; color:rgba(255,255,255,.92);
+    text-shadow:0 1px 2px rgba(0,0,0,.18);
+  }
+  .menubar .left{font-weight:700}
+  .menubar .right{margin-left:auto; display:flex; gap:14px; opacity:.92}
+  /* 一个虚化的"正在工作"的窗口，烘托"软件最小化、胶囊常驻" */
+  .work-window{
+    position:absolute; left:9%; top:20%; width:46%; height:62%;
+    background:rgba(250,250,252,.82); border-radius:12px;
+    box-shadow:0 24px 70px rgba(0,0,0,.22);
+    backdrop-filter:blur(2px); overflow:hidden; opacity:.9;
+  }
+  .work-window .wbar{height:34px; background:#f1f1f3; display:flex; align-items:center; gap:7px; padding:0 13px; border-bottom:1px solid #e6e6e9}
+  .work-window .dot{width:11px;height:11px;border-radius:50%}
+  .work-window .dot.r{background:#ff5f57}.work-window .dot.y{background:#febc2e}.work-window .dot.g{background:#28c840}
+  .work-window .wbody{padding:22px 26px}
+  .work-window .ln{height:9px;border-radius:5px;background:#e3e3e7;margin-bottom:13px}
+  .work-window .ln.t{height:13px;width:42%;background:#cfcfd4;margin-bottom:20px}
+
+  /* ===== 胶囊（单一形变元素：idle ↔ peek ↔ capture）===== */
+  .capsule{
+    position:fixed; right:14px; top:50%; transform:translateY(-50%);
+    width:46px; height:104px; border-radius:var(--r-pill);
+    background:var(--cap); border:1px solid var(--stroke);
+    box-shadow:var(--shadow);
+    overflow:hidden; cursor:pointer; z-index:50;
+    transition:width var(--t) var(--spring), height var(--t) var(--spring),
+               border-radius var(--t) ease, background var(--t) ease;
+    will-change:width,height;
+  }
+  .capsule:hover{border-color:var(--stroke-strong)}
+
+  /* 形变后的尺寸 */
+  .capsule[data-state="peek"],
+  .capsule[data-state="capture"]{
+    width:324px; border-radius:var(--r-panel); background:var(--panel);
+    cursor:default;
+    /* 让面板从右缘"长出"，高度自适应内容 */
+    height:var(--panel-h, 360px);
+  }
+
+  /* idle 面 */
+  .idle-face{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+    transition:opacity .14s ease;
+  }
+  .idle-face .glyph{color:#C9C9CE; display:flex}
+  .idle-face .count{
+    font-size:15px; font-weight:600; color:var(--accent);
+    line-height:1; min-width:20px; text-align:center;
+    transition:transform .2s var(--spring);
+  }
+  .idle-face .count.bump{transform:scale(1.32)}
+  .capsule[data-state="peek"] .idle-face,
+  .capsule[data-state="capture"] .idle-face{opacity:0; pointer-events:none}
+
+  /* 展开面板 */
+  .panel{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    opacity:0; pointer-events:none; transition:opacity .16s ease .04s;
+    padding:12px 12px 10px;
+  }
+  .capsule[data-state="peek"] .panel,
+  .capsule[data-state="capture"] .panel{opacity:1; pointer-events:auto}
+
+  .p-head{display:flex; align-items:center; gap:8px; padding:4px 6px 8px}
+  .p-head .ttl{font-size:13px; font-weight:600; color:var(--txt)}
+  .p-head .n{font-size:12px; font-weight:600; color:var(--accent); background:var(--accent-dim);
+             padding:1px 7px; border-radius:9px; line-height:1.5}
+  .p-head .spacer{flex:1}
+  .p-head .hk{font-size:11px; color:var(--txt-3); font-weight:500}
+
+  /* 捕获输入行 */
+  .capture-row{
+    display:flex; align-items:center; gap:9px; padding:9px 10px; margin:0 0 6px;
+    border-radius:10px; background:transparent;
+    border:1px solid transparent; transition:border-color .16s ease, background .16s ease;
+    cursor:text;
+  }
+  .capture-row .plus{color:var(--txt-3); display:flex; transition:color .16s}
+  .capsule[data-state="capture"] .capture-row{
+    border-color:rgba(52,199,90,.55); background:rgba(52,199,90,.06);
+  }
+  .capsule[data-state="capture"] .capture-row .plus{color:var(--accent)}
+  #capInput{
+    flex:1; background:transparent; border:none; outline:none;
+    font-family:inherit; font-size:13px; color:var(--txt); caret-color:var(--accent);
+  }
+  #capInput::placeholder{color:var(--txt-3)}
+
+  /* 列表 */
+  .list-wrap{flex:1; overflow-y:auto; overflow-x:hidden; padding:0 2px; margin:0 -2px}
+  .list-wrap::-webkit-scrollbar{width:7px}
+  .list-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1); border-radius:4px}
+  ul.todos{list-style:none}
+  .todo{
+    display:flex; align-items:center; gap:10px; padding:8px 9px; border-radius:9px;
+    transition:background .14s ease, opacity .26s ease, transform .26s var(--spring), height .26s ease, padding .26s ease, margin .26s ease;
+    cursor:default;
+  }
+  .todo:hover{background:var(--row-hover)}
+  .todo.dragging{opacity:.5}
+  .todo.over{box-shadow:inset 0 2px 0 var(--accent)}
+  .box{
+    width:18px; height:18px; flex:none; border-radius:6px;
+    border:1.6px solid var(--txt-3); cursor:pointer; position:relative;
+    transition:border-color .15s, background .15s;
+  }
+  .box:hover{border-color:var(--txt-2)}
+  .box svg{position:absolute; inset:0; margin:auto; opacity:0; transform:scale(.4); transition:opacity .18s, transform .2s var(--spring)}
+  .todo .txt{flex:1; font-size:13px; color:var(--txt); line-height:1.4; cursor:text; outline:none; border-radius:4px}
+  .todo .txt:focus{background:rgba(255,255,255,.06); box-shadow:0 0 0 2px rgba(52,199,90,.3); padding:0 3px; margin:0 -3px}
+  .todo .grab{opacity:0; color:var(--txt-3); cursor:grab; transition:opacity .14s; display:flex; padding:2px}
+  .todo:hover .grab{opacity:1}
+
+  /* 完成态：划线 + 淡出 → 折叠移除 */
+  .todo.done .box{background:var(--accent); border-color:var(--accent)}
+  .todo.done .box svg{opacity:1; transform:scale(1)}
+  .todo.done .txt{color:var(--txt-3); text-decoration:line-through; text-decoration-color:var(--txt-3)}
+  .todo.removing{opacity:0; transform:translateX(14px); height:0 !important; padding-top:0; padding-bottom:0; margin:0; overflow:hidden}
+
+  /* 空态 */
+  .empty{
+    flex:1; display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:7px; padding:18px; color:var(--txt-2);
+  }
+  .empty.show{display:flex}
+  .empty .big{font-size:13px; color:var(--txt); font-weight:600}
+  .empty .sub{font-size:12px; color:var(--txt-3); line-height:1.6}
+  .empty .ring{width:34px;height:34px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:3px}
+
+  /* 撤销 toast */
+  .undo{
+    position:absolute; left:12px; right:12px; bottom:10px;
+    display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px;
+    background:var(--panel-2); border:1px solid var(--stroke); box-shadow:0 6px 18px rgba(0,0,0,.4);
+    font-size:12.5px; color:var(--txt-2); transform:translateY(140%); opacity:0;
+    transition:transform .26s var(--spring), opacity .2s; z-index:5;
+  }
+  .undo.show{transform:translateY(0); opacity:1}
+  .undo .u-btn{margin-left:auto; color:var(--accent); font-weight:600; cursor:pointer; font-size:12.5px}
+
+  /* 提交一闪确认（confirm 态） */
+  .flash{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.6);
+    width:54px;height:54px;border-radius:50%; background:var(--accent-dim);
+    display:flex;align-items:center;justify-content:center; color:var(--accent);
+    opacity:0; pointer-events:none; z-index:9;
+  }
+  .flash.go{animation:flash .56s ease}
+  @keyframes flash{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+    35%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1.25)}
+  }
+
+  /* ===== reduced-motion 降级版（D-008）：去位移弹性，保留因果（淡入淡出/瞬时尺寸）===== */
+  .reduced .capsule{transition:width .12s linear, height .12s linear, border-radius .12s linear, background .12s}
+  .reduced .idle-face,.reduced .panel{transition:opacity .12s linear}
+  .reduced .todo{transition:opacity .12s linear, background .12s}
+  .reduced .box svg,.reduced .idle-face .count{transition:opacity .12s linear}
+  .reduced .undo{transition:opacity .12s linear; transform:none}
+  .reduced .undo:not(.show){transform:none; display:none}
+  .reduced .flash.go{animation:flashR .2s linear}
+  @keyframes flashR{0%{opacity:0}40%{opacity:1}100%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){
+    .capsule{transition:width .12s linear,height .12s linear,border-radius .12s linear}
+  }
+
+  /* ===== 原型控制提示（非产品 UI，仅 demo 脚手架）===== */
+  .hint{
+    position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+    display:flex; gap:7px; align-items:center; flex-wrap:wrap; justify-content:center;
+    background:rgba(20,18,22,.5); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:9px 13px;
+    font-size:12px; color:rgba(255,255,255,.92); z-index:80; max-width:92vw;
+    box-shadow:0 6px 22px rgba(0,0,0,.22);
+  }
+  .hint b{font-weight:600}
+  .hint kbd{
+    font-family:inherit; font-size:11px; background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.2); border-bottom-width:2px; border-radius:6px;
+    padding:1px 6px; margin:0 1px;
+  }
+  .hint .sep{opacity:.4}
+  .hint .rm{cursor:pointer; padding:2px 8px; border-radius:7px; border:1px solid rgba(255,255,255,.22); user-select:none}
+  .hint .rm.on{background:var(--accent); color:#0a2b14; border-color:var(--accent); font-weight:600}
+  .tag{position:fixed; top:32px; right:14px; font-size:11px; color:rgba(255,255,255,.7); z-index:80;
+       background:rgba(20,18,22,.4); padding:3px 9px; border-radius:8px; backdrop-filter:blur(10px)}
+</style>
+</head>
+<body>
+<div class="desktop">
+  <div class="menubar">
+    <span class="left">⌘ todo-capsule</span>
+    <span>文件</span><span>编辑</span><span>视图</span>
+    <span class="right"><span>🔋</span><span>📶</span><span>14:32</span></span>
+  </div>
+  <div class="work-window" aria-hidden="true">
+    <div class="wbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+    <div class="wbody">
+      <div class="ln t"></div>
+      <div class="ln" style="width:92%"></div><div class="ln" style="width:86%"></div>
+      <div class="ln" style="width:94%"></div><div class="ln" style="width:70%"></div>
+      <div class="ln" style="width:88%"></div><div class="ln" style="width:60%"></div>
+    </div>
+  </div>
+
+  <!-- ===== 单一形变胶囊 ===== -->
+  <div class="capsule" id="capsule" data-state="idle" aria-label="待办胶囊">
+    <!-- idle 面 -->
+    <div class="idle-face" id="idleFace">
+      <span class="glyph" title="待办">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/>
+          <path d="M4 6l1 1 2-2" stroke="#34C75A"/><path d="M4 12l1 1 2-2"/><path d="M4 18l1 1 2-2"/>
+        </svg>
+      </span>
+      <span class="count" id="idleCount">0</span>
+    </div>
+
+    <!-- 展开面板 -->
+    <div class="panel" id="panel">
+      <div class="p-head">
+        <span class="ttl">待办</span><span class="n" id="headN">0</span>
+        <span class="spacer"></span><span class="hk">⌥Space 记一条</span>
+      </div>
+      <div class="capture-row" id="captureRow">
+        <span class="plus">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </span>
+        <input id="capInput" placeholder="记一条…" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="list-wrap">
+        <ul class="todos" id="todos"></ul>
+        <div class="empty" id="empty">
+          <div class="ring"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <div class="big">今日清零 ✓</div>
+          <div class="sub">敲 <b>⌥Space</b> 随手记一条<br/>鼠标移到这儿看清单</div>
+        </div>
+      </div>
+      <div class="flash" id="flash"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div class="undo" id="undo"><span id="undoTxt">已完成 1 条</span><span class="u-btn" id="undoBtn">撤销</span></div>
+    </div>
+  </div>
+
+  <div class="tag">Stage 1 高保真原型 · 非真软件</div>
+  <div class="hint">
+    <b>hover 胶囊</b>=展开看 <span class="sep">·</span>
+    <kbd>⌥</kbd>+<kbd>Space</kbd> 或 <kbd>/</kbd>=记一条 <span class="sep">·</span>
+    勾选框=完成 <span class="sep">·</span> 双击文字=改 <span class="sep">·</span> 拖拽=排序 <span class="sep">·</span>
+    <span class="rm" id="rmToggle">reduced-motion</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const capsule=document.getElementById('capsule');
+  const idleFace=document.getElementById('idleFace');
+  const panel=document.getElementById('panel');
+  const todosEl=document.getElementById('todos');
+  const emptyEl=document.getElementById('empty');
+  const capInput=document.getElementById('capInput');
+  const captureRow=document.getElementById('captureRow');
+  const idleCount=document.getElementById('idleCount');
+  const headN=document.getElementById('headN');
+  const flash=document.getElementById('flash');
+  const undo=document.getElementById('undo');
+  const undoTxt=document.getElementById('undoTxt');
+  const undoBtn=document.getElementById('undoBtn');
+  const rmToggle=document.getElementById('rmToggle');
+
+  let state='idle';            // idle | peek | capture
+  let pinned=false;            // 点击钉住
+  let dwellTimer=null, leaveTimer=null;
+  const DWELL=180, LEAVE=240, UNDO_MS=4000;
+
+  let todos=[
+    {id:1,text:'回复李工的方案评审'},
+    {id:2,text:'把周报草稿发出去'},
+    {id:3,text:'订下周三的会议室'},
+  ];
+  let nextId=4;
+  let undoStash=null, undoTimer=null;
+
+  /* ---------- 渲染 ---------- */
+  function checkSvg(){return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a2b14" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';}
+  function grabSvg(){return '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';}
+
+  function render(){
+    todosEl.innerHTML='';
+    todos.forEach(t=>{
+      const li=document.createElement('li');
+      li.className='todo'; li.dataset.id=t.id; li.draggable=true;
+      li.innerHTML=
+        '<span class="box" data-act="check">'+checkSvg()+'</span>'+
+        '<span class="txt" data-act="edit">'+escapeHtml(t.text)+'</span>'+
+        '<span class="grab" title="拖拽排序">'+grabSvg()+'</span>';
+      todosEl.appendChild(li);
+    });
+    updateCounts();
+    toggleEmpty();
+  }
+  function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+  function updateCounts(){
+    const n=todos.length;
+    idleCount.textContent=n; headN.textContent=n;
+    idleCount.classList.add('bump');
+    setTimeout(()=>idleCount.classList.remove('bump'),200);
+  }
+  function toggleEmpty(){
+    const isEmpty=todos.length===0;
+    emptyEl.classList.toggle('show',isEmpty);
+    // 自适应面板高度：空态较矮，否则按内容
+    const h = isEmpty ? 240 : Math.min(420, 150 + todos.length*44);
+    capsule.style.setProperty('--panel-h', h+'px');
+  }
+
+  /* ---------- 状态机 ---------- */
+  function setState(s){
+    state=s; capsule.dataset.state=s;
+    if(s==='idle'){pinned=false;}
+  }
+  function enterPeek(pin){
+    clearTimeout(leaveTimer);
+    if(pin) pinned=true;
+    if(state==='idle'){ toggleEmpty(); setState('peek'); }
+  }
+  function enterCapture(){
+    clearTimeout(leaveTimer);
+    toggleEmpty(); setState('capture');
+    requestAnimationFrame(()=>{ setTimeout(()=>capInput.focus(),60); });
+  }
+  function collapse(){
+    if(state==='capture' && document.activeElement===capInput && capInput.value.trim()){ return; }
+    capInput.value='';
+    setState('idle');
+  }
+
+  /* ---------- hover 去抖（D-003）---------- */
+  capsule.addEventListener('mouseenter',()=>{
+    clearTimeout(leaveTimer);
+    if(state==='idle'){
+      clearTimeout(dwellTimer);
+      dwellTimer=setTimeout(()=>{ if(state==='idle') enterPeek(false); },DWELL);
+    }
+  });
+  capsule.addEventListener('mouseleave',()=>{
+    clearTimeout(dwellTimer);
+    if(state==='peek' && !pinned){
+      leaveTimer=setTimeout(collapse,LEAVE);
+    }
+  });
+
+  /* 点击 idle 面 = 钉住展开看（D-003 兜底入口）；点击捕获行 = 进 capture 写 */
+  idleFace.addEventListener('click',()=>{ if(state==='idle'){ clearTimeout(dwellTimer); enterPeek(true);} });
+  captureRow.addEventListener('click',()=>{ if(state!=='capture') enterCapture(); else capInput.focus(); });
+
+  /* ---------- 全局热键写（D-002）：⌥Space / "/" ---------- */
+  window.addEventListener('keydown',(e)=>{
+    const typing = document.activeElement===capInput || (document.activeElement&&document.activeElement.classList.contains('txt'));
+    if((e.altKey && e.code==='Space') || (e.key==='/' && !typing)){
+      e.preventDefault(); enterCapture(); return;
+    }
+    if(e.key==='Escape'){
+      if(state==='capture'){ capInput.value=''; }
+      pinned=false; setState('idle');
+    }
+  });
+
+  /* 提交一条：Enter → 落库 + 一闪确认 + 缩回（D-002 / confirm 态）*/
+  capInput.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'){
+      const v=capInput.value.trim();
+      if(!v){ return; }
+      todos.unshift({id:nextId++,text:v});
+      capInput.value=''; render();
+      flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
+      // 一闪后缩回静止（"记完即离开视野"）
+      setTimeout(()=>{ if(state==='capture'){ setState('idle'); } },520);
+    }
+  });
+  capInput.addEventListener('blur',()=>{
+    setTimeout(()=>{ if(state==='capture' && !capInput.value.trim()) collapse(); },120);
+  });
+
+  /* ---------- 列表交互：完成 / 编辑 / 拖拽 ---------- */
+  todosEl.addEventListener('click',(e)=>{
+    const box=e.target.closest('[data-act="check"]');
+    if(box){ completeTodo(box.closest('.todo')); }
+  });
+  todosEl.addEventListener('dblclick',(e)=>{
+    const txt=e.target.closest('[data-act="edit"]');
+    if(txt){ startEdit(txt); }
+  });
+
+  function completeTodo(li){
+    const id=+li.dataset.id;
+    li.classList.add('done');
+    setTimeout(()=>{
+      li.classList.add('removing');
+      const idx=todos.findIndex(t=>t.id===id);
+      const item=todos[idx];
+      setTimeout(()=>{
+        todos=todos.filter(t=>t.id!==id);
+        render();
+        showUndo(item, idx);
+      },280);
+    },360);
+  }
+
+  function showUndo(item, idx){
+    clearTimeout(undoTimer);
+    undoStash={item,idx};
+    undoTxt.textContent='已完成「'+ (item.text.length>10?item.text.slice(0,10)+'…':item.text) +'」';
+    undo.classList.add('show');
+    undoTimer=setTimeout(()=>{ undo.classList.remove('show'); undoStash=null; },UNDO_MS);
+  }
+  undoBtn.addEventListener('click',()=>{
+    if(undoStash){
+      todos.splice(Math.min(undoStash.idx,todos.length),0,undoStash.item);
+      undoStash=null; undo.classList.remove('show'); render();
+    }
+  });
+
+  function startEdit(txt){
+    txt.contentEditable=true; txt.focus();
+    const r=document.createRange(); r.selectNodeContents(txt);
+    const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    const li=txt.closest('.todo'); const id=+li.dataset.id;
+    function done(){
+      txt.contentEditable=false;
+      const v=txt.textContent.trim();
+      const t=todos.find(t=>t.id===id);
+      if(t){ if(v){t.text=v;} render(); }
+      txt.removeEventListener('blur',done);
+    }
+    txt.addEventListener('blur',done);
+    txt.addEventListener('keydown',function k(ev){
+      if(ev.key==='Enter'){ev.preventDefault(); txt.blur();}
+      if(ev.key==='Escape'){txt.textContent=todos.find(t=>t.id===id).text; txt.blur();}
+    });
+  }
+
+  /* 拖拽排序（D-004 行排序）*/
+  let dragId=null;
+  todosEl.addEventListener('dragstart',(e)=>{
+    const li=e.target.closest('.todo'); if(!li) return;
+    dragId=+li.dataset.id; li.classList.add('dragging');
+  });
+  todosEl.addEventListener('dragend',(e)=>{
+    const li=e.target.closest('.todo'); if(li) li.classList.remove('dragging');
+    todosEl.querySelectorAll('.over').forEach(n=>n.classList.remove('over'));
+  });
+  todosEl.addEventListener('dragover',(e)=>{
+    e.preventDefault();
+    const li=e.target.closest('.todo'); if(!li||+li.dataset.id===dragId) return;
+    todosEl.querySelectorAll('.over').forEach(n=>n.classList.remove('over'));
+    li.classList.add('over');
+  });
+  todosEl.addEventListener('drop',(e)=>{
+    e.preventDefault();
+    const li=e.target.closest('.todo'); if(!li) return;
+    const targetId=+li.dataset.id;
+    const from=todos.findIndex(t=>t.id===dragId);
+    const to=todos.findIndex(t=>t.id===targetId);
+    if(from<0||to<0) return;
+    const [m]=todos.splice(from,1); todos.splice(to,0,m);
+    render();
+  });
+
+  /* reduced-motion 切换 */
+  rmToggle.addEventListener('click',()=>{
+    document.documentElement.classList.toggle('reduced');
+    rmToggle.classList.toggle('on');
+  });
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    document.documentElement.classList.add('reduced'); rmToggle.classList.add('on');
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

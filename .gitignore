@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+*.dmg
+*.zip
+
+# SwiftPM / Xcode
+.build/
+code/.build/
+DerivedData/
+*.xcuserdata/
+*.xcuserstate
+
+# Local app bundles and packaging output
+*.app/
+code/TodoCapsule.app/
+
+# Local reports and temporary artifacts
+agent-report-*.html
+progress.html
+
+# Node dependencies, if temporary tooling is added locally
+node_modules/
+code/**/node_modules/

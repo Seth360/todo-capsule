@@ -1,0 +1,57 @@
+# Todo Capsule
+
+Todo Capsule 是一个 macOS 桌面边缘待办胶囊。它用 SwiftUI + AppKit `NSPanel` 实现，常驻屏幕边缘，无 Dock 图标，适合工作时快速记一条、扫一眼、勾掉。
+
+## 功能
+
+- 全局热键快速记录待办
+- 小窗一瞥、输入态、大窗面板三种主要工作形态
+- 清单、标签、收藏夹、回收箱
+- 行内编辑、拖拽排序、置顶、撤销
+- 亮色/暗色/跟随系统主题
+- AI 总结配置与导出设置
+- 本地 JSON 持久化
+
+## 运行
+
+```bash
+cd code
+swift run
+```
+
+要求 macOS 14+，并安装 Xcode 或 Command Line Tools。
+
+## 打包
+
+```bash
+cd code
+./build-app.sh
+open ./TodoCapsule.app
+```
+
+生成 DMG：
+
+```bash
+cd code
+./package-dmg.sh
+```
+
+## 数据位置
+
+运行数据保存在：
+
+```text
+~/Library/Application Support/todo-capsule/
+```
+
+## 项目结构
+
+```text
+code/
+  Package.swift
+  Sources/TodoCapsule/   # SwiftUI + AppKit app
+  Resources/             # Info.plist, icon
+docs/                    # 产品、研究和工程文档
+```
+
+更多开发细节见 `code/README.md`。

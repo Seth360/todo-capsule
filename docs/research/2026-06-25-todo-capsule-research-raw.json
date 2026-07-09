@@ -1,0 +1,873 @@
+{
+  "date": "unknown-date",
+  "competitive": [
+    {
+      "app": "Things 3 (Cultured Code)",
+      "platform": "macOS / iPadOS / iOS / visionOS (native Apple-platform suite; Mac is most relevant for a desktop edge-capsule)",
+      "quick_capture": "Two-tier capture, both engineered to require near-zero context switch:\n\n1. MAC GLOBAL QUICK ENTRY (the gold standard for a desktop capsule): global hotkey Ctrl+Space pops a small floating pop-over over whatever app you're in. You type a title, hit Enter, it files to Inbox, pop-over dismisses, you're back in your prior app. Variant Ctrl+Opt+Space = \"Quick Entry with Autofill\": grabs a link/reference from the foreground app (optimized for Mail/Safari/Finder) and auto-pastes it into the new to-do's notes. The whole loop is 'invoke -> type -> Enter -> gone' with no window management. (culturedcode.com/things/support/articles/2249437)\n\n2. IN-APP MAGIC PLUS: a single floating '+' button (default bottom-right). Tap = new to-do at top of current list; the title field is immediately focused so you just start typing. No form, no required fields — only a name is needed before it's 'ready to go'. (culturedcode.com support 2803582)\n\nFriction level: extremely low. No mandatory metadata, no project picker, no save dialog. Scheduling/tags are OPTIONAL and added via keyboard 'type travel' inside the to-do (e.g. open When popover, type 'tues 8am' or 'in 5 weeks' and natural-language parser resolves the date — supports EN/DE/FR/IT/ES/RU/ZH/JA). Capture and organize are deliberately separated: you dump fast into Inbox, triage later.",
+      "core_model": "\"Capture now, organize later\" GTD funnel expressed as a single vertical spine of time-based lists, NOT folders. The IA top-to-bottom: Inbox (unprocessed staging) -> Today (what you'll start before day ends = your priorities) -> Upcoming (timeline of future start-dates/deadlines) -> Anytime (no blockers, do whenever) -> Someday (maybe later, hidden from Anytime/Upcoming). The key conceptual trick: a 'start date' means 'the day I'll begin', not a calendar appointment — so the system answers 'what should I work on' rather than 'what's on my calendar'. Areas/Projects exist for grouping but are secondary; the time-based lists are the primary lens. The mental model is paper: opening a to-do 'transforms into a clear white piece of paper', details tucked in a corner until needed. (culturedcode.com support 4001304)",
+      "standout_interactions": [
+        "Magic Plus button is draggable and context-sensitive: drop it mid-list to insert at that exact position; drag onto Inbox target (bottom-left) to file there from anywhere; in Upcoming, drop it ON a specific day to assign that start date in one gesture; drag in sidebar to create a Project inside an Area. One control, multiple intents resolved by drop target.",
+        "Open-to-card transition: tapping a to-do makes it 'pop out into a card-like form while the rest of the list fades into the background' — depth + focus, reinforcing the paper metaphor.",
+        "Haptics designed-in (Taptic Engine): distinct feedback when picking up a task to drag, when interacting with Magic Plus, and when pull-to-search — makes interactions 'feel real'.",
+        "Swipe vocabulary: swipe right = open When/reschedule popover; swipe left = enter multi-select; swipe up/down on the selection circles = bulk select/deselect ranges. Long-press = task 'pops out of the list' to drag/reorder without a mode switch.",
+        "Magnetic micro-interactions: clickable elements subtly highlight and enlarge on approach/hover, giving a tactile, alive feel.",
+        "Type-travel scheduling: inside When/Deadline popovers you type natural language ('tomorrow', 'tues 8am', 'in 35 days') and it resolves instantly — no date-picker scrolling.",
+        "Satisfying completion: tap the checkbox to mark done; interactive Home Screen widgets even let you complete without opening the app."
+      ],
+      "complexity_traps": [
+        "GTD-complete IA (5 system lists + Areas + Projects + Headings + repeating to-dos + deadlines vs start-dates) — powerful but heavy; a capsule should not import the whole funnel.",
+        "Project/Area hierarchy and the sidebar tree — organizational overhead that pulls toward 'manager of lists' rather than 'quick jotter'.",
+        "This Evening sub-section, deadlines distinct from start dates, repeating rules — nuanced scheduling semantics most lightweight users never need.",
+        "Multi-select bulk operations, tags taxonomy, headings within projects — power-user surface area.",
+        "Natural-language parser across 8 languages is delightful but expensive to build; a capsule can ship a tiny subset (today/tomorrow/+Nd) and still feel smart.",
+        "Cross-device sync (Things Cloud) and platform-specific gesture sets — scope creep for a single-surface desktop widget."
+      ],
+      "adopt_for_capsule": [
+        "Mirror the Mac Quick Entry loop as the capsule's soul: hover/hotkey -> single focused text field -> Enter files it -> auto-collapse back to capsule. Capture must never require choosing a list, date, or project.",
+        "Separate capture from organize: everything lands in one default bucket (an Inbox/'unsorted') so the write path stays one keystroke; triage is a separate, optional moment.",
+        "Only a name is required — make every other field optional and keyboard-reachable, never a blocking form.",
+        "Steal 'Today vs everything else' as the minimal IA: a flat list with at most a 'Today' filter, not the full 5-list spine. Hover-expand shows Today; one tap reveals the rest.",
+        "Optional type-travel for dates: let users append 'tomorrow'/'+3d' inline and parse it, but never force a picker.",
+        "Bake in tactile feedback: a small spring/scale on the capsule hover-expand, a satisfying checkbox completion animation, subtle haptics if trackpad supports it — 'magnetic highlight on hover' translates directly to a capsule that grows on approach.",
+        "Paper/card metaphor for the expanded panel: clean white surface, generous whitespace, details hidden until needed — the capsule collapsed = pen tip, expanded = sheet of paper.",
+        "Context-aware capture (the Autofill idea): optionally grab the foreground app/URL as a reference on the new item — a low-cost 'magic' touch for a desktop-resident tool."
+      ],
+      "lightweight_traits": [
+        "No required fields — a to-do is valid with just a title.",
+        "Single floating '+' as the only persistent capture affordance.",
+        "Generous whitespace, custom type for clarity, minimal-but-informative icons — restraint over density.",
+        "Details progressively disclosed: metadata 'tucked away in the corner until you need it'.",
+        "Optional scheduling — Clear button drops a task back to Anytime (no date), so dates are never mandatory.",
+        "Gestures replace chrome: swipe/long-press do the work instead of visible buttons and menus."
+      ],
+      "sources": [
+        "https://culturedcode.com/things/support/articles/2249437/ — Quick Entry on Mac (Ctrl+Space, Autofill Ctrl+Opt+Space)",
+        "https://culturedcode.com/things/support/articles/2803582/ — Using Gestures / Magic Plus button behaviors",
+        "https://culturedcode.com/things/support/articles/4001304/ — Today/Upcoming/Anytime/Someday IA",
+        "https://culturedcode.com/things/support/articles/9780167/ + blog/2017/07/things-3-1 — natural language date parsing (8 languages)",
+        "https://www.macstories.net/reviews/things-3-beauty-and-delight-in-a-task-manager/ — animations, haptics, card transition, swipe vocabulary",
+        "https://curtismchale.ca/2020/10/26/magic-button-things-3/ — Magic Plus drag-to-context behaviors",
+        "https://culturedcode.com/things/blog/2023/09/things-big-and-small/ — design philosophy (whitespace, paper metaphor, purposeful transitions)"
+      ]
+    },
+    {
+      "app": "Todoist",
+      "platform": "Desktop (macOS/Windows native app + web), with iOS/Android parity",
+      "quick_capture": "Single-field \"one-sentence\" capture, zero modal-stepping. The entire task — title, date, time, project, label, priority, assignee, reminder — is typed as one natural-language string into a single input, and a real-time parser strips out the metadata. Trigger symbols are the spine: `#project`, `@label`, `+assignee`, `!reminder` (e.g. !14:00, !30 min before), `/section`, and bare `p1`–`p4` for priority (no symbol). Dates are pure natural language: \"tomorrow at 4pm\", \"every other Tuesday starting Mar 3\", \"submit invoice Friday\", \"{march 30}\" for a deadline. As you type, recognized tokens get highlighted/underlined inline and lifted out of the title; typing `#` or `@` or `+` pops an autocomplete dropdown of matching projects/labels/people so you never type a full name. Friction level: near-zero — type one line, press Enter, done. Critically there is a DESKTOP GLOBAL SHORTCUT: a system-wide hotkey (customizable in Settings > Desktop > Quick Add global shortcut) opens a small floating Quick Add window from ANY app even when Todoist is minimized; type, Enter, and the window dismisses back to wherever you were. This is the exact \"capture without context-switch\" behavior an edge capsule wants. Recovery from misparse is one click: tap any highlighted/underlined token to convert it back to plain text so it stays in the title instead of becoming metadata.",
+      "core_model": "\"Type a sentence, get a structured task.\" Single text field that is secretly a parser; tasks organized by Project/Section, cross-cut by Labels, ranked p1-p4, surfaced by date in Today/Upcoming/Inbox. Inbox is the frictionless default — capture now, file later (or never).",
+      "standout_interactions": [
+        "Live token highlighting: date/priority/project words underline or pill-ify in real time AS you type, giving instant confidence the parse is right before you hit Enter",
+        "Click-to-deselect a parsed token: tap a highlighted word to demote it back to plain title text — instant, reversible misparse recovery with no menu",
+        "Symbol-triggered autocomplete dropdown: `#`/`@`/`+` instantly opens a filtered fuzzy-search list of projects/labels/people, so a full name is 2-3 keystrokes",
+        "Global hotkey floating window: appears over any app, dismisses on Enter/Esc back to prior focus — the capture surface comes to you, you never travel to the app",
+        "Inbox sound / subtle confirmation on add, reinforcing 'it's captured, forget it'",
+        "Color-coded priority feedback: p1 red, p2 orange, p3 blue render their color the moment the token is recognized"
+      ],
+      "complexity_traps": [
+        "Karma/streaks/gamification system — motivation theater, pure bloat for a lightweight capsule",
+        "Deep project/sub-project/section nesting hierarchy — heavy organizational overhead that contradicts 'capture fast'",
+        "Filters & saved queries with a query language — power-user surface area that 95% never touch",
+        "Collaboration layer (assignees, comments, shared projects, activity log) — irrelevant to a personal edge capsule",
+        "Boards/Kanban view, calendar layout toggles — multiple competing view paradigms add weight",
+        "Templates, reminders-as-paid-tier gating, integrations marketplace — feature sprawl that dilutes the core capture loop",
+        "Settings sprawl: customizable Quick Add field actions, productivity reports — configuration burden"
+      ],
+      "adopt_for_capsule": [
+        "Single-field NLP capture: one text line parsed into structured task — this IS the capsule's hover-to-write surface; keep the parser, ship a tiny symbol set (#, !, p1-3) and natural dates only",
+        "The global/edge-summon model: Todoist's global shortcut == our always-resident capsule; capture comes to the user with zero app-switch, Enter commits and it recedes",
+        "Live inline highlighting of recognized tokens — cheap, beautiful, and gives parse-confidence; pair with click-to-undo a token (the single best low-cost trust mechanism)",
+        "Symbol-triggered autocomplete dropdown on # / @ — fast fuzzy pick instead of typing full names",
+        "Inbox-as-default: capture lands in one frictionless bucket, organization is optional and deferred — matches 'simple, not bloated'",
+        "Esc-to-dismiss / Enter-to-commit-and-recede as the only two exits from the write state — minimal modal surface"
+      ],
+      "lightweight_traits": [
+        "Capture is one keystroke (global hotkey) + one line + Enter — no fields, no steps",
+        "No mandatory filing: Inbox absorbs everything, structure is opt-in",
+        "Metadata via terse symbols means hands never leave the keyboard",
+        "Parser does the work silently; UI stays a plain text box visually until tokens light up",
+        "Floating quick-add window is small and ephemeral — appears, captures, vanishes"
+      ],
+      "sources": [
+        "https://www.todoist.com/help/articles/use-task-quick-add-in-todoist-va4Lhpzz",
+        "https://www.todoist.com/help/articles/customize-quick-add-in-todoist-eqRRlZJNN",
+        "https://www.todoist.com/help/articles/use-keyboard-shortcuts-in-todoist-Wyovn2",
+        "https://calmevo.com/todoist-natural-language-input-guide/",
+        "https://thesweetsetup.com/using-natural-language-with-todoist/",
+        "https://www.todoist.com/inspiration/add-tasks-todoist"
+      ]
+    },
+    {
+      "app": "TickTick",
+      "platform": "Cross-platform (iOS, Android, macOS, Windows, Web, browser extension, widgets, watch); freemium with Premium tier",
+      "quick_capture": "(see quick_capture field)",
+      "core_model": "(see core_model field)",
+      "standout_interactions": [
+        "Inline NLP token highlighting: date/priority/tag/list tokens light up (blue) as you type in Quick Add, with tap-to-revert on any highlighted token — instant visible feedback that the parse worked, plus a one-tap undo.",
+        "Fully customizable swipe actions with FOUR distinct gestures per row: Short-Swipe-Right, Long-Swipe-Right, Short-Swipe-Left, Long-Swipe-Left, each bindable to Complete / Due Date / Priority / Move-to / Delete / None. The short-vs-long swipe distinction packs 4 actions into 2 directions.",
+        "Checkbox tap = complete with reversible undo (Show Completed keeps it recoverable) — low-stakes, satisfying, animated tick.",
+        "Progress on a single task: long-press the task's time, a status bar appears, swipe left/right to set % complete — granular without a separate screen.",
+        "Today screen as a calm focused surface (TidBITS: 'focused daily task list') — the default is intentionally narrow."
+      ],
+      "complexity_traps": [
+        "Habit tracker — a whole separate sub-app with streaks/calendars; orthogonal to to-dos, adds a second mental model.",
+        "Pomodoro / Focus timer with white-noise soundscapes and focus statistics — scope creep into a focus app.",
+        "Built-in Calendar with month/week/agenda views + external calendar sync — heavyweight; competes with real calendar apps.",
+        "Kanban board view and Timeline/Gantt view per list — power-user PM features that bloat a lightweight todo.",
+        "Eisenhower Matrix (4-quadrant) view — yet another visualization mode.",
+        "Statistics / Achievement score / 'productivity' gamification — vanity metrics.",
+        "Advanced filtering with AND/OR boolean query builder — powerful but a configuration rabbit hole most users never touch.",
+        "Collaboration: shared lists, @assignee, comments — multiplayer surface area irrelevant to a personal capsule.",
+        "Five+ list types, folders, sub-tasks, custom smart lists — the org taxonomy itself becomes a chore to maintain."
+      ],
+      "adopt_for_capsule": [
+        "Single-line Quick Add with inline NLP date parsing as the ONE primary input — for a hover-expand capsule this is perfect: type one line, get back to work. No fields, no modal.",
+        "Blue-highlight-token + tap-to-revert pattern: gives the user trust+control over the parser in zero extra UI; ideal for a tiny surface where you can't afford a date picker.",
+        "Inbox-as-default-destination: capture never forces categorization. The capsule should accept any text and file it to one default bucket; organizing is a separate, optional moment.",
+        "Scope NLP to capture only (not edit) — keeps the parser from fighting inline edits, a clean way to bound complexity.",
+        "Reversible completion (tap-to-check with undo) — keep the satisfying tick + easy un-check, since a glanceable capsule needs forgiving interactions.",
+        "One calm default view (Today/focused list) with everything else hidden behind progressive disclosure — directly maps to 'collapsed capsule shows minimal, hover/expand reveals more'.",
+        "Optional short-vs-long gesture to pack a couple of actions (complete, snooze/defer) into the small expanded panel without buttons cluttering it."
+      ],
+      "lightweight_traits": [
+        "Default view is intentionally narrow (Today / focused daily list) — depth is hidden, not absent.",
+        "Capture has zero required fields; Inbox absorbs everything so the user never blocks on categorization.",
+        "Smart Date Parsing deliberately limited to Quick Add only — a conscious scope cut to protect speed.",
+        "Same task surfaces across many filtered views from one flat stream — viewing complexity without storage complexity.",
+        "Glanceable checkbox interactions with easy reversal — forgiving, low-stakes."
+      ],
+      "sources": [
+        "https://help.ticktick.com/articles/7081924556310446080",
+        "https://curtismchale.ca/2020/08/10/ticktick-quick-add-syntax/",
+        "https://help.ticktick.com/articles/7055782422935240704",
+        "https://support.ticktick.com/hc/en-us/articles/360016273812-Smart-Date-Parsing",
+        "https://help.ticktick.com/articles/7055782240994721792",
+        "https://help.ticktick.com/articles/7055782283059396608",
+        "https://support.ticktick.com/hc/en-us/articles/360011475052-Swipe-for-quick-actions",
+        "https://tidbits.com/2025/08/14/ticktick-provides-a-focused-daily-task-list-and-more/",
+        "https://www.androidpolice.com/ticktick-to-keep-day-on-track/",
+        "https://productivityendeavor.com/mastering-productivity-with-ticktick-and-getting-things-done-gtd/",
+        "https://upbase.io/blog/ticktick-review/",
+        "https://work-management.org/to-do-list/ticktick-review/"
+      ]
+    },
+    {
+      "app": "Superlist",
+      "platform": "Cross-platform (macOS/Windows/Linux desktop, iOS/Android, web) — desktop native feel is the relevant reference",
+      "quick_capture": "Multiple low-friction entry points, all designed to capture-before-organize (items land in Inbox/Today, you sort later). Desktop: (1) Global keyboard-driven creation — Cmd+N creates a new task instantly in Inbox/Today; Cmd+K opens a quick-command palette; Cmd+Return opens task detail while creating. (2) Inline hover-add: hovering between rows in a populated list reveals a thin grey insertion line; clicking it drops a new editable task exactly at that position (no modal, no navigation away). (3) Natural-language parsing inside the single text field — type the title plus 'next Thursday', '@person', '#label' and it auto-extracts due date / assignee / label, so one typed line = a fully structured task with zero extra clicks. (4) Voice 'Talk' capture (long-press +, iOS Action Button even when locked, lock-screen widget) transcribes speech and AI-parses it into task/note/list. Friction level: near-zero — the design goal is the thought never has to leave the keyboard or wait for a form.",
+      "core_model": "A flat capture-first inbox with progressive organization. Primitives are few and interchangeable (task/subtask/note/list); a list is just an ordered, drag-reorderable stream. Inbox/Today are the dump zones, organization happens later. The model optimizes capture speed and a calm single view over taxonomy.",
+      "standout_interactions": [
+        "Completion as a reward: a satisfying tactile/audio 'tick' sound on marking complete (Cmd+D) — the check is treated as a delightful moment, not a state change",
+        "Hand-drawn 'squiggle' / doodle custom dividers instead of plain 1px lines — gives lists hand-made warmth and personality while still organizing content",
+        "Hover-reveal grey insertion line between rows — affordance appears only on hover, keeping the resting state clean but making add-anywhere instantly discoverable",
+        "Reorder animation: neighboring rows animate aside (~100ms eased) to open a gap as you drag, with the dragged row lifted via subtle shadow/scale — fluid spring-like make-space motion",
+        "Smooth view/state transitions ('Task to List switch', reveal interactions) rather than hard cuts — surfaces morph rather than swap",
+        "Loading line-path animation and typing-style onboarding motion — motion is used as personality, not just feedback",
+        "Real-time voice waveform/transcription during Talk capture — capture feels alive and confirms it heard you"
+      ],
+      "complexity_traps": [
+        "Multi-surface sprawl: Inbox + Today + Updates + Tasks + Lists + collaboration feeds is a lot of navigation for a single-user edge capsule — a hover capsule needs ONE stream, not five destinations",
+        "Real-time collaboration / invite-member / assignee / updates-feed machinery — pure team-tool weight; irrelevant and heavy for a personal capsule",
+        "AI voice assistant (Talk) with transcription pipeline — high infra cost and a separate modality; tempting but bloat for a hover-to-type capsule",
+        "Custom wallpapers / nature backgrounds / heavy theming — charming but scope creep against 'absolutely not bloated'",
+        "Full natural-language parser (@/#/date NLP) — nice but a real engineering rabbit hole; only worth it if dead simple",
+        "Notes-as-rich-documents + task/list/note interchangeability — adds editor complexity that fights minimalism"
+      ],
+      "adopt_for_capsule": [
+        "Hover-reveal thin insertion line as the primary add affordance — maps perfectly to 'hover expands the capsule, then add inline at the exact spot'; clean resting state, add-anywhere on hover",
+        "Single-field capture with optional inline NLP (at minimum 'today'/date keyword detection) so one typed line becomes a structured todo without a form",
+        "Capture-first, triage-later model: everything you type drops into one flat Inbox stream; no folder decision at capture time",
+        "Make completion a rewarding micro-moment: a crisp check animation plus an optional subtle sound — the single highest-leverage 'feels good' detail and cheap to build",
+        "~100ms eased make-space reorder: neighbors slide to open a gap, dragged row lifts with shadow/slight scale — the core drag delight",
+        "Keyboard-first ergonomics: a global hotkey to summon the capsule + instant Cmd+N-style new-row + Cmd+D-style complete, so power users never touch the mouse",
+        "Hand-drawn / doodle divider as a cheap personality signature that keeps it warm without adding UI weight",
+        "Motion as identity not decoration: smooth morphs for expand/collapse of the capsule rather than instant show/hide — this is where 'lightweight but premium' is won"
+      ],
+      "lightweight_traits": [
+        "Praised repeatedly for resisting feature bloat — 'meaningful utility wrapped in a delightfully simple package'",
+        "Single-key destinations and minimal chrome; resting UI is calm and uncluttered, affordances appear on hover",
+        "Capture flow optimized so a thought is logged in one action/keystroke before it vanishes",
+        "Flat list-of-tasks primitive rather than deep project/folder hierarchy",
+        "Delight comes from micro-interactions (sound, squiggles, smooth motion) not from feature count"
+      ],
+      "sources": [
+        "https://help.superlist.com/en/articles/10059-keyboard-shortcuts",
+        "https://60fps.design/apps/superlist",
+        "https://www.superlist.com/updates/quickly-add-new-tasks-in-lists",
+        "https://www.superlist.com/blog/never-lose-any-thought-quickly-capture-ideas-with-talk",
+        "https://www.superlist.com/updates/custom-dividers",
+        "https://efficient.app/apps/superlist",
+        "https://max-productive.ai/ai-tools/superlist/",
+        "https://www.superlist.com/updates/quickly-add-new-tasks-in-lists"
+      ]
+    },
+    {
+      "app": "Amie + Notion Calendar (paired study)",
+      "platform": "Amie: macOS/iOS native (Mac menu-bar + mobile, heavy native motion/haptics). Notion Calendar: macOS/Windows/web/iOS/Android, menu-bar + command-bar driven.",
+      "quick_capture": "Two distinct quick-capture philosophies worth contrasting for an edge capsule:\n\nAMIE — capture-as-object-then-place. You create a todo as a first-class card (it lives in an unscheduled \"todos\" rail, not buried in a list), then DRAG it onto the timeline to give it a time + duration. Scheduling and capturing are decoupled: you can dump a task in 1 second with zero time decision, and only later drag-to-time-block. Mobile uses press-and-hold + drag with continuous haptic feedback so the card \"feels held.\" Friction: very low to capture (just type a title), and the act of scheduling is a physical gesture rather than a form. Reviewers single out \"dragging unscheduled tasks into the calendar\" and \"turning notes into follow-ups\" as the signature flow.\n\nNOTION CALENDAR — capture-as-keystroke. The capsule equivalent is its always-resident menu-bar window opened by a GLOBAL shortcut (Ctrl+⌘+K) that works even when the app is backgrounded / you're in another app. The universal command bar (⌘K) accepts natural language (\"Meet with…\", \"Create event…\") so a single typed line becomes an event — no fields, no mouse. To-do checkboxes are one keystroke (type `[]`+space, or `/todo`). Friction: near-zero for keyboard users; the global hotkey is the key trait — capture without leaving your current context, exactly the \"summon from anywhere\" behavior an edge capsule wants.\n\nCombined lesson for the capsule: support BOTH a 1-keystroke summon (Notion's global hotkey → type → done) AND a frictionless \"just title it now, place it later\" object model (Amie's unscheduled rail), so capture never forces a scheduling decision.",
+      "core_model": "Tasks are first-class citizens that occupy the SAME surface as time, not a separate list bolted onto a calendar. Amie blurs the line: a todo and an event are the same primitive — a todo simply hasn't been given a time/duration yet; dragging it onto the timeline \"promotes\" it into a time block (\"connecting events to bigger goals\"). Notion Calendar does the inverse fusion: database items / deadlines render inline alongside events and are drag-edited without leaving the calendar. The shared mental model: ONE timeline is the source of truth; an unscheduled task is just a block without coordinates. For the capsule this means: the list and the (eventual) schedule are the same data, and \"scheduling\" is an optional, reversible gesture, not a mode switch.",
+      "standout_interactions": [
+        "Amie drag-to-schedule: pick up an unscheduled todo and drop it on the timeline to set start+duration in one continuous gesture; the block resizes live as you drag its edges (time-blocking without a form).",
+        "Amie continuous haptics: press-hold-drag of a card emits Taptic feedback so it 'feels like holding a small calendar in your hand' — reviewers explicitly call the haptics 'amazing'. Motion is described as 'lively', 'fluid', 'smooth', 'purposeful' rather than flashy.",
+        "Amie context-morphing bottom bar: the nav bar's actions change based on what you're doing (e.g. a 'Record Meeting' action appears right after task creation) — affordances surface exactly when relevant instead of cluttering a static toolbar.",
+        "Amie onboarding app-icon picker: you choose your app icon during setup — an uncommon 'ownership' delight moment before you've even used the product.",
+        "Amie view morphing: smooth animated transition between a daily vertical timeline and a gridded weekly view; date-picking is animated, not a jump-cut.",
+        "Notion Calendar global summon: Ctrl+⌘+K pops a compact menu-bar window from anywhere showing upcoming events + database entries in order, with join-meeting/links inline — instant, no app focus-switch.",
+        "Notion Calendar natural-language command bar (⌘K): type a sentence, get an event; keyboard-first, mouse-optional, with `?` revealing the full shortcut sheet.",
+        "Notion Calendar inline drag-edit of database items directly on the calendar grid — editing a 'task' is just nudging a block."
+      ],
+      "complexity_traps": [
+        "Email + AI note-taker + meeting recording/transcription (Amie has pivoted toward 'AI Note Taker' / record-meeting). This is the obesity risk Amie's own founder warned about ('products die from obesity rather than starvation') — a capsule must NOT absorb email, transcription, or AI summarization.",
+        "Full calendar surface (week grid, month, multi-calendar merge, free-slot sharing, RSVP, Zoom creation). Notion Calendar's power-user feature density (12 languages, conferencing filters, participant management) is the opposite of a lightweight capsule.",
+        "Database/relations modeling (Notion's DB-item-as-event). Powerful but heavy; an edge capsule should store flat todos, not a queryable database with properties/filters/views.",
+        "Deep settings surfaces (menu-bar event-count filters, appearance toggles+previews, system-wide shortcut remapping). Useful at scale, but each toggle is weight; ship opinionated defaults.",
+        "Treating scheduling as mandatory. The trap is forcing a time on every capture; both apps avoid it (Amie's unscheduled rail), and the capsule must too.",
+        "Multi-account / calendar-merge sync plumbing — large surface, not needed for a personal quick-todo capsule."
+      ],
+      "adopt_for_capsule": [
+        "Global summon hotkey that works app-unfocused (Notion's Ctrl+⌘+K) → for the capsule: a hotkey or hover that expands the edge capsule from anywhere, type a line, collapse. This is the single most transferable pattern.",
+        "Unscheduled-first object model (Amie): capture a bare title instantly; never force a time. 'Place it later' via optional drag is a separate, reversible step — keeps the hover-write flow to one field.",
+        "Natural-language single-line entry (Notion ⌘K): one text input parses title (+ optional time later) instead of a multi-field form.",
+        "Continuous, restrained haptics/micro-motion on the core gesture (Amie): the expand/collapse of the capsule and the add-todo confirm should have one tasteful spring + (on supported HW) a single subtle tap — 'purposeful, not flashy'. Avoid confetti-everywhere; reserve celebration for genuine completion.",
+        "Context-morphing minimal chrome (Amie bottom bar): the collapsed capsule shows almost nothing; relevant actions appear only on hover/expand — affordances on demand, not a permanent toolbar.",
+        "Component-first build discipline + ruthless feature stack-ranking (Amie founder): start from a tiny component set, and gate every addition against 'does this add obesity?' — codify a hard no-list (no email, no DB, no AI).",
+        "One-keystroke todo checkbox (Notion `[]`+space) and `?`-to-reveal-shortcuts: keep the keyboard path first-class even in a hover UI.",
+        "Animated daily↔weekly / collapsed↔expanded transitions (Amie): the capsule's expand should be a smooth spring reveal of the list, not an instant pop — the motion IS the delight."
+      ],
+      "lightweight_traits": [
+        "Capture decoupled from scheduling — drop a title in ~1s with no time decision (Amie unscheduled rail).",
+        "Always-resident, summonable surface that stays out of the way until called (Notion menu-bar window; Amie's compact native presence) — the Granola-style 'ambient, lightweight' feel.",
+        "Keyboard-first single-line entry; mouse optional.",
+        "Opinionated minimal chrome — 'see your schedule at a glance', glanceable, low cognitive load.",
+        "Native motion/haptics that make a tiny surface feel premium without adding features.",
+        "Todos and time on one surface so there's no app/mode switching to plan."
+      ],
+      "sources": [
+        "https://screensdesign.com/showcase/amie-todos-calendar",
+        "https://amie.so/",
+        "https://amie.so/stories/design",
+        "https://ellieplanner.com/comparisons/amie-calendar-review",
+        "https://www.producthunt.com/products/amie-2",
+        "https://efficient.app/apps/amie",
+        "https://www.notion.com/help/notion-calendar-keyboard-shortcuts",
+        "https://www.notion.com/help/notion-calendar-settings",
+        "https://www.notion.com/product/calendar",
+        "https://efficient.app/apps/notion-calendar"
+      ]
+    },
+    {
+      "app": "TeuxDeux + Tot (paired study: TeuxDeux = date-list todo; Tot = menu-bar plain-text scratchpad)",
+      "platform": "TeuxDeux: web + iOS/Android (PWA). Tot: macOS menu-bar/Dock + iOS/iPadOS/watchOS. Tot is the closest reference for our menu-bar/edge always-resident pattern.",
+      "quick_capture": "Tot = the gold standard for an edge/menu-bar capsule: click icon -> panel drops with cursor already in the field -> type -> done (autosave + iCloud, no save/title/new-note step). `tot://` URL scheme appends timestamped lines headless. Only decision is which of 7 dots (active is preselected). TeuxDeux: inline 'click empty line under a day, type, Enter' — the list is the input, markdown renders inline; slightly more friction because you pick a day-column in a full-window app rather than an ambient panel.",
+      "core_model": "TeuxDeux: time-axis paper calendar with auto-rollover and undated 'Someday' lists; no projects/tags/priorities. Tot: 7 fixed flat color buffers, no hierarchy or filing — the small fixed count is the feature. For our capsule: fuse Tot's instant ambient buffer with TeuxDeux's date+rollover as the ONLY structure, nothing else.",
+      "standout_interactions": [
+        "Tot dot fill-state as content indicator: the active dot renders as a SOLID filled circle, inactive dots as colored outlines/rings; an empty dot shows NO outline at all — and whitespace doesn't count as content. So at a glance the row of dots tells you which buffers have real text. This is a brilliant zero-chrome status display we should steal for the capsule (e.g. capsule shows a filled vs hollow indicator when there are open todos).",
+        "Tot swipe-between-dots with proportional haptics: swiping from dot 1 to dot 4 makes the intermediate dots visually 'fly by' with one haptic tap PER dot passed (3 taps for 1->4). Motion + haptics encode distance traveled — the animation is informative, not decorative.",
+        "Tot Dock/menu-bar icon recolors to match the currently active dot's color, and auto-adapts to system light/dark. The launcher itself is a live status surface — the chrome reflects state.",
+        "Per-document (not global) toolbar + format toggle: each dot independently remembers Markdown-vs-richtext and whether the word/char-count toolbar is shown; persists across force-quit. Settings are spatially local, so config never becomes a global preferences screen.",
+        "TeuxDeux drag-and-drop as the core scheduling verb: you drag an item from a 'Someday' list onto a day-column to schedule it, and drag between days to reschedule. Time-management is direct manipulation, not a date-picker dialog.",
+        "TeuxDeux automatic overnight rollover: unchecked items silently move to today, so the list is self-maintaining and you never face a date-picker or 'snooze' UI — the passage of time does the work.",
+        "TeuxDeux inline Markdown: typing markdown in a line renders formatting live, so there's no formatting toolbar — the text field is the only surface.",
+        "Strike-through completion: checking an item strikes it through in place rather than removing it, preserving the satisfying paper-checklist feel before it rolls/clears."
+      ],
+      "complexity_traps": [
+        "Due dates / deadlines (TeuxDeux deliberately OMITS these — argues a due date marks a deadline, not the work, and breeds anxiety; they rely on day-placement + rollover instead).",
+        "Subtasks / nesting (omitted — their guidance: if a task needs subtasks it should become its own list, never nested checkboxes).",
+        "Per-item notes / rich detail screens (omitted — 'if it needs notes it belongs in a project tool'). No item ever opens a detail view.",
+        "Tags, folders, projects, priorities (Tot has literally none — 7 flat dots; TeuxDeux has only time-columns + flat someday lists).",
+        "Named files / file browser (Tot drops the entire file-management concept — no save, no naming, no open-dialog; iCloud sync removes the need to ever locate a doc).",
+        "Global settings screens (Tot pushes the few settings down to per-dot, avoiding a preferences labyrinth).",
+        "Reminders/notifications as core loop (TeuxDeux keeps only light, unintrusive email reminders; no push-notification nagging engine).",
+        "Team sharing / collaboration / assignments (both stay single-user; collaboration is the classic bloat vector for 'simple' todo apps).",
+        "Unlimited buffers (the temptation to make Tot's dots infinite — the fixed count of 7 is precisely what stops it becoming a notes app)."
+      ],
+      "adopt_for_capsule": [
+        "Zero-step capture: hovering/opening the capsule must land the cursor in an empty input with NO 'add' button, NO title, NO save — type-and-it's-saved (Tot's 'click, type' standard). This is the single most important pattern.",
+        "Use the collapsed capsule itself as a live status indicator (Tot's recoloring icon + filled/hollow dot): the resting capsule should encode 'has open todos / count / nothing' via a tiny fill or color state, so you read status without expanding.",
+        "Filled-vs-hollow + whitespace-doesn't-count rule for any multi-buffer affordance — only show an indicator when there's REAL content.",
+        "Inline Markdown instead of a formatting toolbar — keep the text field as the only surface.",
+        "Auto-rollover of unfinished items as the ONLY time mechanic (no date-picker) — borrow TeuxDeux's silent overnight roll so the list self-maintains.",
+        "Direct-manipulation scheduling (drag onto today vs someday) instead of date-picker dialogs, IF we add any time dimension at all.",
+        "Strike-through-in-place on complete for the tactile paper-checklist payoff before clearing.",
+        "Proportional, informative micro-motion + (on capable platforms) haptics when moving between views/buffers — animation that encodes state, not filler.",
+        "Hard cap the structure: adopt a small fixed scope (e.g. Today + Someday, or a tiny fixed number of lanes) à la Tot's 7 dots, and treat the cap as a feature so the capsule can never grow into a project manager.",
+        "Continuous autosave + sync with no save affordance and no file/naming concept — the capsule is always 'ready when opened.'"
+      ],
+      "lightweight_traits": [
+        "No accounts-of-features bloat: both refuse due dates, subtasks, tags, projects (TeuxDeux philosophy explicitly names the 'task labyrinth' it avoids).",
+        "No save/file/naming concept in Tot — continuous autosave + iCloud sync means it's 'always ready when opened.'",
+        "Minimal chrome: Tot is mostly a text field; toolbar (word/char count) is opt-in per-dot and hidden by default.",
+        "Fixed, hard-capped scope (Tot's 7 dots) so it can't sprawl into a filing system.",
+        "Settings pushed to per-document scope instead of a global preferences screen.",
+        "Single-user, no collaboration/sharing surface.",
+        "Self-maintaining list via silent overnight rollover (TeuxDeux) — no manual triage UI.",
+        "Plain text / lightweight Markdown rather than a rich document model.",
+        "Free, no-subscription, no in-app-purchase (Tot) — minimalism extends to the business model.",
+        "Ambient presence (menu bar) rather than a window you manage."
+      ],
+      "sources": [
+        "https://teuxdeux.com/blog/our-product-philosophy-simple-stays-organized-teuxdeux",
+        "https://grokipedia.com/page/teuxdeux",
+        "https://daringfireball.net/2020/02/tot",
+        "https://www.macstories.net/reviews/tot-review-collect-and-edit-bits-of-text/",
+        "https://blog.iconfactory.com/2020/02/meet-tot-your-tiny-text-companion/",
+        "https://onmymenubar.app/tot/"
+      ]
+    },
+    {
+      "app": "Granola (AI notepad for meetings, macOS/iOS)",
+      "platform": "macOS desktop (menu-bar tray + floating on-screen \"nub\"/indicator) + iOS companion (lock-screen widget one-tap capture)",
+      "quick_capture": "Capture is deliberately near-zero-friction and \"write as much or as little as you like.\" Three concrete entry points: (1) the menu-bar tray icon for open-from-anywhere access; (2) the floating \"nub\" / live indicator that sits on the right edge of the screen while a session is active — single-click jumps you back into the active note, drag the bottom handle to reposition it; (3) on iOS a lock-screen widget records with a single tap \"without fumbling through apps.\" The note editor itself is a plain markdown surface: type freely with `**bold**`/Cmd+B, `*italic*`/Cmd+I, Cmd+U underline, `#` headers, `-`/`*` bullets, `[]` checkboxes — no modal, no required fields, no save button. Critically, typos/abbreviations/fragments are accepted as-is (\"Granola will understand and fix them\") and notes are OPTIONAL — the surface never demands completeness. Friction level: extremely low; capture is an afterthought layered on a passive background process, not a gated form. Source-verified: editor accepts incomplete input; no slash-command system documented (markdown shortcuts only).",
+      "core_model": "\"Stay present, capture passively, refine later.\" The mental model is a quiet always-on companion that does NOT join/interrupt (it transcribes system audio in the background rather than appearing as a bot). The persistent form factor (tray + edge nub) signals \"I'm here and listening but out of your way.\" User input is treated as low-stakes intent signals (\"anything you write is a hint about what matters\"), not authoritative structured data — the system tolerates messiness because an enhancement pass cleans it up afterward. Organization is by discrete sessions/notes, surfaced as bite-sized topic-separated summaries you skim, with detail revealed on demand rather than shown upfront.",
+      "standout_interactions": [
+        "Floating edge 'nub'/indicator pinned to the right side of the screen: a tiny ambient presence that is click-to-expand (jump into note) and drag-by-handle to reposition — a persistent affordance that never blocks the underlying app",
+        "Progressive disclosure via hover: summaries are collapsed by default; hovering a summary reveals a magnifying-glass that opens a popup with the full underlying transcript context — detail on demand, clean surface by default",
+        "Menu-bar tray as a calm home base; movement between notes from tray, system notification, in-app, or the nub — multiple equivalent low-effort access paths",
+        "Background-first 'set it and forget it' feel: the indicator quietly shows recording state instead of a heavy active UI; the app 'works quietly in the background until the meeting ends'",
+        "Forgiving inline editor: markdown renders as you type, typos auto-tolerated, images drag-droppable inline — typing feels weightless because nothing is validated or required"
+      ],
+      "complexity_traps": [
+        "Meeting-transcription + system-audio capture engine — heavy, permission-laden, and irrelevant to a plain todo capsule; do NOT replicate the AI-enhancement-of-transcript machinery",
+        "Calendar integration + pre-meeting 'Brief' generation — adds account/auth surface and config weight",
+        "AI chatbox / ask-questions-of-your-notes layer and auto-generated action items / follow-up email drafting — feature creep that pulls you toward an 'assistant' not a capsule",
+        "Multi-surface sync (desktop+mobile+sharing+guest access) — collaboration/sharing is a whole product axis; a personal capsule must resist it",
+        "Templates ('Interview', 'Stand-up') and structured note types — even these lightweight templates are scope the capsule doesn't need at v1"
+      ],
+      "adopt_for_capsule": [
+        "Edge-pinned 'nub' as the core form factor: a tiny always-on capsule docked to a screen edge that NEVER occludes the underlying app — this is the direct ancestor of the right-side hover capsule; keep it click-to-expand + draggable-by-handle",
+        "Hover-to-expand as the primary reveal gesture: collapsed pill at rest, hover expands to show/write — exactly the requested model; mirror Granola's 'summary collapsed, detail on hover' progressive disclosure for the todo list",
+        "Zero-friction, no-modal capture: typing into a plain forgiving surface with no required fields, no save button, no validation — fragments and typos accepted; this is the soul of 'random capture without interruption'",
+        "Quiet/non-interrupting presence as the design north star: ambient indicator over active dialog; the capsule should feel like it's 'out of your way until you reach for it'",
+        "Markdown-lite inline formatting for the write surface (- bullets, [] checkboxes) so a todo can be typed naturally without a structured form",
+        "Multiple equivalent low-effort entry points (global hotkey/tray-equivalent + the visible capsule) so capture is always one gesture away"
+      ],
+      "lightweight_traits": [
+        "Lives in chrome the user already has (menu bar) + a single tiny floating element — no persistent window real estate",
+        "Optional everything: notes optional, input optional, completeness never enforced",
+        "Background-first: minimal active UI, state shown as a small indicator not a panel",
+        "Forgiving input: typos/abbreviations tolerated, no validation friction",
+        "Collapsed-by-default surfaces with detail on hover keep the resting UI tiny and skimmable",
+        "One-gesture capture (single tap/click) from any context"
+      ],
+      "sources": [
+        "https://www.granola.ai/",
+        "https://docs.granola.ai/help-center/taking-notes/transcription",
+        "https://docs.granola.ai/help-center/taking-notes/taking-notes-in-granola",
+        "https://www.bluedothq.com/blog/granola-review",
+        "https://zackproser.com/blog/granola-ai-review",
+        "https://onmymenubar.app/blog/quick-note-taking-menubar-apps-that-actually-capture-your-thoughts/"
+      ]
+    },
+    {
+      "app": "Capsule/Notch-class desktop tools — composite study of NotchNook, Boring Notch (TheBoringNotch, open-source), MediaMate, and Dropover",
+      "platform": "macOS (menu-bar/agent app, top-edge notch real estate)",
+      "quick_capture": "No single one of these is a todo app, so quick-capture is reconstructed from their summon mechanics. Two distinct friction models, both sub-second:\n\n1. PROXIMITY/HOVER (NotchNook, Boring Notch, MediaMate): the capsule lives permanently at the screen's top-center notch. Cursor approaching the notch region (NSTrackingArea with .alwaysActive so it fires even when the app isn't key/focused) triggers expansion. NotchNook adds a tactile pre-signal: on hover the notch 'lightly pulses outward' with a drop shadow before fully expanding. No click required to peek; click or two-finger swipe-down commits to the full 'Nook' panel. Friction: zero clicks to view, one gesture to act. Cost: top-center is far from a right-resting hand — a real friction note for your right-edge placement.\n\n2. GESTURE-INVOKED-AT-CURSOR (Dropover): the shelf is NOT always visible — it materializes on demand exactly where the cursor is. Three summon paths ranked by friction: (a) shake the mouse mid-drag — 'give me a shelf right here', single-handed, becomes second-nature/unconscious per Gruber; (b) hold a modifier (Shift/Cmd/Ctrl) while dragging; (c) global hotkey (default Opt+D) or menu-bar click. The shake is the standout: location-based (appears under cursor, not at a fixed edge), single-handed, physically metaphoric.\n\nFor an edge todo: the highest-leverage capture is HOVER-TO-PEEK + a single global hotkey that opens the capsule already focused in an empty text field (type-and-Enter to file a todo, Esc to dismiss). Borrow Dropover's 'no-click commit' philosophy and MediaMate's auto-dismiss timer (UI stays N seconds then retracts on its own).",
+      "core_model": "A persistent edge 'capsule' that is a SHELF/STAGING SURFACE, not a database. Mental model across all four: the screen edge (notch) is dormant chrome by default and becomes a transient surface on demand. Three shared invariants: (1) idle = nearly invisible / matches system chrome, costs zero attention; (2) expanded = temporary, summoned, and self-retracting; (3) content is short-lived 'in-flight' items (now-playing, files being moved, a HUD reading) rather than a permanent archive. Dropover makes this explicit: a SHELF you stage items on, switch apps/Spaces, then drop elsewhere — the shelf floats on top across Spaces. The right todo analogue: the capsule holds 'today / right-now' actionable items as a hand-off surface; the full backlog lives elsewhere and is NOT what the capsule shows.",
+      "standout_interactions": [
+        "NotchNook hover pre-signal: notch 'lightly pulses outward' + drop shadow on approach, BEFORE full expansion — a 0-cost affordance hint that the surface is alive and reachable.",
+        "Fluid expand/contract as one continuous morph (the panel grows from and collapses back into the notch silhouette) — implemented in SwiftUI with matchedGeometryEffect + spring() so the capsule and expanded panel are the same geometric element, not a popover that appears over it.",
+        "Dropover mouse-shake-to-summon mid-drag: location-aware, single-handed, metaphoric ('a shelf right here'); reportedly becomes unconscious muscle memory — the gold standard for low-friction summon.",
+        "MediaMate slight-expand-on-event: the notch expands just enough to reveal a single control (volume/brightness slider) on the relevant keypress, then auto-retracts on a user-configurable timer — minimal reveal proportional to need.",
+        "Boring Notch Metal-accelerated visualizer + album art with color-blend 'magical' effects, and a toggle between 'classic' and 'modern' notch animation styles — animation is treated as a first-class, user-choosable trait.",
+        "Multi-touch gesture vocabulary on the capsule (Boring Notch): tap / double-tap / long-press / swipe each bindable to an action — rich input on a tiny target without adding visual chrome.",
+        "Drop-onto-notch to instantiate (Dropover + NotchNook tray): dragging a file to the notch spawns a fresh shelf — the edge doubles as a drop target."
+      ],
+      "complexity_traps": [
+        "Widget-platform creep: NotchNook accreted calendar, notes, mirror, system indicators, shortcuts, 'live activities' modules — turns a capsule into a mini-OS panel. A todo app must resist becoming a widget host.",
+        "HUD/system-replacement scope (MediaMate replaces native volume/brightness/now-playing HUDs; Boring Notch a 'complete macOS HUD replacement') — out of scope and a maintenance sink; do not intercept system events.",
+        "Music-control center gravity: Boring Notch's identity collapsed into a music visualizer. A todo capsule should not let any single rich-media feature dominate the surface.",
+        "Deep settings sprawl: MediaMate's 'quite advanced' timing/theme settings (4 themes, per-event timing rules) — powerful but a configuration-paralysis trap for a 'simple, never bloated' product. Ship 1-2 opinionated defaults.",
+        "Multi-modal summon overload: Dropover exposes 4+ ways to open a shelf (shake, 3 modifier choices, hotkey, menu, drop-on-notch). Each is individually nice but the matrix is cognitive overhead — pick one primary + one fallback.",
+        "Notch-hardware coupling: these apps fight the physical notch's top-center position. Don't inherit that constraint; a freely-placed right-edge capsule is strictly better for a right-handed reach."
+      ],
+      "adopt_for_capsule": [
+        "Continuous morph identity: make the collapsed capsule and the expanded panel the SAME element via matchedGeometryEffect + spring (response ~0.3-0.4, damping ~0.8) so expand/collapse reads as one organic grow, never a popover.",
+        "Hover pre-signal before commit: on cursor approach, do NotchNook's micro-pulse + soft shadow to advertise reachability at zero attention cost; full expand only on deliberate hover-dwell or hotkey.",
+        "Two-state discipline: idle (thin, chrome-matching, ~invisible) vs expanded (temporary, self-retracting). Add MediaMate's user-tunable auto-dismiss timer so the surface always returns to dormant.",
+        "Type-and-Enter quick capture: global hotkey opens the capsule with an already-focused empty field; Enter files the todo, Esc dismisses — zero-click commit borrowed from Dropover's drag-out-to-finish flow.",
+        "Shelf-not-database framing: show only 'right now / today' actionable items as a hand-off surface; keep the full backlog off the capsule. The capsule is a staging shelf, per Dropover's core metaphor.",
+        "Reliable hover via AppKit bridge: use NSTrackingArea with .alwaysActive (not bare SwiftUI .onHover, which drops mouse-exit at high cursor velocity and misfires near edges) for trustworthy enter/exit even when unfocused.",
+        "Lightweight menu-bar agent architecture: no Dock icon, runs as a background agent like all four — reinforces the 'always there, never in the way' feel.",
+        "One primary + one fallback summon only: hover-peek as primary, global hotkey as fallback. Explicitly DON'T ship the 4-way summon matrix."
+      ],
+      "lightweight_traits": [
+        "Runs as a background menu-bar/agent utility — no Dock presence, no window-management footprint (all four).",
+        "Idle state matches system chrome so it costs zero visual attention until summoned.",
+        "Boring Notch is 100% free and open-source — a readable reference implementation in Swift for hover-expand + file shelf.",
+        "Metal-accelerated rendering keeps animations smooth without CPU cost (Boring Notch visualizer).",
+        "Self-retracting surfaces (MediaMate auto-dismiss timers) mean no manual cleanup / no lingering panels.",
+        "Single-purpose summon gestures that become muscle memory (Dropover shake) — low cognitive load."
+      ],
+      "sources": [
+        "https://github.com/TheBoredTeam/boring.notch",
+        "https://boringnotch.com/",
+        "https://www.macworld.com/article/2406934/notfhnook-macbook-dynamic-island-widgets-files-tray.html",
+        "https://www.digitaltrends.com/computing/app-turns-macbook-notch-into-dynamic-island/",
+        "https://www.macstories.net/reviews/notchnook-and-mediamate-two-apps-to-add-a-dynamic-island-to-the-mac/",
+        "https://wouter01.github.io/MediaMate/",
+        "https://dropoverapp.com/",
+        "https://daringfireball.net/linked/2026/05/15/dropover",
+        "https://developer.apple.com/documentation/appkit/nstrackingarea",
+        "https://gist.github.com/importRyan/c668904b0c5442b80b6f38a980595031",
+        "https://nilcoalescing.com/blog/TrackingHoverLocationInSwiftUI/"
+      ]
+    },
+    {
+      "app": "Edge-Capsule Todo — synthesis of: Granola floating recording pill; Things 3 Quick Entry / Quick Entry with Autofill; NotePlan Quick Capture; macOS notch/Dynamic Island apps (NotchNook, Seam, MediaMate, Bartender Pro Top Shelf); Amazon/Apple hover-intent (hover-triangle) menus",
+      "platform": "macOS desktop primary (always-on-top non-activating panel + right screen-edge hot-zone); Windows secondary",
+      "quick_capture": "Two capture paths, both sub-second, zero context-switch.\n\n1) GLOBAL HOTKEY PATH (the TRUE primary — Things 3 / NotePlan model). A non-activating panel (macOS NSWindowStyleMaskNonactivatingPanel, which sets the kCGSPreventsActivationTagBit so the owning app never activates) summoned by a customizable global hotkey (Things defaults: Ctrl+Space plain, Ctrl+Opt+Space for Autofill). Floats ON TOP of the active app WITHOUT stealing focus or activating your app in the Dock. Type one line, Enter to commit, panel vanishes, underlying app keeps its caret/selection. NotePlan pattern: hotkey -> command bar -> type -> routes straight into a default Inbox note. Friction: ~1 chord to open, 1 line, Enter. Escape dismisses with no side effects AND the keypress is CONSUMED so it doesn't leak to the underlying editor/terminal (cmux PR #847). Things Autofill: panel pre-grabs a link to the current page/email/file so the todo lands with context for free.\n\n2) EDGE-CAPSULE HOVER PATH (Granola floating-pill model, our differentiator). Small always-on-top capsule pinned to the right edge. Hover the edge hot-zone -> expands into a peek panel with today's list + a one-line write field. Glance-and-jot. Critically the hotkey path must remain the FASTEST capture even when the capsule is collapsed — never force users through the hover to write.\n\nTarget: capture in under 2 seconds, no app-switch, no window raise, no Dock activation.",
+      "core_model": "\"Invisible handrail\" (Granola's own metaphor): the tool stays out of peripheral vision and out of your workflow until the instant you reach for it, then it is already there — no launch, no window management, no app-switch. The model is a persistent ambient surface + a single Inbox. Everything captured drops into ONE default list with zero up-front triage (NotePlan Inbox, Things Inbox); organizing is a deliberate, separate, later action, never a tax on capture. Granola's retention lesson (cited ~70%): augment, don't replace — keep the user in control, do the heavy lifting (sorting/scheduling) only after the fact. The capsule is a STATUS + ENTRY surface, like Granola's always-visible recording indicator that proves the app is alive without demanding attention.",
+      "standout_interactions": [
+        "Capsule -> panel expansion: spring/ease-out width+height morph (~200-260ms), capsule visually becomes the panel (shared-element / morph, not a separate popover appearing). Mirrors NotchNook/Dynamic Island expand where the pill IS the container.",
+        "Hover-reveal with intent timing (NN/g numbers): instant visual feedback <0.1s (capsule brightens/nudges on edge touch), then a 0.3-0.5s dwell before the panel actually expands — this delay is what distinguishes a deliberate hover from a cursor merely passing the edge.",
+        "Forgiving dismiss timing: hide only AFTER cursor leaves for >0.5s (NN/g), so micro-overshoots while reaching for the write field don't collapse the panel.",
+        "Hover-triangle / mouse-corridor (Tognazzini 1986, Amazon megamenu): while the cursor travels from the edge capsule toward the expanded panel, build a trajectory triangle to the panel corners so a diagonal path doesn't accidentally exit the hot-zone and collapse it.",
+        "Edge stickiness on reveal (macOS Dock behavior): when the panel is showing, make the screen edge 'sticky' so the cursor can't slide onto a secondary monitor; release stickiness on dismiss.",
+        "Non-activating focus handoff: panel can receive keystrokes and IME input without the underlying app losing its caret; on Enter/Escape, focus returns invisibly (no window-raise flash).",
+        "Commit micro-feedback: on Enter, the typed line animates as a small chip flying into the capsule, then capsule shows a brief count badge tick — confirms capture without keeping the panel open.",
+        "Ambient idle state: collapsed capsule is low-contrast/translucent and can fade further when the cursor is far away (Granola's stay-out-of-the-way), regaining opacity as the cursor approaches the edge."
+      ],
+      "complexity_traps": [
+        "Projects / sub-projects / nested hierarchies / areas — turns a capture pill into a PM tool; kills the lightweight feel.",
+        "Per-item metadata at capture time (tags, priority, due-date pickers, assignees) — every field added to the capture box is friction tax. Keep capture to one text line; defer metadata to a later edit.",
+        "Multiple lists/inboxes to choose between AT capture — forces a routing decision mid-thought. One default Inbox only.",
+        "Real-time sync spinners / account/login walls before first capture — invisible tools must work instantly and locally first.",
+        "Rich-text editor, attachments, embeds, AI auto-categorization shown in the peek panel — bloats the panel and slows the morph animation.",
+        "Notch dependency: building core UI around the MacBook notch (a real temptation given Dynamic Island apps) fails because not every Mac has a notch and external displays drop it (Apple's own stated reason for not shipping Dynamic Island on macOS). The capsule must be a free-floating edge element, notch-independent.",
+        "Hover-only affordance with no keyboard path — NN/g warns hover is undiscoverable/inaccessible; always pair the edge capsule with the global hotkey.",
+        "Settings sprawl: dozens of toggles for the capsule. Ship strong defaults (right edge, vertical center, 0.4s reveal delay)."
+      ],
+      "adopt_for_capsule": [
+        "Non-activating panel (NSWindowStyleMaskNonactivatingPanel) for BOTH the hotkey capture window and the hover peek panel — never steal focus, never activate in Dock, never raise a window. This is the single most important technical primitive.",
+        "Customizable global hotkey as the primary capture path (Things Ctrl+Space), with the edge capsule as the ambient/glanceable secondary path. Don't make hover the only way in.",
+        "Consume Escape and commit-on-Enter with full no-side-effect dismiss; Escape must not leak to the underlying app (cmux PR #847).",
+        "NN/g hover timing as concrete defaults: 0.1s visual feedback, 0.3-0.5s dwell-to-expand, >0.5s leave-to-collapse — tunable but ship these.",
+        "Hover-triangle / corridor + sticky-edge to make the edge-to-panel travel forgiving and prevent accidental collapse and cursor sliding to a second monitor (the documented multi-monitor failure mode).",
+        "Single Inbox capture model (NotePlan/Things) — capture writes one line to a default list, triage is a separate deliberate act.",
+        "Things 'Autofill' context grab — optionally attach the link/title of the frontmost app/page to the captured todo, so capture-with-context costs zero extra taps.",
+        "Granola 'invisible handrail' idle behavior — collapsed capsule is translucent/low-contrast and fades when the cursor is far, brightening on approach; status presence without attention-grabbing.",
+        "Pill-IS-the-container morph animation (Dynamic Island/NotchNook) for the expand, ~200-260ms spring, so the capsule and panel feel like one continuous object."
+      ],
+      "lightweight_traits": [
+        "Zero-launch: always running, capture is instant — no cold start, no window to find (Granola one-tap-already-recording feel)",
+        "One-line capture, one default Inbox, no required fields",
+        "Local-first / works offline before any account",
+        "Stays out of peripheral vision until summoned (translucent idle capsule)",
+        "Strong opinionated defaults over configuration",
+        "No app-switch and no Dock activation for any capture"
+      ],
+      "sources": [
+        "https://www.granola.ai/",
+        "https://uxplanet.org/the-art-of-invisible-ai-what-granolas-70-retention-teaches-us-about-product-design-2de5a2836d17",
+        "https://culturedcode.com/things/support/articles/2249437/",
+        "https://noteplan.co/plugins/jgclark.QuickCapture",
+        "https://forums.getdrafts.com/t/quick-capture-workflows/15368",
+        "https://www.nngroup.com/articles/timing-exposing-content/",
+        "https://mayank.co/blog/hover-triangles/",
+        "https://css-tricks.com/dropdown-menus-with-more-forgiving-mouse-movement-paths/",
+        "https://www.smashingmagazine.com/2021/05/frustrating-design-patterns-mega-dropdown-hover-menus/",
+        "https://philz.blog/nspanel-nonactivating-style-mask-flag/",
+        "https://developer.apple.com/documentation/appkit/nswindow/stylemask-swift.struct/nonactivatingpanel",
+        "https://github.com/manaflow-ai/cmux/pull/847",
+        "https://www.macstories.net/reviews/notchnook-and-mediamate-two-apps-to-add-a-dynamic-island-to-the-mac/",
+        "https://getseam.app/blog/dynamic-island-for-mac-complete-guide",
+        "https://linuxdesktopofanewtype.wordpress.com/2019/09/28/hot-corners-and-edges/",
+        "https://ssg.dev/hover-is-over-5ca728a01cde/"
+      ]
+    }
+  ],
+  "feasibility": [
+    {
+      "question": "Can Tauri 2.x build a right-edge-docked, always-on-top, transparent frameless capsule window that is click-through when idle, positionable to the screen edge, persists after app minimize, and is lightweight with good animation? Which exact APIs/plugins/config are needed, and what are the limits?",
+      "verdict": "conditionally-feasible",
+      "findings": [
+        "Every individual requirement maps to a real Tauri 2 config flag or API. In tauri.conf.json the window object supports `transparent: true`, `decorations: false`, `alwaysOnTop: true`, `skipTaskbar: true`, plus sizing/position keys — confirmed in the official Configuration and Window Customization docs. These can also be set programmatically via the Rust WebviewWindowBuilder (`.transparent()`, `.decorations()`, `.always_on_top()`, `.skip_taskbar()`).",
+        "macOS transparency REQUIRES `app.macOSPrivateApi: true` in tauri.conf.json (also surfaced as the `macos-private-api` Cargo feature). Per official docs this enables the transparent-background API and sets fullScreenEnabled. Hard consequence: an app using this in production CANNOT be submitted to the Mac App Store (notarization + direct/DMG distribution still work). This is the single biggest constraint and is non-negotiable for a transparent capsule on macOS.",
+        "Click-through (idle pass-through) is supported via `WebviewWindow.setIgnoreCursorEvents(true)` (JS) / `window.set_ignore_cursor_events(true)` (Rust). BUT Tauri/wry has NO per-region hit-testing: setting it true makes the ENTIRE window click-through, including your visible capsule pixels. There is an open feature request (tauri issue #13070) and known non-working reports (#11461, #6164). The established workaround is a Rust/JS loop that polls cursor position (~60fps) against the capsule's screen rect and toggles setIgnoreCursorEvents — exactly what a production Tauri-v2 overlay author documented. For your design this is actually clean: idle state = ignore=true (full pass-through); on cursor entering the edge hot-zone, flip ignore=false and expand. You drive the toggle from the polling loop or from monitoring global cursor position rather than relying on DOM hover (DOM events don't fire while ignore=true).",
+        "Edge positioning is fully supported: `availableMonitors()`/`currentMonitor()` give monitor position+size+scaleFactor; `outerSize()` gives the window size; compute x = monitor.position.x + monitor.size.width - window.width and call `setPosition(new PhysicalPosition(x, y))`. Use Physical (not Logical) coordinates and account for scaleFactor on Retina to avoid the multi-monitor offset bugs (tauri #7890). Re-run on monitor-change/resize events to stay pinned to the right edge.",
+        "Persist-after-minimize is a standard menubar/overlay pattern: set `tauri::ActivationPolicy::Accessory` (config `app.macOSPrivateApi`-independent; via `app.set_activation_policy(ActivationPolicy::Accessory)` or `\"activationPolicy\": \"accessory\"`) so the capsule has no Dock/Cmd-Tab presence and is not tied to a 'main' app window's minimize lifecycle. The capsule is its own always-on-top window; the 'main' app minimizing does not hide it. Pair with the official tray-icon plugin (`TrayIconBuilder`) for a menubar anchor and `tauri-plugin-global-shortcut` (`app.global_shortcut().register(...)`) for a quick-add hotkey.",
+        "Multi-window: create the capsule as a dedicated WebviewWindow (second window) distinct from any settings/main window — define it in `app.windows[]` in config or build at runtime with WebviewWindowBuilder. This isolates the transparent+click-through window from normal app windows so the polling/ignore-cursor logic only affects the capsule.",
+        "Footprint is genuinely lightweight (uses the OS WebView2/WKWebView, no bundled Chromium). A real Tauri-v2 overlay reported ~14 MB RAM / <1% CPU on Windows 11 and ~20-29 MB on macOS Sequoia. Caveat: the same author measured macOS RAM climbing on newer OS versions — ~66 MB on Sonoma and ~110 MB (15.6% CPU peak) on Tahoe — driven by WKWebView/compositor, not Tauri itself. Still far below Electron, but budget 30-110 MB on macOS depending on OS version, and profile the 60fps cursor-poll loop (move it to a timer of ~30-60ms and short-circuit when state is unchanged to keep CPU near idle).",
+        "Animation: hover-to-expand capsule animation runs as normal CSS/JS inside the webview (transform/opacity transitions on the panel; animate the window itself by also resizing via `setSize` if the panel must grow beyond initial bounds). Note the macOS gotcha below re: backdrop-filter."
+      ],
+      "apis_or_mechanisms": [
+        "tauri.conf.json window: transparent:true, decorations:false, alwaysOnTop:true, skipTaskbar:true, width/height, x/y, resizable:false",
+        "tauri.conf.json app.macOSPrivateApi:true (REQUIRED for macOS transparency; blocks Mac App Store)",
+        "Cargo feature: tauri = { features = [\"macos-private-api\"] }",
+        "WebviewWindowBuilder (Rust): .transparent() .decorations(false) .always_on_top(true) .skip_taskbar(true) .build()",
+        "setIgnoreCursorEvents(bool) (JS) / window.set_ignore_cursor_events(bool) (Rust) — whole-window only, no per-region hit-test",
+        "availableMonitors() / currentMonitor() / outerSize() / setPosition(PhysicalPosition) / setSize() for edge-dock + expand",
+        "tauri::ActivationPolicy::Accessory via app.set_activation_policy(...) or app.activationPolicy config — hide Dock/Cmd-Tab, decouple from minimize",
+        "tauri-plugin-global-shortcut: app.global_shortcut().register(shortcut, handler) for quick-add hotkey",
+        "tray-icon: tauri::tray::TrayIconBuilder / TrayIconEvent for menubar anchor",
+        "data-tauri-drag-region attribute + startDragging() if the capsule must be draggable",
+        "Cursor-position polling loop (Rust/JS ~30-60ms) toggling ignore_cursor_events to simulate per-region click-through (idle=ignore on)"
+      ],
+      "gotchas": [
+        "macOSPrivateApi permanently disqualifies the app from the Mac App Store. If MAS distribution is ever required, transparent windows are off the table on macOS — only direct/DMG/notarized distribution works.",
+        "No native per-region click-through: setIgnoreCursorEvents toggles the WHOLE window. While idle/ignore=true, DOM mouse/hover events do NOT fire, so the 'hover edge to expand' trigger must come from a cursor-position poll (or global pointer monitor), not from CSS :hover. Plan the state machine: idle(ignore=true) -> cursor enters edge rect -> ignore=false + expand -> cursor leaves panel -> collapse + ignore=true.",
+        "CSS backdrop-filter: blur() is broken on macOS transparent Tauri windows — frosted-glass capsule effect won't work; use solid/semi-opaque fills or native NSVisualEffectView via objc2-app-kit instead.",
+        "macOS isolates fullscreen apps: an always-on-top overlay may NOT float over other apps' fullscreen spaces by default (tauri #11488). Needs visibleOnAllWorkspaces and possibly a private/third-party NSWindow collectionBehavior tweak; verify against your 'always visible' requirement.",
+        "Multi-monitor positioning bugs: physical position/monitor coords can be reported incorrectly (tauri #7890); always use PhysicalPosition and multiply by scaleFactor, and recompute on monitor/resize events.",
+        "macOS memory/CPU regression on newer OS (Sonoma ~66MB, Tahoe ~110MB / 15.6% CPU peak) — driven by WKWebView, not Tauri. Throttle the cursor-poll loop and verify it idles near 0% CPU when collapsed.",
+        "Transparency can be lost specifically in packaged DMG builds even when it works in dev (tauri #13415) — test the bundled .app, not just `tauri dev`.",
+        "set_activation_policy at runtime has historically interfered with window.show() (tauri #5122, #9244) — set Accessory at setup/startup and test show/hide of the capsule.",
+        "On Windows, decorations:false + shadow can still leak a title bar in some cases (tauri #14859) — set shadow:false and verify."
+      ],
+      "recommendation": "Feasible and a good fit — build the capsule as a dedicated transparent/alwaysOnTop/skipTaskbar WebviewWindow with macOSPrivateApi + ActivationPolicy::Accessory, and drive idle-click-through via a throttled cursor-position poll that toggles setIgnoreCursorEvents (idle=on, expand=off), pinned to the right edge via currentMonitor()+setPosition; just accept up front that macOS transparency means no Mac App Store, no backdrop-filter blur, and that hover-expand must be cursor-poll-driven rather than CSS :hover.",
+      "sources": [
+        "https://v2.tauri.app/reference/config/",
+        "https://v2.tauri.app/learn/window-customization/",
+        "https://v2.tauri.app/reference/javascript/api/namespacewindow/",
+        "https://v2.tauri.app/distribute/app-store/",
+        "https://blog.manasight.gg/why-i-chose-tauri-v2-for-a-desktop-overlay/",
+        "https://github.com/tauri-apps/tauri/issues/13070",
+        "https://github.com/tauri-apps/tauri/issues/11461",
+        "https://github.com/tauri-apps/tauri/issues/6164",
+        "https://v2.tauri.app/plugin/global-shortcut/",
+        "https://v2.tauri.app/learn/system-tray/",
+        "https://github.com/tauri-apps/tauri/issues/11488",
+        "https://github.com/tauri-apps/tauri/issues/7890",
+        "https://github.com/tauri-apps/tauri/issues/13415",
+        "https://github.com/tauri-apps/tauri/issues/5122",
+        "https://github.com/tauri-apps/tauri/issues/9244"
+      ]
+    },
+    {
+      "question": "Electron 能否实现边缘常驻胶囊(transparent/frameless/alwaysOnTop/skipTaskbar/setIgnoreMouseEvents/globalShortcut/Tray)？与 Tauri 的取舍。",
+      "verdict": "feasible",
+      "findings": [
+        "全部七项能力 Electron 都有官方一等 API，无需第三方 hack：①frameless → BrowserWindow 构造项 frame:false；②透明 → transparent:true；③置顶 → alwaysOnTop:true（构造项）+ win.setAlwaysOnTop(flag, level, relativeLevel)，level 可设 'screen-saver'/'floating' 把胶囊压在系统级层；④不进任务栏/Dock → skipTaskbar:true（Win/Linux），macOS 隐藏 Dock 用 app.dock.hide() 或 LSUIElement；⑤鼠标穿透 → win.setIgnoreMouseEvents(true, {forward:true})，forward 让 idle 态胶囊点击穿透但仍能收到 mousemove/mouseenter 触发热区展开。",
+        "胶囊'软件最小化后仍常驻'天然满足：Electron 主进程与渲染窗口生命周期独立，主窗 hide()/最小化不影响这个独立的胶囊 BrowserWindow——它本就是一个常驻 always-on-top 窗口，不依赖主窗存活。配合 Tray(systemTray) 提供退出/显隐入口，globalShortcut.register('Cmd+Shift+T') 提供全局唤起，二者均为官方模块。",
+        "'idle 极小 → hover 展开成面板'的动画用 win.setBounds(bounds, true)（第二参 animate=true，macOS 原生缓动）或在渲染层用 CSS/JS 动画把窗口做大、内容用 transform/opacity 过渡（推荐窗口预留展开后尺寸+内部 CSS 动画，避免逐帧 setBounds 卡顿）。setIgnoreMouseEvents 动态切换：idle 时 (true,{forward:true}) 让大部分透明区域穿透、只有边缘热区响应；展开后 setIgnoreMouseEvents(false) 让面板可交互。",
+        "贴边定位用 screen 模块 getDisplayNearestPoint / getPrimaryDisplay().workArea 计算右侧边缘坐标，win.setBounds 贴住 workArea.x+workArea.width-capsuleWidth；多屏/分辨率变化监听 screen 的 'display-metrics-changed' 重新吸附。setVisibleOnAllWorkspaces(true,{visibleOnFullScreen:true}) 让胶囊跨所有 Space 常驻（macOS/Linux）。",
+        "Tauri 2.0 同样具备全部能力（decorations:false、transparent、always_on_top、skip_taskbar、set_ignore_cursor_events、global-shortcut 插件、tray-icon），所以可行性两者都成立；差异在工程取舍而非能力有无。",
+        "体积/内存取舍（官方+实测博客）：Electron 安装包 80–150MB、idle 内存约 150–300MB（每个 BrowserWindow 一个 Chromium 渲染进程，胶囊+主窗=多进程叠加）；Tauri 安装包 <10MB、idle 约 30–50MB（复用系统 WebView：macOS WKWebView / Win WebView2 / Linux WebKitGTK）。对一个'要轻量、常驻后台、内存敏感'的胶囊类工具，Tauri 在体积和常驻内存上明显占优。",
+        "原生感/一致性取舍：Electron 自带 Chromium，跨平台渲染（含透明/vibrancy/动画）行为一致、调试简单、动效更可控；Tauri 用各平台原生 WebView，CSS/字体/透明效果在 WKWebView 与 WebView2 间有渲染差异，复杂动画与透明叠层需各平台单测。对'美观+动效好+透明胶囊'这种视觉/动画密集场景，Electron 的渲染一致性反而是优势。"
+      ],
+      "gotchas": [
+        "透明窗 + vibrancy 在 macOS 有长期已知 bug：window 随机变白底（issue #31862/#25547）、切换 app 后丢失 vibrancy、loadURL/刷新后出现白底（#20357）。若胶囊要毛玻璃质感，需谨慎测试，必要时退回纯透明 + CSS 自绘背景。",
+        "透明窗官方限制：macOS 上透明窗不显示原生窗口阴影（胶囊阴影得自己用 CSS box-shadow 画）；部分平台 transparent 窗设 resizable:true 会让透明失效——胶囊建议 resizable:false，靠 setBounds 程序化改尺寸做展开动画。",
+        "显隐切换透明窗有 fade-in 闪烁（issue #12130/#10069），首次 show 或 toggle 可见性时易见 flicker；缓解：窗口常驻不销毁、用 CSS opacity 而非 window.show()/hide() 做展开收起。",
+        "setIgnoreMouseEvents(true,{forward:true}) 的 mousemove/mouseleave 转发不稳定：当焦点在某些非 Electron 窗口时 mousemove 可能不触发（#33281）、Windows 上 :hover/mouseleave 有 bug（#30808）、拖拽时其他窗口闪烁（#35030）。'hover 进热区展开'若纯靠 forward 的 mousemove 可能漏触发——更稳的是用一条始终可交互(不穿透)的窄边缘热区窗/区域来捕获 hover。",
+        "macOS globalShortcut 某些组合（含媒体键/系统级）需 app 被授予辅助功能(Accessibility)信任权限才能注册成功；register 在快捷键被其他 app 占用时静默失败、返回前需校验返回值。",
+        "Wayland(Linux) 下 setBounds/setSize 程序化改窗口大小可能被 WM 拒绝，展开动画在 Linux/Wayland 上需降级方案。setVisibleOnAllWorkspaces 在 Windows 上是 no-op（isVisibleOnAllWorkspaces 恒 false）。",
+        "Tauri 侧对应坑：原生 WebView 渲染差异需各平台验透明/动画；某些底层窗口能力（极端 z-order、精细 mouse-passthrough 行为）成熟度与社区案例不如 Electron 丰富，遇到平台特例可能要写 Rust 原生代码补。"
+      ],
+      "apis_or_mechanisms": [
+        "BrowserWindow 构造项: frame:false, transparent:true, alwaysOnTop:true, skipTaskbar:true, resizable:false, hasShadow:false, focusable",
+        "win.setAlwaysOnTop(flag, level, relativeLevel) — level:'screen-saver'/'floating'",
+        "win.setIgnoreMouseEvents(ignore, {forward:true}) — 点击穿透+事件转发",
+        "win.setBounds(bounds, true) / win.setSize(w,h,true) — animate=true 做展开动画(macOS 原生缓动)",
+        "win.setVisibleOnAllWorkspaces(true, {visibleOnFullScreen:true}) — 跨 Space 常驻(macOS/Linux)",
+        "screen.getPrimaryDisplay().workArea / getDisplayNearestPoint + 'display-metrics-changed' — 右侧贴边定位与多屏适配",
+        "app.dock.hide() / Info.plist LSUIElement — macOS 隐藏 Dock 图标",
+        "Tray (systemTray) — 常驻托盘/菜单栏入口",
+        "globalShortcut.register(accelerator, cb) — 全局唤起(返回值校验; macOS Accessibility 信任)",
+        "Tauri 2.0 对应: decorations(false), transparent, always_on_top, skip_taskbar, set_ignore_cursor_events, @tauri-apps/plugin-global-shortcut, tray-icon feature"
+      ],
+      "recommendation": "两者都能做到全部七项能力；如果团队已有 Web/JS 栈、看重透明/动画的跨平台渲染一致与调试便利，且能接受 ~100MB 体积/~150–300MB 常驻内存，用 Electron（动效和透明叠层更可控）；如果这个胶囊定位是'轻量、长期后台常驻、内存敏感'的小工具且团队能写 Rust，优先 Tauri 2.0（体积小一个数量级、常驻内存约低一半），但要预算各平台 WebView 的透明/动画渲染差异测试。",
+      "sources": [
+        "https://www.electronjs.org/docs/latest/api/browser-window",
+        "https://www.electronjs.org/docs/latest/api/base-window",
+        "https://www.electronjs.org/docs/latest/api/structures/base-window-options",
+        "https://www.electronjs.org/docs/latest/tutorial/custom-window-interactions",
+        "https://www.electronjs.org/docs/latest/api/global-shortcut/",
+        "https://www.electronjs.org/docs/latest/tutorial/menus",
+        "https://github.com/electron/electron/issues/31862",
+        "https://github.com/electron/electron/issues/20357",
+        "https://github.com/electron/electron/issues/12130",
+        "https://github.com/electron/electron/issues/33281",
+        "https://github.com/electron/electron/issues/30808",
+        "https://github.com/electron/electron/issues/35030",
+        "https://v2.tauri.app/learn/window-customization/",
+        "https://v2.tauri.app/plugin/global-shortcut/",
+        "https://v2.tauri.app/learn/system-tray/",
+        "https://www.gethopp.app/blog/tauri-vs-electron",
+        "https://www.pkgpulse.com/guides/electron-vs-tauri-2026"
+      ]
+    },
+    {
+      "question": "如何让 macOS \"胶囊\"窗口在所有 Space 可见、悬浮在全屏应用之上、且不抢焦点；Tauri/Electron 的 webview 窗口能否设置这些，还是必须用 native 逃生口？",
+      "verdict": "conditionally-feasible",
+      "findings": [
+        "核心结论：全部三项目标(全 Space 可见 + 浮于全屏之上 + 不抢焦点)用 native AppKit (NSPanel) 完全可达，这是基线;webview 框架(Tauri/Electron)能达到\"全 Space 可见 + 浮于全屏\",但\"完全不抢焦点(non-activating)\"这一项在纯 JS/config 层达不到——必须经 native 逃生口(Tauri 用 tauri-nspanel 插件或自写 objc;Electron 用 type:'panel' BaseWindow + 原生模块)才能拿到 NSWindowStyleMaskNonactivatingPanel。",
+        "Native AppKit 基线(最可靠):用 NSPanel 子类,styleMask 加 .nonactivatingPanel(点击面板不激活你的 app、不抢前台 app 焦点);becomesKeyOnlyIfNeeded=true(只有点到真正需要键盘输入的文本框/控件时才成为 key window——正好匹配\"hover 展开后快速写待办\");level=.floating 或 .statusBar(浮于普通窗口之上,statusBar 比 floating 更高);collectionBehavior=[.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]。三者缺一不可:canJoinAllSpaces 让面板跟随用户切 Space;fullScreenAuxiliary 让面板能浮在别的 app 的全屏会话之上;stationary 让面板在 Mission Control/切 Space 动画时不被当普通窗口平移。",
+        "Tauri(v2):纯 config/JS 不够。setVisibleOnAllWorkspaces / alwaysOnTop 在 dev 下偶尔像样,但 `tauri build` 产物里\"浮于全屏之上\"会失效或把窗口丢到非全屏桌面(已确认 bug:tauri#11488、tauri#9556、tauri#9439,均 closed as not planned——框架本身不打算修)。tauri 也没有原生 NonactivatingPanel 枚举(tao#136/#414、tauri#13034 长期未落地)。逃生口=社区插件 tauri-nspanel(ahkohd/tauri-nspanel,v2.x):把已建的 webview window 转成真正的 NSPanel,提供 PanelBuilder、PanelLevel::Floating、is_floating_panel、can_become_key_window 等;Cap、Screenpipe 等产品已用它实现\"浮于全屏 + 不夺焦\"。这是 Tauri 路线的推荐做法。",
+        "Electron:同样需要部分 native。setVisibleOnAllWorkspaces(true,{visibleOnFullScreen:true}) + setAlwaysOnTop(true,'screen-saver'/'floating') 能做到全 Space + 浮于全屏(参考 Daily/codestudy 实战)。但\"不抢焦点\"靠 BrowserWindow 选项(focusable:false 只是不可聚焦,不等于 non-activating,且会让面板内输入框收不到键盘)无法干净达成;真正的 non-activating 需要 BaseWindow 的 type:'panel'(Electron 已支持 panel 类型)或经原生模块拿 NSWindowStyleMaskNonactivatingPanel。已知坑 electron#36364:setAlwaysOnTop+setVisibleOnAllWorkspaces+visibleOnFullScreen 组合在全屏上\"不手动 focus 就不显示\",closed as not planned。",
+        "\"软件最小化后胶囊仍常驻\":胶囊应是独立 NSPanel/独立窗口,与主窗口生命周期解耦——主窗口 miniaturize/close 不影响面板;面板默认不出现在 Dock/窗口菜单(NSPanel 天然如此),正好符合常驻轻量诉求。",
+        "\"贴边热区 hover 展开动画\":NSPanel + 鼠标跟踪可达;tauri-nspanel 内置 mouse enter/exit/move 事件,适合做边缘热区触发。展开/收起动画在 webview 内用 CSS/JS 做(transform/clip-path),窗口尺寸变化用带动画的 setFrame(display:animate:) 或保持窗口够大、内容层做动画(避免逐帧 resize 窗口卡顿,推荐后者)。"
+      ],
+      "apis_or_mechanisms": [
+        "NSPanel (NSWindow 子类)",
+        "NSWindowStyleMask.nonactivatingPanel (NSWindowStyleMaskNonactivatingPanel)",
+        "panel.becomesKeyOnlyIfNeeded = true",
+        "window.level = .floating / .statusBar (NSWindow.Level)",
+        "collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]",
+        "NSApp activationPolicy = .accessory (LSUIElement) — 让 app 不占 Dock,但会隐藏 Dock 图标,需权衡",
+        "Tauri: tauri-nspanel 插件 (ahkohd/tauri-nspanel v2.x) — PanelBuilder, PanelLevel::Floating, is_floating_panel, can_become_key_window, set_collection_behavior",
+        "Tauri webview API: setVisibleOnAllWorkspaces / alwaysOnTop(不足以独立达成,仅 dev 近似)",
+        "Electron: BaseWindow/BrowserWindow type:'panel'",
+        "Electron: setVisibleOnAllWorkspaces(true,{visibleOnFullScreen:true, skipTransformProcessType}), setAlwaysOnTop(true,'screen-saver'|'floating')",
+        "Electron: setIgnoreMouseEvents(true,{forward:true}) — 透传鼠标做边缘热区(可选)",
+        "setFrame(_:display:animate:) — 窗口尺寸动画(展开面板)"
+      ],
+      "gotchas": [
+        "webview 框架纯 config 达不到\"不抢焦点\":focusable:false ≠ non-activating——前者会让面板里的文本框收不到键盘(写待办失败),后者(NonactivatingPanel)才是\"app 不前置但控件仍可输入\"。这是本产品的关键约束,必须走 native panel 类型。",
+        "canJoinAllSpaces 单独不够浮于全屏:必须同时加 fullScreenAuxiliary,否则切到别的 app 全屏后胶囊消失。漏配是最常见错误。",
+        "Tauri 在 `tauri build` 发布产物里行为与 dev 不一致(浮于全屏失效/窗口被丢到非全屏桌面),tauri#11488/#9556/#9439 均 closed as not planned——不要指望官方修,直接上 tauri-nspanel。",
+        "Electron #36364:alwaysOnTop+visibleOnAllWorkspaces+visibleOnFullScreen 组合可能\"不手动 focus 就不在全屏上显示\",且官方 not planned。",
+        "activationPolicy=.accessory 能把窗口顶到系统层之上,但会从 Dock 抹掉 app 图标——如果产品要有正常 Dock 图标,别用 accessory,改用 NSPanel non-activating + collectionBehavior 达成同效果。",
+        "Electron setVisibleOnAllWorkspaces 默认会在 UIElement/Foreground 进程类型间切换,导致窗口和 Dock 短暂闪烁;若已是 UIElement 用 skipTransformProcessType:true 规避。",
+        "tao 早期把 NonactivatingPanel 枚举值直接转 cocoa 会崩溃(社区记录),所以别手搓 styleMask 位,务必用维护过的 tauri-nspanel。",
+        "动画别逐帧 resize 原生窗口(卡顿/掉帧):窗口保持展开态尺寸,内容在 webview 内用 CSS transform 动画;或用 setFrame(display:animate:) 但限制频率。",
+        "stationary 漏配会让胶囊在 Mission Control/切 Space 时被当普通窗口平移、动画割裂,影响\"常驻\"观感。"
+      ],
+      "recommendation": "用 NSPanel(.nonactivatingPanel + becomesKeyOnlyIfNeeded + level .statusBar + collectionBehavior [.canJoinAllSpaces,.fullScreenAuxiliary,.stationary])作为唯一可靠路径;若用 webview,选 Tauri v2 + tauri-nspanel 插件把胶囊窗口转成真 NSPanel(不抢焦/浮全屏/全 Space 全部由插件的 native 层保证),展开动画放 webview 内 CSS——不要试图只靠 Tauri/Electron 的 JS config 达成\"不抢焦点\",那一项在框架层达不到,必须经 native 逃生口。",
+      "sources": [
+        "https://developer.apple.com/documentation/appkit/nswindow/stylemask-swift.struct/nonactivatingpanel",
+        "https://fazm.ai/blog/swiftui-floating-panel",
+        "https://github.com/ahkohd/tauri-nspanel",
+        "https://github.com/ahkohd/tauri-nspanel/issues/19",
+        "https://github.com/tauri-apps/tauri/issues/11488",
+        "https://github.com/tauri-apps/tauri/issues/9556",
+        "https://github.com/tauri-apps/tauri/issues/9439",
+        "https://github.com/tauri-apps/tauri/discussions/9876",
+        "https://github.com/tauri-apps/tao/issues/136",
+        "https://github.com/tauri-apps/tauri/issues/13034",
+        "https://github.com/electron/electron/issues/36364",
+        "https://www.electronjs.org/docs/latest/api/browser-window",
+        "https://www.daily.co/blog/building-a-video-call-overlay-app-with-electron-and-daily-part-1/",
+        "https://www.codestudy.net/blog/set-browserwindow-always-on-top-even-other-app-is-in-fullscreen-electron-mac-os/"
+      ]
+    },
+    {
+      "question": "刘海/胶囊类 app（NotchNook、Boring Notch、MediaMate）技术上如何实现常驻胶囊 + hover 展开？是否用原生 Swift/AppKit 无边框 NSWindow/NSPanel？对本产品\"webview vs 原生\"架构选择有何启示——本产品（右侧贴边常驻、置顶不抢焦点、idle 极小、hover 展开成待办面板、最小化后仍常驻、轻量美观动效好）该用 webview 还是 native Swift？",
+      "verdict": "conditionally-feasible",
+      "findings": [
+        "这一整类 app 全部是原生 Swift/AppKit + SwiftUI，没有一个用 webview/Electron。Boring Notch（开源，github.com/TheBoredTeam/boring.notch）自述技术栈为 SwiftUI + Core Animation + Combine + 私有 MediaRemote framework；DynamicNotchKit（github.com/MrKai77/DynamicNotchKit，被多个 notch app 复用的库）明确 'all the UI is handled by SwiftUI'，底层自己 'drawing a custom window'（即自定义 NSPanel）。NotchNook 是闭源商业 app（lo.cafe，$25 买断/$3 月订），但行为特征（贴 notch、非抢焦点、media live activity）与开源同类完全一致，几乎确定同构。",
+        "核心窗口原语是 NSPanel（NSWindow 的子类，专为辅助/浮动窗口设计），不是普通 NSWindow。关键配置：styleMask 含 .borderless（无标题栏边框，'displays none of the usual peripheral elements'）+ .nonactivatingPanel（点击面板不把 app 拉到前台、不抢焦点——这正是'置顶不抢焦点'的核心 API）。",
+        "置顶用 window.level 设为高层级——浮动面板用 .floating，需要盖过菜单栏/全屏的 notch app 通常用更高的 .statusBar 或 .screenSaver（NSScreenSaverWindowLevel）。跨 Space / 全屏常驻用 collectionBehavior：.canJoinAllSpaces（跟随用户在所有 Space 显示）+ .fullScreenAuxiliary（在别的 app 全屏时仍可叠加显示）+ .stationary。",
+        "hover 展开靠 AppKit 的 NSTrackingArea：在贴边/notch 区域注册一个 tracking rect，options 设 [.mouseEnteredAndExited, .activeAlways, .inVisibleRect]。关键是 .activeAlways（而非 .activeInKeyWindow）——这样即使 app 不在前台、面板没焦点，鼠标进入热区也能收到 mouseEntered 回调触发展开。SwiftUI 侧也可用 .onHover，但贴边热区检测更可靠的是 AppKit tracking area。",
+        "展开动画：idle 小胶囊 ↔ 展开面板的形变/尺寸过渡用 Core Animation / SwiftUI 隐式动画（.spring/.easeInOut）。做法是面板窗口本身保持一个较大的固定 frame，内容用 SwiftUI matchedGeometry / 尺寸动画在窗口内伸缩；或动态改 NSPanel 的 setFrame(display:animate:)。Boring Notch 明确用 Core Animation 做 smooth transitions。",
+        "'最小化后胶囊仍常驻' = 把 app 设为 accessory/agent 类型：Info.plist 设 LSUIElement=1，或运行时 NSApp.setActivationPolicy(.accessory)。这样 app 无 Dock 图标、无主菜单栏，但浮动 NSPanel 持续显示，主窗口关闭/'最小化'不影响胶囊存活。胶囊本质是一个常驻 agent 进程托管的 NSPanel，不是某个主窗口的子视图。",
+        "成熟可复用基建已存在：DynamicNotchKit / DynamicNotch / mew-notch / Atoll 等开源库已封装'自定义贴边窗口 + 安全区 + 动画 + hover'，本产品（右侧胶囊，不一定贴 notch）可直接借鉴其 NSPanel 配置代码，不必从零写。",
+        "webview 路线（Electron / Tauri / WKWebView 套壳）在本场景有硬伤：Electron 难以做到真正的 .nonactivatingPanel 非抢焦点 + .canJoinAllSpaces 全 Space 常驻 + 高 window level 盖菜单栏，BrowserWindow 的 alwaysOnTop/level 映射粗糙且不暴露 NSTrackingArea 级别的边缘热区；且单胶囊 app 背一个 ~100-150MB Chromium 运行时与'轻量'诉求直接冲突。"
+      ],
+      "gotchas": [
+        "LSUIElement/accessory 模式下 macOS 不允许'有主菜单栏但无 Dock 图标'——要么都有要么都没有。agent app 通常无 Dock 无主菜单栏，设置入口靠 menu bar status item 或胶囊内的按钮，不要指望传统 App 菜单。",
+        ".nonactivatingPanel 面板默认 canBecomeKey/canBecomeMain 为 false，文本输入（写待办的输入框）拿不到键盘焦点。必须子类化 NSPanel 重写 canBecomeKey 返回 true（同时保留 nonactivating 不抢 app 焦点），否则 hover 展开后输入框打不了字——这是该交互最常见的坑。",
+        "高 window level（.screenSaver/.statusBar）会盖住几乎所有东西，包括别的 app 的弹窗甚至部分系统 UI；level 调过高体验割裂，需精调到刚好盖住目标层级。",
+        "collectionBehavior 若不设 .canJoinAllSpaces，胶囊只在创建它的那个 Space 显示，切 Space 就消失——'常驻'诉求必须显式加这个 flag。.fullScreenAuxiliary 不加则别的 app 进全屏时胶囊被遮。",
+        "NSTrackingArea 在多显示器 / 显示器热插拔 / 分辨率变化时 rect 坐标会失效，需监听 NSApplication.didChangeScreenParametersNotification 重建 tracking area 和重定位面板。贴边坐标要从 NSScreen.visibleFrame 实时算，别硬编码。",
+        "全屏 app 之上叠加常驻浮层在新版 macOS 上对非 notch 区域有额外限制（系统对覆盖菜单栏/全屏的浮层管控趋严），需在目标 macOS 版本实测；这也是为什么这类 app 多绑定 notch 区（系统对 notch 周边相对宽容）。",
+        "Boring Notch 用了私有 MediaRemote framework——那是为媒体控制功能，本产品做待办面板不需要私有 API，纯公开 AppKit 即可，不要被'它们用私有 framework'误导成本产品也必须用。",
+        "若坚持 webview 取美观/动效，折中是原生 Swift 写 NSPanel + hover + 动画外壳，面板内容嵌 WKWebView 渲染待办 UI——但这样仍需写全套 AppKit 窗口代码，省不掉原生工作量，只是把内容层换成 web，收益有限且增加 IPC/性能复杂度。"
+      ],
+      "recommendation": "用原生 Swift（AppKit NSPanel + SwiftUI 内容 + NSTrackingArea hover + accessory 模式），直接参照 DynamicNotchKit 等开源库的窗口配置；webview/Electron 在'非抢焦点 + 全 Space 常驻 + 边缘热区 + 轻量'这四点上做不到或代价过高，不建议。",
+      "apis_or_mechanisms": [
+        "NSPanel（NSWindow 子类，浮动窗口原语）",
+        "styleMask: .borderless + .nonactivatingPanel",
+        "NSWindow.level: .floating / .statusBar / .screenSaver(NSScreenSaverWindowLevel)",
+        "collectionBehavior: .canJoinAllSpaces, .fullScreenAuxiliary, .stationary",
+        "重写 NSPanel.canBecomeKey/canBecomeMain → true（让输入框可输入而不抢 app 焦点）",
+        "NSTrackingArea(options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect]) → mouseEntered/mouseExited",
+        "NSHostingView（把 SwiftUI 视图嵌入 NSPanel）",
+        "NSApp.setActivationPolicy(.accessory) / Info.plist LSUIElement=1（无 Dock 常驻 agent）",
+        "Core Animation / SwiftUI .spring 隐式动画 + NSPanel.setFrame(_:display:animate:)（胶囊↔面板形变）",
+        "NSApplication.didChangeScreenParametersNotification（多屏/分辨率变化重建热区）",
+        "NSScreen.visibleFrame（贴边坐标实时计算）",
+        "SwiftUI .onHover（轻量 hover，贴边热区仍优先 NSTrackingArea）"
+      ],
+      "sources": [
+        "https://github.com/TheBoredTeam/boring.notch",
+        "https://github.com/MrKai77/DynamicNotchKit",
+        "https://github.com/jackson-storm/DynamicNotch",
+        "https://cindori.com/developer/floating-panel",
+        "https://fazm.ai/blog/swiftui-floating-panel",
+        "https://developer.apple.com/documentation/appkit/nspanel",
+        "https://developer.apple.com/documentation/appkit/nswindow/stylemask-swift.struct/borderless",
+        "https://developer.apple.com/documentation/appkit/nswindow/collectionbehavior",
+        "https://developer.apple.com/documentation/appkit/nstrackingarea",
+        "https://artlasovsky.com/fine-tuning-macos-app-activation-behavior",
+        "https://lo.cafe/notchnook",
+        "https://www.howtogeek.com/these-apps-turn-your-macbook-notch-into-a-dynamic-island/"
+      ]
+    },
+    {
+      "question": "macOS engineering reality for an independent small utility: global hotkey capture, lightweight local persistence (SQLite/JSON), launch-at-login, menu bar item, and packaging/notarization — for an always-on, edge-docked, topmost-but-non-focus-stealing \"capsule\" window that idles tiny and animates open into a todo panel on edge-hover hot-zone, persisting after minimize.",
+      "verdict": "feasible",
+      "findings": [
+        "GLOBAL HOTKEY: Fully feasible with mature, MAS-compatible tooling. The de-facto choice is sindresorhus/KeyboardShortcuts (SPM), which gives user-customizable, recordable shortcuts via a SwiftUI Recorder component and is explicitly sandbox + Mac App Store compatible. Under the hood global hotkeys still rely on Carbon's RegisterEventHotKey (or a CGEventTap); Apple never shipped a modern replacement, but the deprecated Carbon path remains the supported reality and Apple states new APIs will land before removal. soffes/HotKey is the lighter wrapper if you only need hard-coded keys with no settings UI.",
+        "NON-FOCUS-STEALING TOPMOST WINDOW: This is the single most important architectural decision and it is feasible — use NSPanel (not NSWindow) with styleMask .nonactivatingPanel. A nonactivating panel can become KEY (receive keyboard input, so the todo text field is editable) WITHOUT becoming MAIN and WITHOUT activating/foregrounding your app, so the user's current app keeps focus. Set window.level = .floating (or .statusBar) for always-on-top, collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary] so the capsule rides over every Space and over other apps' full-screen windows. Subclass NSPanel and override canBecomeKey = true.",
+        "EDGE-HOVER REVEAL: The capsule idling tiny means the cursor is OUTSIDE the window most of the time, so an in-window NSTrackingArea/mouseEntered is insufficient for the initial trigger. Use NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved]) to watch the cursor globally; when X is within an edge threshold (e.g. within ~4px of the right screen edge AND inside the capsule's Y-band), animate expansion. Crucially: a GLOBAL mouse-MOVED monitor does NOT require Accessibility permission (only synthetic event POSTING or key monitoring does), so the hot-zone works permission-free. Once expanded, switch to in-window NSTrackingArea (.mouseEnteredAndExited + .activeAlways) to detect mouseExited and collapse.",
+        "EXPAND/COLLAPSE ANIMATION: Animate by resizing the panel frame: window.animator().setFrame(expandedRect, display: true) inside NSAnimationContext.runAnimationGroup with a custom timingFunction, or animate SwiftUI content inside a fixed max-size panel with .animation/withAnimation (often smoother — keep the panel at full expanded size, animate internal content offset/opacity, so you avoid per-frame window resize cost). Pin the panel to the screen's right edge by computing frame from NSScreen.visibleFrame. 'Stays after minimize' is automatic: the panel is independent of any main window; if you also have a main window, minimizing/closing it does not affect the panel as long as the app process keeps running (LSUIElement keeps it running with no Dock presence).",
+        "MENU BAR ITEM: Feasible and standard. Two routes: (1) SwiftUI MenuBarExtra (macOS 13+) with .menuBarExtraStyle(.window) — simplest, reactive; but the .window popover is size-constrained (~half screen) and less positionally flexible. (2) NSStatusItem + NSPopover (or just the panel) — full control over size/position/behavior, recommended here since you already manage a custom panel. Set Info.plist LSUIElement = YES (Application is agent) so there is NO Dock icon, NO app menu bar, NO Cmd-Tab entry — only the menu bar status item, which is exactly the 'lightweight background utility' profile you want.",
+        "LAUNCH AT LOGIN: Feasible and modern. Use ServiceManagement's SMAppService (macOS 13+): try SMAppService.mainApp.register() to enable, .unregister() to disable, and read .status to reflect a toggle in your settings UI. This replaces the deprecated SMLoginItemSetEnabled / SMJobBless and the old separate helper-bundle dance — for a single app it is a one-liner with no helper target required. macOS surfaces it in System Settings > General > Login Items where the user can also revoke it.",
+        "PERSISTENCE: Trivially feasible and lightweight either way. For a todo list, plain Codable JSON written to Application Support (FileManager .applicationSupportDirectory, or the sandbox container Library/Application Support) is the lowest-overhead option and entirely adequate. If you want querying/ordering/scale, GRDB.swift (SPM) is the recommended thin SQLite layer; SwiftData (macOS 14+) is the Apple-native ORM but heavier and overkill for a flat todo store. Under App Sandbox, files must live inside the container — never hardcode ~/Library outside the container or you hit SQLite open error 14.",
+        "PACKAGING / NOTARIZATION: Feasible, this is the routine gate for any Mac app distributed outside the App Store. Requirements: (a) a paid Apple Developer Program account ($99/yr) to obtain a 'Developer ID Application' certificate — note an 'Apple Development' cert is REJECTED by the notary service; (b) sign with Hardened Runtime enabled: codesign -o runtime --deep --sign 'Developer ID Application: ...'; (c) submit a .zip/.dmg/.pkg with xcrun notarytool submit --wait (altool is dead since Nov 1 2023); (d) xcrun stapler staple the .app/.dmg so Gatekeeper passes offline. Without this, Gatekeeper blocks the app for downloaders (quarantine bit). Mac App Store distribution is an alternative path that skips Developer-ID notarization but adds sandbox + review constraints."
+      ],
+      "gotchas": [
+        "NSPanel .nonactivatingPanel set AFTER init is broken: NSPanel only calls its internal -_setPreventsActivation: during initialization, so flipping the style mask later via setStyleMask: silently fails to update activation behavior. Create the panel with the nonactivating flag in the initializer, or use the documented private-selector workaround (see philz.blog NonactivatingPanelBug). Build the panel right the first time.",
+        "macOS 15 regression: RegisterEventHotKey-based global shortcuts using ONLY Option or Option+Shift modifiers stopped firing for sandboxed apps (feedback-assistant #552). Avoid Option-only hotkey defaults; require a Cmd/Ctrl-containing combo, or expose a recorder so the user picks a working combo.",
+        "Global mouse-moved monitoring (addGlobalMonitorForEvents) is passive/observe-only — you receive events but cannot consume them, and the handler fires only while your app is NOT the active app (pair with addLocalMonitorForEvents to cover the active state). It does not need Accessibility permission, but a global KEY monitor WOULD — so keep the hot-zone trigger on mouse-moved, and route key handling through the registered hotkey / the panel's own key view, not a global key tap, to stay permission-free.",
+        "App Sandbox + SQLite: opening a database outside the container yields SQLite error 14 (SQLITE_CANTOPEN). Always resolve paths via the container's Application Support; if you ever add an extension/helper sharing the DB, you need an App Group container + file coordination (GRDB documents this).",
+        "Floating window over full-screen apps and all Spaces requires collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]; without it the capsule disappears when the user enters another app's full-screen Space. window.level alone is not enough.",
+        "Notarization rejects 'Apple Development' certs and any binary not built with Hardened Runtime (codesign -o runtime). Also every bundled dylib/framework/SPM binary must be individually signed (use --deep or sign inside-out) or notarization fails. Budget for the $99/yr Developer Program account as a hard prerequisite for outside-MAS distribution.",
+        "Edge-resize animation jank: animating the NSWindow frame every frame (animator().setFrame) can stutter, especially with vibrancy/blur. Prefer keeping the panel at its full expanded size and animating SwiftUI content (offset/scale/opacity) inside it, so the window geometry is stable and only layer compositing animates.",
+        "LSUIElement=YES removes the Dock icon AND the standard app menu bar — there is no Cmd-Q menu, so you must provide quit/settings affordances inside the menu bar status item or the panel itself, and remember the global hotkey is then the primary keyboard entry point.",
+        "MenuBarExtra(.window) style caps popover size at roughly half the screen and gives little positional control — if the capsule needs precise right-edge docking and arbitrary size, drive the panel yourself via NSStatusItem rather than relying on MenuBarExtra's built-in window."
+      ],
+      "apis_or_mechanisms": [
+        "NSPanel + styleMask .nonactivatingPanel; override canBecomeKey=true",
+        "NSWindow.level = .floating / .statusBar; collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]",
+        "sindresorhus/KeyboardShortcuts (SPM, recordable, sandbox/MAS-safe); soffes/HotKey; Carbon RegisterEventHotKey",
+        "NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved]) + addLocalMonitorForEvents (no Accessibility needed for mouse-moved)",
+        "NSTrackingArea(.mouseEnteredAndExited, .activeAlways) + mouseEntered/mouseExited for collapse-on-leave",
+        "NSAnimationContext.runAnimationGroup + window.animator().setFrame; or SwiftUI withAnimation on internal content",
+        "NSScreen.visibleFrame for right-edge docking geometry",
+        "SwiftUI MenuBarExtra (.menuBarExtraStyle(.window)) OR NSStatusItem + NSPopover",
+        "Info.plist LSUIElement = YES (Application is agent — no Dock icon)",
+        "ServiceManagement SMAppService.mainApp.register()/.unregister()/.status (macOS 13+, replaces SMLoginItemSetEnabled)",
+        "Persistence: Codable JSON in FileManager.applicationSupportDirectory; or GRDB.swift (SPM) over SQLite; SwiftData (macOS 14+) as heavier native option",
+        "Codesign: codesign -o runtime (Hardened Runtime) --sign 'Developer ID Application'",
+        "Notarize: xcrun notarytool submit --wait; xcrun stapler staple (altool deprecated Nov 2023)",
+        "CGPreflightPostEventAccess/CGRequestPostEventAccess only if posting synthetic events (not needed here)"
+      ],
+      "recommendation": "Build it as a SwiftUI app with an AppKit core: an LSUIElement agent (no Dock icon) driving a hand-managed NSStatusItem and a .nonactivatingPanel NSPanel pinned to the right edge at .floating level with all-Spaces collection behavior — use a global mouse-moved monitor (permission-free) for the edge hot-zone and an in-panel NSTrackingArea for collapse, animate the panel's internal SwiftUI content (not the window frame) for smoothness, persist todos as Codable JSON (or GRDB if you want querying), wire launch-at-login via SMAppService and hotkeys via sindresorhus/KeyboardShortcuts; the only hard external prerequisite is a $99/yr Apple Developer account for Developer-ID signing + notarytool notarization.",
+      "sources": [
+        "https://github.com/sindresorhus/KeyboardShortcuts",
+        "https://github.com/soffes/HotKey",
+        "https://github.com/feedback-assistant/reports/issues/552",
+        "https://developer.apple.com/documentation/appkit/nswindow/stylemask-swift.struct/nonactivatingpanel",
+        "https://philz.blog/nspanel-nonactivating-style-mask-flag/",
+        "https://developer.apple.com/documentation/appkit/nsevent/1535472-addglobalmonitorforeventsmatchin",
+        "https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/MouseTrackingEvents/MouseTrackingEvents.html",
+        "https://developer.apple.com/documentation/servicemanagement/smappservice",
+        "https://nilcoalescing.com/blog/LaunchAtLoginSetting/",
+        "https://sarunw.com/posts/swiftui-menu-bar-app/",
+        "https://nilcoalescing.com/blog/BuildAMacOSMenuBarUtilityInSwiftUI/",
+        "https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution",
+        "https://developer.apple.com/documentation/security/customizing-the-notarization-workflow",
+        "https://developer.apple.com/developer-id/",
+        "https://github.com/groue/GRDB.swift",
+        "https://developer.apple.com/forums/thread/735249"
+      ]
+    },
+    {
+      "question": "用原生 SwiftUI + AppKit(NSPanel) 直接做\"右侧贴边、置顶不抢焦点、hover 展开\"的胶囊待办 App，可行性与利弊，以及对比 webview 方案的明确推荐架构",
+      "verdict": "feasible",
+      "findings": [
+        "核心窗口必须是 NSPanel 而非 SwiftUI 原生 Window/MenuBarExtra。原生 SwiftUI 的 WindowGroup 无法做到'点击不激活 App、不抢焦点'。正确做法：自定义 NSPanel 子类，styleMask 加 .nonactivatingPanel（点击面板不把 App 拉到前台、不打断用户当前正在用的 App），level = .floating（置顶悬浮），isFloatingPanel = true，contentView = NSHostingView(rootView: 你的 SwiftUI 视图)。这是 NotchNook/Slidepad/DockDoor 等同类商业产品的标准做法。",
+        "'软件最小化后胶囊仍常驻'有明确实现路径：把 App 设为 LSUIElement=true（Info.plist，accessory/agent 模式，不出现在 Dock 和 Cmd-Tab），胶囊由 NSPanel 独立承载，其生命周期与任何主窗口解耦——没有主窗口时面板照常存在。配 collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary] 让胶囊跨 Space 跟随、并在别的 App 全屏时仍可见。只要持有 NSPanel 的强引用防止提前释放即可。",
+        "'idle 极小 → hover 边缘热区 → 动画展开成面板'用纯原生即可做到且更顺滑：(1) 热区检测用 NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved) 做全局鼠标追踪，判断光标 x 是否进入屏幕右缘 N px 热带；(2) 展开/收起用 SwiftUI 的 withAnimation(.spring/.snappy) 驱动尺寸与圆角，或对 NSPanel 用 animator().setFrame(_:display:animate:) 做窗口级几何动画；(3) 设 panel.animationBehavior = .utilityWindow 得到柔和淡入、避免系统默认窗口闪白。SwiftUI 在 macOS 上由系统优化渲染管线驱动，动画为 GPU 合成，60/120fps 丝滑，无 webview 的 JS 主线程抖动。",
+        "体积/内存对原生压倒性有利：SwiftUI App 典型 ~50MB RAM、安装包数 MB~十几 MB、冷启动约 0.3s。Electron/webview 方案单 Chromium 引擎约 150MB 包体起步、运行时 200-300MB 内存、启动 2-10s。对一个'轻量、idle 不打扰'的常驻胶囊，webview 的资源开销与产品诉求直接冲突。",
+        "'轻量美观 + 动效好'与原生栈高度契合：SwiftUI 提供 .ultraThinMaterial/.regularMaterial 毛玻璃、matchedGeometryEffect（胶囊→面板的形变过渡）、spring 物理动画、圆角阴影等开箱即用，且与 macOS 视觉语言一致(响应深浅色/降低动态偏好/强调色)。webview 要复刻这套原生材质与系统级动效反而更费力、更不像原生。",
+        "存在成熟先例，非新颖未验证机制：NotchNook(hover/swipe/click 三种展开方式)、Slidepad(屏幕边缘召出滑入滑出侧栏)、DockDoor(dock 滑出屏外、边缘 hover 唤回) 均为原生 macOS 实现的'边缘贴边 + hover 揭示 + 动画'产品，证明该交互模型在原生栈下成熟可落地。"
+      ],
+      "apis_or_mechanisms": [
+        "NSPanel 子类 + styleMask: [.nonactivatingPanel, .titled, .closable, .resizable, .fullSizeContentView]",
+        "panel.isFloatingPanel = true; panel.level = .floating（NSWindow.Level）",
+        "panel.becomesKeyOnlyIfNeeded = true（不抢键盘焦点，仅在点 TextField 时变 key）",
+        "NSHostingView(rootView:) 作为 panel.contentView 承载 SwiftUI 视图",
+        "panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]（跨 Space + 别的 App 全屏时可见）",
+        "panel.animationBehavior = .utilityWindow（柔和淡入、防窗口闪白）",
+        "Info.plist LSUIElement=true（accessory/agent 模式，最小化后胶囊常驻、不占 Dock/Cmd-Tab）",
+        "NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved){}（全局鼠标追踪 → 屏幕右缘热区检测；removeMonitor 释放）",
+        "SwiftUI withAnimation(.spring/.snappy) + matchedGeometryEffect（胶囊↔面板形变过渡）",
+        "NSWindow animator().setFrame(_:display:animate:)（窗口级几何展开动画）",
+        "SwiftUI .ultraThinMaterial / .regularMaterial（原生毛玻璃材质）",
+        "可选 MenuBarExtra(.window) 作为辅助入口，但主胶囊仍走 NSPanel（MenuBarExtra 满足不了贴边常驻+非激活）"
+      ],
+      "gotchas": [
+        "TextField 焦点陷阱（最常见坑）：.nonactivatingPanel + becomesKeyOnlyIfNeeded 会导致点进 TextField 写待办时面板不是 key window、输入无响应。修法：在控件被点/获得焦点时显式 panel.makeKey()——用 NSViewRepresentable 包一层，在其 updateNSView 里当绑定的 focus 为真时调用 window?.makeKey()，或在 onTapGesture 里手动 makeKey。这是写待办的核心交互，必须专门处理。",
+        "绝对不要在显示面板时调用 NSApp.activate(ignoringOtherApps: true)——这会激活整个 App、抢走前台焦点，直接破坏'不打扰/不抢焦点'的产品核心。",
+        "全局 .mouseMoved 监控有隐私/性能注意点：高频事件需节流（只在接近边缘时升频）；某些场景全局监控可能触发系统对辅助功能/输入监控的限制，需在真实多显示器+多 Space 环境实测热区坐标换算（屏幕坐标系 y 轴翻转、外接屏负坐标）。",
+        "NSPanel 必须被强引用持有（如 AppDelegate 的属性），否则会被提前释放导致胶囊消失。",
+        "SwiftUI Window/Settings/WindowGroup 这些原生场景无法实现非激活贴边胶囊——必须下沉到 AppKit NSPanel，纯 SwiftUI App 生命周期(@main App)需要用 NSApplicationDelegateAdaptor 桥接来创建和管理这个 panel。",
+        "面板尺寸跟随 SwiftUI 内容：NSHostingView 会把 SwiftUI 的 minWidth/minHeight 回传成窗口约束；hover 展开做窗口尺寸动画时，对内容多的子视图用 .fixedSize() 或 LazyVStack 降低布局成本，避免 resize 动画卡顿。",
+        "跨 Space/全屏行为要测：.canJoinAllSpaces 让胶囊跟随用户，但若希望它在某些全屏 App 上也悬浮需 .fullScreenAuxiliary；不加 .stationary 才会跟随用户切 Space。"
+      ],
+      "recommendation": "明确推荐原生 SwiftUI + AppKit：以一个 .nonactivatingPanel 的 NSPanel(level=.floating, isFloatingPanel=true) 承载 NSHostingView 包裹的 SwiftUI 视图，App 设 LSUIElement 使胶囊脱离主窗口常驻，hover 用 NSEvent 全局鼠标监控检测右缘热区、用 SwiftUI spring 动画展开——这是同类产品(NotchNook/Slidepad)已验证的成熟路径，体积/内存/动效/系统一致性全面优于 webview，唯一需重点投入的是 TextField 写待办时的 makeKey 焦点处理，webview 方案对本产品无任何收益、反而带来 150MB+ 包体和资源开销。",
+      "sources": [
+        "https://fazm.ai/blog/swiftui-floating-panel",
+        "https://developer.apple.com/documentation/appkit/nswindow/stylemask-swift.struct/nonactivatingpanel",
+        "https://fazm.ai/blog/swiftui-menu-bar-app-floating-window-best-practices",
+        "https://artlasovsky.com/fine-tuning-macos-app-activation-behavior",
+        "https://developer.apple.com/documentation/appkit/nsevent/1535472-addglobalmonitorforeventsmatchin",
+        "https://developer.apple.com/videos/play/wwdc2024/10148/",
+        "https://troz.net/post/2025/swiftui-mac-2025/",
+        "https://openmarkapp.com/blog/native-mac-apps-vs-electron",
+        "https://dev.to/nic_luther_e29bc02b683c55/why-we-chose-swiftui-over-electron-for-our-mac-app-3gkj",
+        "https://digitalblake.com/2026/04/28/swiftui-vs-appkit-macos-ui-performance/",
+        "https://github.com/Slidepad",
+        "https://www.howtogeek.com/these-apps-turn-your-macbook-notch-into-a-dynamic-island/"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "claim": "桌面右侧常驻、贴边的胶囊窗口能在 macOS 上保持始终可见（含跨所有 Space、悬浮于全屏应用之上）且不抢焦点",
+      "holds": false,
+      "confidence": "medium-high",
+      "evidence": "逐项核验后，\"贴边常驻 + 跨 Space + 不抢焦点\"这三项单独都成立且有官方 API 支撑，但\"悬浮于其他应用全屏之上\"这一项是无条件成立的——它要求精确的 NSWindow collectionBehavior 配置，且即便配置正确仍有已记录的可靠性漏洞，因此整条\"始终可见（含悬浮于全屏应用之上）\"的断言不成立（over-claim）。具体证据：\n\n1) 不抢焦点 + 跨 Space + 不进 Dock：成立。NSWindow 高层级（floating/screen-saver level）+ canJoinAllSpaces + ActivationPolicy::Accessory(LSUIElement)/app.dock.hide() 可使窗口常驻所有普通 Space 且不激活 app、不抢焦点。这部分 Tauri/Electron 都有一等 API（research JSON 中 Accessory + setVisibleOnAllWorkspaces 描述准确）。\n\n2) \"悬浮于其他应用全屏之上\"才是软肋——这是 claim 里被一句话带过、实则最脆的部分：\n   - 当其他 app 进入全屏，macOS 为其创建独立、隔离的 Space；窗口默认被绑死在创建时的 Space，不会跨到别人的全屏 Space（technetexperts、Apple 文档一致）。\n   - 仅有 canJoinAllSpaces 不够；必须额外加 NSWindowCollectionBehaviorFullScreenAuxiliary。Apple 官方对 fullScreenAuxiliary 的定义就是\"window displays on the same space as the full screen window\"，这正是悬浮于全屏之上所需的标志位。\n   - 但即使加了正确标志位，仍有大量\"配了也不生效\"的真实报告：Apple 开发者论坛原帖作者报告 collectionBehavior 配对后窗口出现在所有 Space 却仍不显示在全屏 app 之上（El Capitan 及之后）；Electron issue #36364（macOS 12 / Apple Silicon，Electron 20/21）报告 setAlwaysOnTop + setVisibleOnAllWorkspaces({visibleOnFullScreen:true}) 后窗口在全屏之上不显示，除非用户手动 focus/移动，且 show()/focus()/moveTop() 均无效，最终被 close 为 not planned；research JSON 自身也引用 tauri #11488（always-on-top 默认不浮在别人全屏之上，需 visibleOnAllWorkspaces + 可能的私有 collectionBehavior）。\n   - 注意一个常见混淆：有来源称\"fullScreenAuxiliary 是你想要的反面\"——那是针对\"想要在全屏时隐藏\"的相反诉求；对\"悬浮于全屏之上\"而言 fullScreenAuxiliary 恰恰是必需项。\n\n3) Tauri 侧叠加约束（research JSON 已列）：macOS 透明强制 macOSPrivateApi → 不能上架 Mac App Store；无原生 per-region 命中测试，\"idle 点击穿透 + hover 展开\"必须靠光标轮询切 setIgnoreCursorEvents；backdrop-filter blur 在透明 Tauri 窗破损。这些不影响\"是否可见\"的核心断言，但说明该胶囊的整体可行性是\"有条件可行\"而非无条件成立。",
+      "correction": "更准确的陈述：在 macOS 上可以构建一个右侧贴边、跨所有普通 Space 常驻、不进 Dock/不抢焦点的胶囊窗口（NSWindow 高层级 + canJoinAllSpaces + Accessory/LSUIElement）。但\"悬浮于其他应用全屏空间之上\"不是开箱即得、不是无条件成立：它要求显式加上 NSWindowCollectionBehaviorFullScreenAuxiliary（仅 canJoinAllSpaces 不够），且即便配置正确，跨框架仍有已记录的可靠性缺陷——窗口常出现在所有 Space 却不显示在别人全屏 app 之上，往往需用户手动 focus 才浮起（Apple 论坛原帖、Electron #36364 closed not-planned、tauri #11488）。因此该能力应标注为\"需精确 collectionBehavior + 逐 macOS 版本实测、并接受在他人全屏场景下可能不可靠\"的条件性可行，而非断言\"始终可见（含悬浮于全屏之上）\"。Tauri 路线还须叠加：透明依赖 macOSPrivateApi（不能上 MAS）、点击穿透只能全窗切换需光标轮询模拟、backdrop-filter 失效——整体属\"有条件可行\"。"
+    },
+    {
+      "claim": "桌面右侧常驻、贴边的胶囊窗口能在 macOS 上保持始终可见（含跨所有 Space、悬浮于全屏应用之上）且不抢焦点",
+      "holds": false,
+      "confidence": "high",
+      "evidence": "三个独立来源共同推翻\"含悬浮于全屏应用之上\"这一子句（这是整条结论中最脆的承重点）：(1) Apple 开发者论坛 thread/26677：官方文档化组合 collectionBehavior=[.canJoinAllSpaces, .fullScreenAuxiliary] + level=floating/overlay 只能让窗口出现在\"自己 app 的全屏 Space 同层\"，明确 NOT display over fullscreen app windows；fullScreenAuxiliary 做的是相反的事——共处而非压在原生全屏之上。即 Apple 没有任何 documented API 能可靠实现\"始终可见 + 跨所有 Space + 压在别的 app 原生全屏之上\"。(2) Tauri #11488：visibleOnAllWorkspaces 窗口在 macOS 上不停留于全屏 app 之上，issue 被 Closed as not planned（非已修复）。唯一确认可用的 workaround 是 app.set_activation_policy(ActivationPolicy::Accessory)，但它强制摘掉 Dock 图标——是有行为代价的妥协，不是无条件\"始终可见\"。(3) technetexperts/pennywise#5 等独立实现复现同一根因：app 进入原生全屏时 macOS 为其新建专属 Space，高 NSWindowLevel 只在本 Space 内置顶，不会跟随/压制他人全屏 Space。值得注意：被验证结论所附调研 JSON 自身的 gotcha#4 已 flag 此风险（\"may NOT float over other apps' fullscreen spaces by default … verify against your 'always visible' requirement\"），结论却越过该警告做了绝对化断言。结论的其余子句（右侧贴边、常驻不随主窗最小化、不抢焦点/click-through）经 Tauri/Electron 官方 API 核验确为可行——所以这是\"部分成立 + 关键子句证据不足\"。",
+      "correction": "应降级为\"条件成立\"并拆分子句：✅ 贴边右侧定位（currentMonitor()+setPosition，须用 PhysicalPosition 并按 scaleFactor 处理多屏，见 tauri #7890）、✅ 软件最小化后常驻（胶囊为独立 always-on-top 窗口，生命周期与主窗解耦）、✅ 不抢焦点/idle click-through（setIgnoreCursorEvents / setIgnoreMouseEvents，但无 per-region 命中，须用光标轮询切换且 idle 态 DOM hover 不触发）——这三项可靠。❌ \"悬浮于别的 app 原生全屏之上\"在 macOS 上不能无条件保证：Apple 文档化 collectionBehavior 组合做不到；唯一确认 workaround 是 ActivationPolicy::Accessory，代价是必须摘掉 Dock 图标（且历史上与 window.show() 冲突，tauri #5122/#9244），或需第三方/private NSWindow collectionBehavior + 抬到 screen-saver/CGShieldingWindowLevel 级别的非官方手法（不稳定、版本敏感、可能影响 notarization 体验）。隐藏失败模式：①跨自己全屏 vs 跨他人全屏行为不同，dev 模式可见、打包 DMG 后透明/置顶可能丢失（tauri #13415/#9556），必须测 bundled .app；②\"始终可见\"与\"保留 Dock 图标\"在 macOS 上二选一（Accessory trade-off）；③要透明胶囊须 macOSPrivateApi=true → 永久失去上架 Mac App Store 资格，且 backdrop-filter blur 在透明 Tauri 窗失效。因此准确陈述为：\"在直装/DMG 分发 + 接受摘 Dock 图标（Accessory）+ 接受非 App Store + 逐版本验证打包态的前提下，可做到右侧贴边常驻、不抢焦点、并在多数场景压在全屏之上；但'无条件始终悬浮于任意 app 原生全屏之上'在 macOS 上没有受支持的稳定保证。\""
+    },
+    {
+      "claim": "可以做到 idle 时点击穿透/不打扰，而 hover 进入边缘热区时可靠地触发展开面板",
+      "holds": false,
+      "confidence": "high",
+      "evidence": "前半句成立、后半句的\"可靠地\"在 API 层面站不住，构成\"部分成立\"，按默认判 false。验证如下：\n\n(1) Idle 点击穿透——真实且一等支持。Tauri `setIgnoreCursorEvents(true)` / Rust `set_ignore_cursor_events(true)`、Electron `setIgnoreMouseEvents(true,{forward:true})` 均能让窗口整体穿透。这一半无争议。\n\n(2) \"hover 触发展开\"——这是薄弱环节，\"可靠地\"不成立，根因是没有原生分区命中测试(per-region hit-test)：\n - setIgnoreCursorEvents 是整窗开关，没有\"可见胶囊像素不穿透、透明区穿透\"的能力。Tauri issue #13070 正是为此提的 feature request（尚未落地），#11461/#6164 为 known non-working/缺 forward。\n - 关键反驳点：idle=ignore=true 时 DOM 的 :hover / mouseenter 根本不触发，所以\"hover 边缘热区\"不能由 CSS/DOM 驱动，只能靠轮询全局光标位置。而 Tauri issue #9250 明确：JS 侧拿光标位置\"requires the window to be focused\"——一个 idle 穿透 overlay 并不持有焦点，故 JS 路径不可靠，必须从 Rust 侧轮询全局光标（属 workaround，不是有保障的一等 API；#9250 是 feature request，后由 #9297 部分实现）。\n - 轮询本身决定了它是\"尽力而为\"而非\"可靠\"：①有 poll-interval 延迟，30–60ms 间隔下快速划过边缘可能漏检；②macOS 上 WindowServer CPU 随光标轮询率上升（mmazzarolo 实测博客），高频轮询有功耗代价，调低又加重漏检；③无防抖时易在热区边界抖动。\n - Electron 同病更甚：依赖 forward 的 mousemove/mouseleave 文档化不稳定——#33281（某些非-Electron 窗口聚焦时 mousemove 不触发）、#30808（Windows 上 :hover/mouseleave bug）、#15376（reload 后停止转发）、#27017（mac 上 forward 失效）。\n\n(3) 叠加 macOS 平台约束放大不确定性：透明窗强制 macOSPrivateApi（失去 App Store 资格）；always-on-top overlay 默认不浮在他 app 全屏 Space 上（Tauri #11488），即\"始终可见/可触发\"在全屏场景要额外 collectionBehavior hack 才成立。\n\n来源：Tauri #13070、#11461、#6164、#9250、#11488；Electron #33281、#30808、#15376、#27017；mmazzarolo WindowServer CPU 博客；Tauri v2 window API 文档。",
+      "correction": "技术上可达成\"idle 整窗点击穿透 + 进入边缘热区后展开\"，但展开触发是基于全局光标位置轮询的尽力而为模拟，不能保证\"可靠\"。准确陈述应为：「Idle 时可做到整窗点击穿透；hover 展开无法用 CSS/DOM :hover 驱动（穿透态下 DOM hover 不触发），须由 Rust 侧全局光标轮询(~30–60ms)在边缘矩形命中时翻转 ignore=false 并展开——这是 workaround，存在 poll 延迟可能漏检快速划过、需在功耗与灵敏度间折中、且依赖系统级而非聚焦窗口的光标读取。Electron 的 forward 转发路径在跨应用聚焦/reload 等场景文档化不稳定，可靠性更差。务必把'边缘热区'做成始终不穿透的窄交互条来兜底捕获 hover，而非纯靠穿透态轮询。另含 macOS 硬约束：透明窗需 macOSPrivateApi（失 App Store 资格）、默认不浮于他 app 全屏 Space（#11488）、backdrop-filter blur 失效、打包 DMG 透明可能丢失需测真机 .app。」综上：可行但\"可靠地\"需降级为\"经热区兜底+调参后达到可接受可靠性\"。"
+    },
+    {
+      "claim": "可以做到 idle 时点击穿透/不打扰，而 hover 进入边缘热区时可靠地触发展开面板",
+      "holds": false,
+      "confidence": "medium-high",
+      "evidence": "技术上\"idle 穿透 + 边缘触发展开\"两端都能实现，但\"可靠地触发\"这个限定词在 Tauri/macOS 上不成立，存在结构性隐藏失败模式：(1) 无 per-region hit-test：Tauri/wry 的 setIgnoreCursorEvents 是整窗开关，issue #13070(closed as duplicate)、#11461、#6164 确认无原生分区命中测试。idle=ignore=true 时整窗穿透,DOM 的 :hover/mouseenter 不会触发——这意味着展开触发器根本不能用 CSS hover,必须靠 Rust 侧 ~60fps 光标轮询比对屏幕矩形再翻转 ignore(manasight 博客实证)。(2) 该轮询方案是开环的:博客作者只验证了它\"能跑、省电(14MB/<1%CPU,且是 Windows 11)\",对竞态/延迟/漏触发零讨论=未验证而非已验证可靠。轮询固有 16-33ms 采样窗 + 翻转 ignore 后 macOS 还需窗口重获事件捕获,快速划过边缘热区会丢帧漏触发;issue #8770 记录 V2 上 mousemove IPC 风暴导致卡顿/光标闪烁,wry #175 记录 macOS 光标状态\"有时生效有时不生效\",都直接侵蚀\"可靠\"。(3) \"不打扰\"在 macOS 还受全屏空间限制:issue #11488(closed as not planned)确认 always-on-top 默认不浮在别的 app 全屏之上,visibleOnAllWorkspaces 不可靠;若用 ActivationPolicy::Accessory 绕过又会丢 Dock 图标。(4) Electron 侧 setIgnoreMouseEvents(true,{forward:true}) 的 forward 让 idle 态仍收 mousemove(比 Tauri 更接近\"原生 hover 触发\"),但官方坑 #33281/#30808/#35030 记录 forward 的 mousemove/mouseleave 转发不稳、漏触发——同样不满足\"可靠\"。两框架的一致结论:可行但 hover 触发是轮询/forward 模拟出来的,非原生 hit-test,边缘窄热区 + 快速移动场景必然有漏触发尾部。",
+      "correction": "更准确的陈述:\"idle 穿透\"与\"边缘触发展开\"在 Tauri2/Electron 上都能实现,但二者不能由同一套原生 hover 机制驱动,且触发不是无条件可靠的。具体:macOS 上无 per-region 命中测试,idle 全窗穿透时 DOM hover 不再触发,展开必须由 ~30-60ms 节流的全局光标轮询(或 Electron 的 forward mousemove)模拟,这是开环近似——边缘窄热区 + 快速划过 + 翻转 ignore 后的事件重捕获延迟会产生可观测的漏触发/抖动尾部,需要把热区做宽(如整条右边缘几十 px)、加去抖、并对\"翻转后首帧未捕获\"做补偿才能把漏触发压到可接受。建议改为可量化目标:\"idle 穿透 + 边缘热区在 P95 内触发展开,允许约一帧(≤33ms)延迟、快速划过场景有可测漏触发率\",并在打包后的 .app(非 tauri dev,见 #13415)实测;同时确认 always-on-top 对其他 app 全屏的可见性(#11488)是否满足需求。把\"可靠地触发\"作为无条件保证写进规格是 over-claim。"
+    },
+    {
+      "claim": "用 webview 框架(Tauri/Electron)本身即可满足常驻胶囊 + 跨Space/全屏可见 + 不抢焦点的全部要求，无需写原生代码逃生口",
+      "holds": false,
+      "confidence": "high",
+      "evidence": "两个 load-bearing 子需求在 Tauri 和 Electron 上都有未解决的 macOS 框架级缺陷，迫使落到原生逃生口或脆弱 hack：(1) 跨其他 App 全屏 Space 可见——Electron #36364 (setAlwaysOnTop('modal-panel') + setVisibleOnAllWorkspaces{visibleOnFullScreen:true} 不会浮在别的 App 全屏窗口之上，除非用户手动 focus/move；已 closed as not planned；show()/focus()/moveTop() 均无效)；Tauri #11488/#9556/#5566 同样缺陷，唯一稳的修法是 ActivationPolicy::Accessory（耦合 Dock 隐藏副作用，且 #5122/#9244 显示其干扰 show()）或直接改原生 NSWindow.collectionBehavior(.canJoinAllSpaces/.fullScreenAuxiliary)——即写原生码；#5566 进一步显示 setCollectionBehavior_ 在 dev 可用、release build 失效，逼向原生。(2) 不抢焦点+空闲穿透但胶囊仍可见（per-region click-through）——wry/Tauri setIgnoreCursorEvents(#6164/#11461/#13070) 与 Electron setIgnoreMouseEvents+forward(#33281/#30808) 都是整窗级、无 per-region hit-test(对比原生 WM_NCHITTEST / NSWindow hitTest:)，纯框架路径只能靠 ~30-60fps 光标轮询模拟，且 Electron forward 的 mousemove 转发被记录为不可靠。",
+      "correction": "框架可满足绝大多数子能力(transparent/frameless/alwaysOnTop/skipTaskbar/Accessory 脱离 Dock 与最小化生命周期/Tray/globalShortcut/边缘吸附/整窗穿透)，但「可靠浮在任意其他 App 全屏 Space 之上」这一项是 Tauri 与 Electron 共有的、当前未修复的 macOS 框架缺陷：高层 setVisibleOnAllWorkspaces/visibleOnFullScreen 在别的 App 全屏时不生效(需用户手动 focus)。要稳满足该需求，必须落到原生 NSWindow collectionBehavior(.canJoinAllSpaces | .fullScreenAuxiliary) + 合适 window level 的原生逃生口（Tauri 经 objc2/tao，Electron 经 native addon 或等官方修复）。此外 per-region click-through 也无原生级 hit-test，纯框架需用脆弱的光标轮询 hack 替代。因此「无需原生逃生口即满足全部要求」不成立；应表述为「webview 框架覆盖大部分需求，但跨他 App 全屏可见需保留原生 NSWindow collectionBehavior 逃生口，per-region 穿透需轮询 hack」。"
+    },
+    {
+      "claim": "用 webview 框架(Tauri/Electron)本身即可满足常驻胶囊 + 跨Space/全屏可见 + 不抢焦点的全部要求，无需写原生代码逃生口",
+      "holds": false,
+      "confidence": "medium-high",
+      "evidence": "大部分子需求确实映射到纯框架 API：常驻（独立 always-on-top 窗口，主窗最小化不影响）、跨普通 Space（setVisibleOnAllWorkspaces / visibleOnAllWorkspaces）、不进 Dock/Taskbar（Accessory / LSUIElement / skipTaskbar）、idle 穿透（setIgnoreMouseEvents / setIgnoreCursorEvents）——这些都成立。但\"全部要求\"中两项恰好是纯框架配置失守点：(1) 浮在【其他 app 的全屏 Space】之上：Tauri #11488 明确 visibleOnAllWorkspaces 单独做不到浮于全屏，唯一纯配置出路 ActivationPolicy::Accessory 会丢 Dock 图标，issue 被 closed-as-not-planned；Electron #36364 显示即便设了 setAlwaysOnTop('screen-saver')+setVisibleOnAllWorkspaces({visibleOnFullScreen:true}) 全套 flag，窗口在其他 app 全屏时仍不浮起、需手动 focus 才生效，同样 closed-as-not-planned。可靠修法落在原生 NSWindow collectionBehavior/level：Tauri 无对应配置须走 objc2 原生口；Electron 的 canJoinAllSpaces 只是对原生 NSWindow 属性的薄封装且其自家 tracker 承认不可靠。(2) 不抢焦点的 hover-展开：setIgnoreCursorEvents 是整窗级、无 per-region hit-test（Tauri #13070 confirmed），idle 态 DOM/CSS :hover 不触发，触发只能靠光标轮询 workaround（Electron forward:true 的 mousemove 转发亦被记录为不稳定）。因此\"无需原生逃生口\"在'其他 app 全屏时仍可见'这一硬需求上不成立。",
+      "correction": "应表述为：webview 框架可满足绝大多数需求（常驻、跨普通 Space、不抢焦点的 idle 穿透、贴边、轻量），但有两处需要降级或原生逃生口——① 要在【其他 app 进入全屏】时仍可见，纯框架配置不可靠（Tauri/Electron 两边对应 issue 均 closed-as-not-planned），可靠实现需触达原生 NSWindow collectionBehavior + window level（Tauri 经 objc2 原生代码；Electron 经其薄封装的 collectionBehavior，但项目方自承不稳）；若放弃 Dock 图标则 Accessory policy 是纯配置的次优替代。② \"不抢焦点的 hover-展开\"无 per-region 命中测试，须用光标轮询模拟（非框架一等能力，且 Electron 的 mousemove-forward 路径不稳定）。隐藏失败模式：DMG 打包后透明丢失(Tauri #13415)、macOSPrivateApi 永久禁掉 Mac App Store、backdrop-filter 在 macOS 透明窗失效、新版 macOS 上 WKWebView 内存/CPU 回归、轮询循环不节流则吃 CPU。结论：可行但'全部要求无原生逃生口'过强，至少全屏可见这一项实务里需原生介入或接受降级。"
+    },
+    {
+      "claim": "存在比 webview 更契合\"轻量+美观+动效好\"的更优架构（如原生 SwiftUI/AppKit NSPanel）",
+      "holds": true,
+      "confidence": "high",
+      "evidence": "在该胶囊场景（边缘常驻 / idle 穿透 / hover 展开 / 透明 / 毛玻璃 / 动效）的关键技术轴上，原生 AppKit NSPanel 在每一个 webview 的硬限制处都有一等公民解，证据相互印证：(1) 分区点击穿透——webview 调研自承 setIgnoreCursorEvents/setIgnoreMouseEvents 是整窗级、无 per-region hit-test（Tauri #13070/#11461/#6164），只能靠 ~30-60ms 光标轮询 loop 模拟（持续 CPU + 脆弱，idle 态 DOM hover 还不触发）；原生只需在 NSView 重写 hitTest: 对透明区返回 nil 即得真·分区穿透，事件驱动、零轮询，是公认的 Cocoa 公共 API 模式（Apple AppKit 文档 + HandlingMouseEvents）。(2) 毛玻璃——调研明确 backdrop-filter: blur() 在 macOS 透明 Tauri 窗口\"broken\"，Electron 透明窗有长期 vibrancy 变白底 bug（#31862/#25547/#20357）；原生 NSVisualEffectView 是官方支持的磨砂主原语（cindori/fazm/Apple 论坛多源一致）。(3) 轻量——Tauri WKWebView 实测 macOS RAM 已涨到 Sonoma~66MB / Tahoe~110MB 且由 WKWebView/compositor 退化驱动，叠加轮询 CPU；原生 NSPanel+NSHostingView 无 webview/合成器开销，基线显著更低。(4) 跨 fullscreen Space 置顶——webview 需 workaround（Tauri #11488），原生 collectionBehavior=[.canJoinAllSpaces,.fullScreenAuxiliary] 一等支持。(5) 分发——webview 透明强制 macOSPrivateApi:true → 永久丧失 Mac App Store 资格；原生透明+NSVisualEffectView 全走公共 API，MAS 合规。Accessory（无 Dock/Cmd-Tab、与主窗最小化解耦）两边都能做（LSUIElement / ActivationPolicy.accessory）。综合：就\"轻量+美观+动效好+交互正确\"四轴判，原生 NSPanel 在 macOS 上是严格更优架构，结论成立。",
+      "correction": "结论成立，但需加一处限定以防 over-claim：原生 NSPanel 的\"更优\"是在 macOS 单平台、且按运行时质量（轻量/美观/动效/分区穿透正确性/MAS 合规）评分时成立；它并非\"无条件更优\"。在开发成本与跨平台轴上 webview 反而占优——HTML/CSS 快速迭代与动画一致性、无需 Swift/AppKit 专精、一套代码跨 Win/Linux（调研也指出 Electron 渲染一致性对\"美观+动效密集\"是优势）。因此准确表述应为：「对一个仅面向 macOS、以轻量+美观+动效+交互正确为首要目标的边缘胶囊，原生 SwiftUI/AppKit NSPanel 是比 webview 更优的架构（尤其分区点击穿透与毛玻璃这两处 webview 的硬伤）；但若需求包含跨平台或追求最快视觉迭代/最低开发成本，则 webview 仍有其取舍优势，'更优'不无条件成立。」"
+    },
+    {
+      "claim": "存在比 webview 更契合\"轻量+美观+动效好\"的更优架构（如原生 SwiftUI/AppKit NSPanel）",
+      "holds": true,
+      "confidence": "high (claim as stated holds; with the caveat that \"better\" is axis-specific to macOS, not all-around)",
+      "evidence": "原生 NSPanel 在该胶囊 overlay 的四个命名维度上对 webview 形成实打实的优势，且这些优势恰好命中 webview 路径被记录的痛点：\n\n1) 点击穿透/命中测试：原生可重写 hitTest(_:)/NSView 输入区做\"逐区域命中\"，idle 全穿透+边缘热区可交互是一等能力，无需轮询。供给的 JSON 自己承认 webview 侧 setIgnoreCursorEvents 只能整窗、无 per-region（tauri #13070），只能靠 ~30-60ms 光标轮询模拟——这是结构性短板而非可修 bug。\n\n2) 美观（毛玻璃）：NSVisualEffectView/materials 是原生标准磨砂，在透明 NSPanel 上正常工作；而 JSON 明确 backdrop-filter: blur() 在 macOS 透明 Tauri/Electron 窗口上坏掉、frosted-glass 做不出。直接赢\"美观\"轴。\n\n3) 动效：原生有 NSWindow.setFrame(_:display:animate:)、animator() Core Animation 代理、SwiftUI/Core Animation；窗口几何动画由合成器驱动而非 JS resize 循环。JSON 自承 webview 窗口放大要 setSize 且警告\"逐帧 setBounds 卡顿\"。\n\n4) 轻量：原生 menubar/NSPanel idle ~15-30MB；WKWebView 在新版 macOS 实测攀到 66-110MB（Sonoma~66/Tahoe~110MB），Electron 150-300MB。footprint 原生直接占优。\n\n附加：原生透明无需 macOSPrivateApi → 不丧失 Mac App Store 资格（webview 路径最大硬约束消失）。NSPanel 的 .nonactivatingPanel + .floating + .canJoinAllSpaces/.fullScreenAuxiliary + NSHostingView 正是\"贴边+最小化后常驻+跨 Space\"这类 overlay 的文档级标准模式。\n\n来源：Apple ignoresMouseEvents / nonactivatingPanel / setFrame(_:display:animate:) / animationResizeTime 文档；cindori.com、fazm.ai NSPanel floating-panel 模式；Ohanaware/philz.blog NSVisualEffectView vibrancy；native-vs-Electron 内存对比（~15MB vs 80-150MB+）。",
+      "correction": "结论成立，但需两点精化（不推翻、属补全）：\n\n(a) 证据归属：本次提供的可行性 JSON 只覆盖 Tauri 与 Electron——两者都是 webview 架构，JSON 内零原生 SwiftUI/AppKit 证据。因此\"原生更优\"这一结论虽为真，但并非由所给研究支撑，而是由独立核验的原生 macOS 事实支撑。报告若把它说成\"调研已证\"是 over-claim，应标注证据来源为外部核验。\n\n(b) \"更优\"是分轴/分平台的，不是全局无条件更优：原生赢在 macOS 上的 轻量/磨砂美观/合成器级动效/真·逐区域穿透/不丢 MAS 资格；但代价是 (i) 仅 macOS、无跨平台复用（要 Win/Linux 则 webview 触达更广），(ii) 需 AppKit 桥接（NSPanel+NSHostingView+全局事件监听；部分 CGEventTap 受 Accessibility 信任门控），(iii) fullscreen-space 浮动两边都需 .fullScreenAuxiliary/canJoinAllSpaces 且\"始终压住别家全屏\"仍可能 finicky，(iv) webview 在 CSS/设计工具链迭代速度与跨平台渲染一致性上仍有优势——团队若缺 AppKit/Core Animation 深度，实操可能反而做出更差的原生面板（执行风险，与架构天花板正交）。准确表述：\"在 macOS 上、针对'轻量+美观+动效好'这几条具体诉求，原生 NSPanel 是更契合的架构上限；webview 的优势在跨平台触达与设计迭代速度。\""
+    }
+  ],
+  "compSynth": "This is a synthesis task — taking the structured research JSON and producing a decision-oriented Markdown document. This is content generation from provided material, not a project/skill operation, so I'll produce it directly.\n\n# 胶囊待办 — 设计研究综合（10 个顶级极简待办/胶囊应用）\n\n> 决策导向综合。核心目标锚点：**工作中秒速写待办 → 胶囊 hover 看/写 → 勾完成**。一切以\"简单、不打扰、不臃肿\"为最高约束。\n\n---\n\n## 1. 该采纳（Adopt）— 跨应用反复出现、最值得抄的范式\n\n按\"出现频次 × 对胶囊的契合度\"排序，越靠前越该抄。\n\n### A. 单字段 NLP 捕获（一行话 = 结构化待办）—— 最高共识\n- **来源：** Todoist、TickTick、Superlist、Things 3（type-travel）四家都有。\n- **为什么：** 这是胶囊的灵魂。一个文本框、敲一行、回车即存；解析器在后台把日期/标签悄悄抽出。胶囊空间极小，**绝不能放日期选择器**，NLP 是唯一能在一行内承载元数据的方式。\n- **抄的边界（关键克制）：** 只抄\"自然语言日期\"（today / tomorrow / +3d）+ **极小符号集**（`#` 标签、`p1-p3` 优先级），**不抄** Todoist 那套 `@assignee / +person / /section / !reminder` 全家桶。\n\n### B. 实时 token 高亮 + 点击撤销（parse 信任机制）\n- **来源：** Todoist、TickTick 都有\"输入时蓝色高亮被识别词 → 点一下还原成纯文本\"。\n- **为什么：** 这是**全研究里性价比最高的信任机制**。用户敲 \"明天交报告\"，\"明天\"高亮成药丸 → 立刻知道解析对了；解析错时点一下降级回标题。零额外 UI，却给足控制感，对小到放不下确认弹窗的胶囊是完美解。\n\n### C. 全局热键召唤 / 捕获面来找你（零上下文切换）\n- **来源：** Things 3（Ctrl+Space 全局 Quick Entry）、Todoist（系统级全局快捷键浮窗）、Notion Calendar（Ctrl+⌘+K 菜单栏窗）、Superlist（Cmd+N）。**四家一致。**\n- **为什么：** 这正是\"边缘常驻胶囊\"的产品定义本身 —— **不是用户切到 app，而是捕获面浮到用户面前**。敲热键 → 小浮窗出现在任何 app 之上 → 打字 → 回车 → 浮窗消失、焦点回到原 app。这个 \"invoke → type → Enter → gone\" 闭环必须 1:1 复刻。\n\n### D. Inbox/默认桶兜底（捕获即存，整理延后或永不）\n- **来源：** Things 3（Inbox）、Todoist、TickTick、Superlist 全部如此。\n- **为什么：** 写入路径必须是**一键**。捕获时**绝不强制选清单/项目/日期**，所有东西落进一个默认桶，分类是另一个可选时刻。这条直接对应\"简单不臃肿\"——把\"做个列表管理员\"的负担彻底砍掉。\n\n### E. 勾选完成 = 愉悦微反馈（带撤销）\n- **来源：** Superlist（清脆 tick 音 + 动画）、Things 3（Taptic 触感）、TickTick（动画勾 + 可恢复撤销）。\n- **为什么：** 胶囊是高频 glanceable 工具，\"勾完成\"是除写入外最高频动作。一个干脆的勾选动画 + 可选轻音 + **易撤销**（误勾一键还原），是\"feels good\"里最便宜、最高杠杆的一笔。\n\n### F. Hover 揭示插入线（静止干净、悬停才显影）\n- **来源：** Superlist（行间 hover 出灰色细插入线，点击即在该处插入可编辑行）。\n- **为什么：** 与\"hover 展开胶囊\"的形态天然同构。**静止态保持极简，悬停态才长出可操作 affordance** —— 这正是胶囊收起/展开的设计哲学。\n\n### G. ~100ms 缓动\"让位\"动效 + 形态 morph（而非硬切换）\n- **来源：** Superlist（拖拽时邻行缓动让位 + 拖拽行抬起阴影）、Things 3（卡片 pop-out / 列表淡出聚焦）。\n- **为什么：** \"轻量但高级\"靠的就是这些 morph 动效。胶囊的展开/收起应是平滑形变，不是瞬间 show/hide —— 动效是身份，不是装饰。\n\n### H. 捕获与排期解耦（先随手扔，后拖到时间轴）—— 可选进阶\n- **来源：** Amie（先建无时间卡片，之后拖到 timeline 给时间/时长）、Things 3（start date ≠ 日历事件）。\n- **为什么：** 1 秒捕获不带任何时间决策；排期是后续的物理手势而非表单。MVP 可不做排期，但**写入零决策**这一原则必须继承。\n\n---\n\n## 2. 该规避（Avoid）— 破坏\"简单轻量\"的复杂度陷阱\n\n逐条点名，全部跨多家被研究标为 bloat：\n\n| 陷阱 | 来自 | 为什么对胶囊是毒 |\n|---|---|---|\n| **GTD 全功能 IA**（5 系统列表 + Areas + Projects + Headings + start vs deadline 双日期语义） | Things 3 | 把\"快速 jotter\"变成\"列表管理者\"；胶囊只需一条扁平流，不该 import 整套漏斗 |\n| **深层项目/子项目/Section 嵌套层级** | Todoist、TickTick、Superlist | 组织开销与\"快速捕获\"直接对立 |\n| **游戏化**（Karma / 连击 / 成就分 / 统计报表） | Todoist、TickTick | 动机剧场，纯膨胀，与一人用的边缘胶囊零相关 |\n| **多视图范式**（Kanban / 看板 / Timeline-Gantt / 日历月周视图 / 艾森豪威尔四象限） | TickTick、Todoist | 互相竞争的视觉范式，每加一个都加重量 |\n| **协作层**（assignee / 评论 / 共享清单 / 活动 feed / @人） | Todoist、TickTick、Superlist、Amie | 团队工具重量，个人胶囊完全用不上 |\n| **附属子 app**（习惯追踪 / 番茄钟 + 白噪音 / 专注统计 / 内置日历同步） | TickTick | scope creep 成\"专注 app/日历 app\"，引入第二套心智模型 |\n| **多目的地导航**（Inbox + Today + Updates + Tasks + Lists 五处） | Superlist | 单用户胶囊只要 **一条流**，不是五个去处 |\n| **布尔查询/Filter 语言 + 保存查询** | Todoist、TickTick | 95% 用户碰不到的 power-user 表面积 |\n| **符号全家桶 NLP**（`@/+/!/...` 全套 + 8 语言解析器） | Todoist、Things 3 | 工程无底洞；只在\"极简\"前提下抄子集才值 |\n| **重主题化**（自定义壁纸 / 自然背景 / 富文档笔记） | Superlist、TickTick | 迷人但是与\"绝不臃肿\"对冲的 scope creep |\n| **语音/AI 转写管线**（Talk） | Superlist、Amie | 独立模态 + 高基建成本，对\"hover 打字\"胶囊是膨胀 |\n| **跨设备云同步 + 平台专属手势集** | Things 3 | 单面桌面 widget 的 scope creep |\n\n**一句话原则：** 凡是把工具从\"随手记 → 勾掉\"推向\"管理你的任务系统\"的，一律不要。\n\n---\n\n## 3. 推荐的最小功能集（MVP）—— 坚决克制\n\n### MUST（必做，缺一不可）\n\n1. **全局热键召唤浮窗** —— 任何 app 之上弹出小捕获框，`invoke → type → Enter → gone`，焦点回原处。\n2. **单文本框捕获，唯一必填 = 标题** —— 无表单、无必选清单/项目/日期。回车即存。\n3. **极小 NLP 解析**：自然语言日期（today / tomorrow / 明天 / `+3d`）+ `#标签` + `p1-p3`。**仅作用于捕获，不作用于行内编辑**（TickTick 的明确 scope cut，避免解析器与编辑打架）。\n4. **实时 token 高亮 + 点击撤销** —— 被识别词高亮成药丸，点一下降级回纯文本。\n5. **单一默认桶（Inbox/今日流）** —— 一条扁平、可拖拽排序的流，捕获全落这里。\n6. **胶囊 hover 展开看列表** —— 收起=极简，悬停/点击=展开看今日清单。\n7. **勾选完成 + 动画 + 易撤销** —— 干脆的勾选动画，误勾一键还原。\n8. **Esc 取消 / Enter 提交并收起** —— 写入态只有这两个出口，最小模态表面。\n\n### 明确不做（守住边界）\n\n- ❌ 项目 / 子项目 / 文件夹 / Section 层级 —— 只有一条扁平流。\n- ❌ 看板 / 日历 / Gantt / 象限等任何\"第二视图\"。\n- ❌ 协作（assignee / 评论 / 共享）。\n- ❌ 游戏化 / 统计 / 报表 / 习惯 / 番茄钟。\n- ❌ 符号全家桶（`@person / +assignee / !reminder / /section`）。\n- ❌ 语音/AI 转写、富文本笔记、自定义壁纸主题。\n- ❌ 多语言 NLP 解析器（先做 中/英 today-tomorrow-+Nd 子集即可\"显得聪明\"）。\n- ❌ 提醒/通知系统（MVP 不引入后台调度）。\n- ⏸️ 拖拽排期到时间轴（Amie 范式）—— **留作 v2**，MVP 只继承\"写入零时间决策\"。\n\n---\n\n## 4. 胶囊交互范式建议（具体主张）\n\n### 4.1 常驻形态\n- **静止态 = 笔尖（pen tip）：** 屏幕边缘一颗小药丸/小条，极简，不显示任何列表内容、不抢注意力。借 Things 3\"收起=笔尖、展开=纸\"的隐喻。\n- **展开态 = 一张纸（sheet of paper）：** 干净白面、大量留白、今日流 + 顶部单输入框。细节渐进披露，metadata 默认\"塞在角落\"。\n\n### 4.2 触发（三入口，分工明确）\n- **热键召唤捕获（主入口）：** 全局快捷键（如 `⌥Space`）从任何 app 唤出**纯写入小浮窗** → 敲一行 → Enter → 浮窗消失、焦点回原 app。这是\"工作中快速写\"的核心，对标 Things 3 / Todoist 全局热键。\n- **Hover 边缘热区 → 展开看（次入口）：** 鼠标移到边缘胶囊上，**~150ms 缓动**展开成今日流，用于\"看/勾\"。移开自动收起。借 Superlist hover 揭示哲学。\n- **点击 = 钉住展开：** 单击胶囊钉住展开态（不随移开收起），用于多笔操作；再点或 Esc 收起。\n\n### 4.3 展开/收起动效\n- **形变而非显隐：** 胶囊→面板用 ~120-150ms 缓动 morph（宽高 + 圆角 + 透明度联动），借 Superlist\"surfaces morph rather than swap\"。\n- **hover 磁吸放大：** 接近时胶囊轻微放大/高亮（Things 3 magnetic highlight），给\"活的、可点\"的触感。\n- **勾选完成：** 行内勾选触发一次干脆勾画动画（~100ms）+ 可选轻 tick 音（默认关，可开），行随后缓动移出（让位动画，邻行补位）。\n- **新行插入：** hover 行间出灰色插入线，点击即在原位长出可编辑行（Superlist），不跳页不开模态。\n\n### 4.4 不打扰原则（具体主张）\n- **静止零信息泄漏：** 收起态绝不显示任务文字/数量徽标之外的内容；不弹通知、不抖动、不主动展开。\n- **捕获后即隐退：** 写入浮窗 Enter 后立即消失并归还焦点，**绝不停留确认**（用一闪而过的微 toast/音代替\"已捕获\"，借 Todoist inbox sound）。\n- **悬停才显影，移开就收：** affordance 只在 hover 出现，静止态保持纯净（Superlist resting-state-calm）。\n- **零阻塞表单：** 整个捕获-勾选链路中**没有任何必填字段、没有任何模态对话框**；唯二退出是 Enter（提交收起）/ Esc（取消收起）。\n- **解析不抢手：** NLP 只在捕获时高亮提示，错了点一下还原；**绝不自动跳到日期选择器或弹任何选择层**打断打字流。\n\n---\n\n**贯穿全文的单一北极星：** 让\"一个念头\"在**一次击键 + 一行字**内被记下并消失在视野外，让\"勾掉\"成为一个愉悦的瞬间 —— 其余一切都是可被砍掉的重量。",
+  "feasSynth": "Decision-oriented synthesis below. I read both the feasibility research and the adversarial verification; where they conflict, the verification wins.\n\n---\n\n# 桌面边缘常驻胶囊 — 架构决策报告\n\n## 1. 胶囊可行性结论（验证后修正版）\n\n把\"始终可见\"拆成 5 个子能力，逐项给定论。乐观研究判 4 项 feasible，但对抗验证推翻了其中两处\"无条件\"措辞。修正后的真实可行性矩阵：\n\n| 子能力 | 能不能做 | 约束 / 真相 |\n|---|---|---|\n| **贴边右侧常驻定位** | ✅ 可靠 | `currentMonitor()`/`workArea` 计算右缘坐标 + `setPosition`。必须用 **PhysicalPosition × scaleFactor**（Retina/多屏偏移坑 tauri #7890），监听 monitor/resize 重新吸附。 |\n| **软件最小化后常驻** | ✅ 可靠 | 胶囊是**独立 always-on-top 窗口**，生命周期与主窗解耦。主窗 hide/最小化天然不影响它。 |\n| **跨所有普通 Space 可见** | ✅ 可靠 | `canJoinAllSpaces` + 高 window level + `Accessory`/LSUIElement。 |\n| **不抢焦点 (non-activating)** | ⚠️ 条件成立 | **纯 config/JS 达不到**。`focusable:false` ≠ non-activating（会导致面板里的输入框收不到键盘，写待办失败）。必须走 native：`NSWindowStyleMaskNonactivatingPanel` + `becomesKeyOnlyIfNeeded`。Tauri 用 `tauri-nspanel`，Electron 用 `BaseWindow type:'panel'`。 |\n| **悬浮于他人全屏应用之上** | ❌ 不能无条件保证 | **这是整条断言里最脆的承重点。** 别的 app 进全屏时 macOS 给它建隔离 Space；高 window level 只在本 Space 内置顶。需显式加 `fullScreenAuxiliary`（仅 `canJoinAllSpaces` 不够），**且即便配置正确仍有大量\"配了也不显示、要手动 focus 才浮起\"的实测缺陷**（Apple 论坛原帖、Electron #36364 closed not-planned、tauri #11488 closed not-planned）。研究 JSON 自己的 gotcha #4 已 flag 此风险，却在结论里越过它做了绝对化断言。 |\n| **idle 点击穿透** | ✅ 可靠 | `setIgnoreCursorEvents(true)` / `setIgnoreMouseEvents(true,{forward})`。整窗级，无争议。 |\n| **hover 进热区\"可靠\"展开** | ⚠️ 尽力而为，非\"可靠\" | **无 per-region hit-test**（tauri #13070 未落地）。idle=穿透时 **DOM `:hover`/`mouseenter` 根本不触发**，所以热区触发**不能用 CSS hover**，只能靠 **Rust 侧 ~30–60ms 全局光标轮询**比对屏幕矩形再翻转 ignore。这是开环近似：有采样延迟（快速划过会漏检）、有功耗代价（macOS WindowServer CPU 随轮询率上升）、翻转后事件重捕获有延迟。 |\n\n**一句话结论：** 胶囊在 macOS 上**有条件可行**，不是开箱即得。**在「直装/DMG 分发 + 接受摘掉 Dock 图标（Accessory）+ 放弃 Mac App Store + 逐 macOS 版本实测打包态 .app」的前提下**，可做到右侧贴边常驻、跨普通 Space、不抢焦点、idle 穿透、热区展开。但**\"无条件始终悬浮于任意 app 原生全屏之上\"在 macOS 上没有受支持的稳定保证**——这一条必须作为产品决策点显式拍板（要么降级为\"全屏场景下尽力浮起\"，要么接受非官方 collectionBehavior/CGShieldingWindowLevel hack 的不稳定）。\n\n---\n\n## 2. 架构推荐（唯一推荐）\n\n> **推荐：原生 SwiftUI + AppKit（NSPanel），不要用 webview 框架。**\n\n理由——直接打在你最在意的三点上：\n\n**(a) 胶囊所需的关键窗口行为，native 是基线、webview 是\"逃生口堆叠\"。**\n- 报告里**每一条 webview 路线最终都要 native 逃生口**才能达成核心能力：non-activating 要 `tauri-nspanel` / Electron `type:'panel'`；浮于全屏要私有 collectionBehavior；透明要 `macOSPrivateApi`（→ 永久失去 MAS 资格）。也就是说选 webview 你**仍然在写/依赖 AppKit**，只是隔了一层不稳定的胶水（dev 能跑、`tauri build` 打包后行为不一致：tauri #11488/#9556/#13415 透明与置顶丢失，必须测 bundled .app）。\n- SwiftUI/AppKit 直接拿到 `NSPanel + .nonactivatingPanel + becomesKeyOnlyIfNeeded + collectionBehavior[.canJoinAllSpaces,.fullScreenAuxiliary,.stationary]`，这是**官方文档化、版本最稳、社区案例最成熟**的路径。研究 JSON 自己也把 native NSPanel 列为\"最可靠基线\"。\n\n**(b) \"轻量\"——native 完胜。** Electron idle 150–300MB + 80–150MB 包体；Tauri 30–110MB（且 WKWebView 在 Sonoma~66MB / Tahoe~110MB 持续回归）。SwiftUI 胶囊是个小 NSPanel + 少量视图，常驻内存可压到 webview 的零头，且无 60fps 光标轮询那种\"为模拟 hover 而烧 CPU\"的负担——native 可以直接用 `NSTrackingArea` / 全局 `NSEvent` monitor 做热区，无需轮询。\n\n**(c) \"美观 + 动效好\"——这里要破除一个直觉。** 直觉上\"Electron 渲染一致 = 动效更可控\"，但你是**单平台（macOS）单窗口**产品，跨平台一致性这个 Electron 优势对你**不产生价值**。反而：\n- webview 透明窗的毛玻璃 **`backdrop-filter: blur()` 在透明 Tauri 窗破损**，Electron 透明 + vibrancy 有长期白底 bug（#31862/#20357）。想要 macOS 原生质感的胶囊，**native `NSVisualEffectView` 才是正路**。\n- SwiftUI 的 `.animation`/`matchedGeometryEffect`/spring 对\"idle 小圆点 → hover 展开成面板\"这种形变动画是一等支持，配 `NSWindow.setFrame(_:display:animate:)` 做窗口尺寸缓动，原生 60/120fps、无 webview 合成器开销。\n- 唯一代价：写 Swift（团队要有 Swift 能力）。这是本决策的真实 trade-off，不是技术不可行。\n\n**什么情况下才反选 webview：** 仅当①团队完全没有 Swift 能力且无法补、②未来明确要跨 Windows/Linux 复用同一胶囊。若①②都不成立——SwiftUI/AppKit 是清晰的唯一推荐。\n\n---\n\n## 3. 关键技术机制清单（native 路线，确切 API）\n\n**窗口本体（NSPanel 子类，缺一不可）**\n- `NSPanel` 子类，`styleMask` 含 `.nonactivatingPanel`（点面板不激活 app、不抢前台焦点）\n- `becomesKeyOnlyIfNeeded = true`（只有点到文本框才成 key window — 正好匹配\"hover 展开后快速写待办\"）\n- `level = .floating` 或 `.statusBar`（statusBar 更高；浮于普通窗口之上）\n- `collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]`\n  - `canJoinAllSpaces` → 跟随切 Space；`fullScreenAuxiliary` → **能浮在他 app 全屏之上的必需项**（漏配是最常见错误）；`stationary` → Mission Control/切 Space 动画时不被当普通窗口平移\n- `isOpaque = false` + `backgroundColor = .clear` + `hasShadow`（透明 + 自绘）\n\n**App 级**\n- `NSApp.setActivationPolicy(.accessory)`（LSUIElement）→ 不占 Dock/Cmd-Tab，与主窗最小化解耦。**代价：抹掉 Dock 图标**——\"始终可见\"与\"保留 Dock 图标\"在 macOS 上二选一，需产品拍板\n- `NSStatusItem`（菜单栏锚点/退出入口）+ 全局快捷键\n\n**贴边 + 多屏**\n- `NSScreen.visibleFrame` 算右缘坐标；监听 `NSApplication.didChangeScreenParametersNotification` 重新吸附；用物理坐标避免 Retina 偏移\n\n**idle 穿透 + 热区展开（native 优于 webview）**\n- idle：`panel.ignoresMouseEvents = true`\n- 热区触发：**全局 `NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved)`** 或一条**始终不穿透的窄边缘 `NSTrackingArea`** 捕获 enter —— 比 webview 的 60fps 轮询省电且更可靠（这是 native 路线的实质优势）\n- 展开时翻 `ignoresMouseEvents = false`，`setFrame(_:display:animate:)` + SwiftUI spring 做形变\n\n**视觉**\n- `NSVisualEffectView`（毛玻璃，替代失效的 `backdrop-filter`）；阴影自绘或 `hasShadow`\n\n> 若团队最终仍选 Tauri：等价逃生口是 `tauri-nspanel`（`PanelBuilder`/`PanelLevel::Floating`/`set_collection_behavior`）+ `macos-private-api` + 光标轮询切 `set_ignore_cursor_events`，并接受打包态实测负担。\n\n---\n\n## 4. 风险 / gotcha 与 Stage 2 建议\n\n**必须在选型前拍板的产品决策（不是技术问题）**\n1. **全屏悬浮可靠性**：接受\"他人全屏场景下可能不浮起/需手动 focus\"，还是把\"浮于全屏之上\"降为非承诺特性？建议**降级为 best-effort**，不写进硬需求。\n2. **Dock 图标 vs 始终可见**：`Accessory` 二选一。建议走 Accessory + 菜单栏入口（胶囊类工具的标准形态）。\n3. **Mac App Store**：透明胶囊（无论 native private 行为还是 Tauri `macOSPrivateApi`）基本与 MAS 无缘 → **直装/DMG/notarized 分发**。提前定。\n\n**技术 gotcha 速查**\n- `fullScreenAuxiliary` 漏配 = 切到他人全屏后胶囊消失（最常见错误）\n- `setActivationPolicy` 运行时与 `window.show()` 历史冲突（tauri #5122/#9244 / native 同类）→ **启动时设一次**，不在运行中切\n- 打包态 ≠ dev 态：webview 路线透明/置顶在 `tauri build`/DMG 后可能丢失（#13415/#9556）→ **必须测 bundled `.app`**\n- hover 触发不是原子可靠：把热区做**宽**（整条右边缘几十 px）+ 去抖 + \"翻转后首帧未捕获\"补偿，给可量化目标（P95 内、允许 ≤1 帧 ≈33ms 延迟、快速划过有可测漏触发率）\n- WKWebView 内存逐版本回归（Sonoma/Tahoe）——webview 路线要 profile 折叠态 CPU 近 0\n\n**第一步技术 spike（建议 1 个，直击最大不确定性）**\n\n> **Spike：用 SwiftUI/AppKit 起一个最小 NSPanel，验证\"全屏悬浮 + non-activating 写入\"这条最脆链路。**\n\n验收断言（全部在**打包后 .app**、跨 **≥2 个 macOS 版本**、含真机多屏上验证）：\n- [ ] NSPanel 贴右缘，切到**另一个 app 的原生全屏**后胶囊**仍可见且浮于其上**（不是只在自己全屏 Space）→ 这条过不了就立刻把\"全屏悬浮\"降级为 best-effort\n- [ ] idle `ignoresMouseEvents=true` 时底层 app 可正常点击穿透\n- [ ] 全局 monitor / TrackingArea 命中右缘热区 → 展开面板（实测漏触发率与延迟）\n- [ ] 展开后面板内**文本框能收键盘输入**（验证 `nonactivatingPanel + becomesKeyOnlyIfNeeded` 真的\"不抢焦点但能输入\"）\n- [ ] 主窗最小化/关闭后胶囊常驻不受影响\n- [ ] 折叠态常驻内存 + CPU 实测（对比 webview 基线，坐实\"轻量\"）\n\n这个 spike 把两个最高风险点（全屏悬浮可靠性、non-activating 可输入）在写任何业务逻辑前先证伪/证实。若团队倾向 webview，则把同一套断言改在 `tauri-nspanel` 打包态上跑——但断言不变，因为风险根因相同。\n\n---\n\n**关键文件路径**（如需我把本报告落盘或进入 Stage 2 选型，可指定项目目录）：本报告为纯文本输出，未写盘。",
+  "counts": {
+    "apps": 9,
+    "feas": 6,
+    "verifications": 8
+  }
+}

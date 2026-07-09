@@ -1,0 +1,499 @@
+{
+  "date": "unknown",
+  "capabilities": [
+    {
+      "app": "Things 3 (Cultured Code)",
+      "main_view_capabilities": [
+        "Today — 当日唯一聚焦视图，待办与日历事件同列显示，给出当天日程轮廓",
+        "This Evening — Today 内部的次级分区，把\"晚上才能做\"的事从白天事项里视觉隔出（同一视图、不是另一个清单）",
+        "Upcoming — 按日期时间线展开：定时待办、重复项、deadline、日历事件混排，可拖拽改期",
+        "Anytime — 无开始日期的可执行任务池（含 Today 项，排除 Someday）",
+        "Someday — 暂缓池，从主流里移出但不删除",
+        "Projects & Areas — 侧边栏两级结构：Area 下挂 Project；Project 带圆形进度环",
+        "Headings — Project 内的分区标题，可整组拖动/整组归档",
+        "Checklist 子任务 — 单条待办内的多步清单，支持从别处粘贴 bullet list 自动转成 checklist",
+        "When/日期调度（Jump Start 弹层）— 自然语言输入\"Tomorrow/August 1/Thursday 2pm\"设开始日、提醒、或丢进 Someday",
+        "Deadline — 独立于开始日的截止日，到期红色倒计时角标",
+        "Reminders — 基于时间的提醒，自然语言或 Siri 录入，跨设备 Fastlane 即时同步",
+        "Repeaters — 按规则自动重复的待办，自动出现在 Upcoming",
+        "Tags — 标签分类，Quick Find 可按标签名秒筛",
+        "Magic Plus — 可拖拽的 + 按钮，落到不同区域执行不同创建动作（清单内插入/建 Heading/丢 Inbox/落到日历日期设开始日）",
+        "Quick Find — 实时全局搜索（项目/待办/标签），输入即出结果",
+        "Type Travel — Mac 专属：不按任何快捷键，直接打字即跳转到对应清单/标签",
+        "完成动画 — 点圆圈勾选打勾，条目延时滑出收入 Logbook",
+        "Logbook — 已完成项归档区",
+        "Slim Mode — 两指滑动收起侧边栏，适合聚焦/分屏",
+        "Calendar integration — 选择 Personal/Family/Work 等日历叠加显示",
+        "全键盘流 — ⌘N 新建、Space 在下方新建、⌘S 调度、⇧⌘D deadline、⌘T 设今天、⇧⌘C 新建 checklist、⌘K 完成、⇧⌘M 移动、⌘1/2/3 跳 Inbox/Today/Upcoming"
+      ],
+      "standout_well_done": [
+        "Today + This Evening 的\"一个聚焦视图、内部分时段\"模型：不开第二个清单就把\"白天/晚上\"分开，避免视图爆炸——胶囊面板可直接抄成\"今天\"单视图里的一条轻分隔，比做多 tab 更克制",
+        "Anytime / Someday 的三态心智模型（今天做 / 有空做 / 以后再说）：用极少的桶解决\"任务该出现在哪\"的根本焦虑，没有无限自定义清单。轻量面板只需这三态就能覆盖 90% 场景",
+        "Jump Start 自然语言日期解析（\"明天\"\"周四下午2点\"直接成提醒）：录入日期零摩擦、零下拉菜单，是\"不打扰\"的典范——胶囊里快速设提醒就该是一个输入框 + NL 解析",
+        "Type Travel / Quick Find：不需要先按快捷键唤起搜索，直接打字就跳转/过滤。键盘流的最高形态，对常驻面板尤其值得抄——面板获焦后直接打字即搜/即跳",
+        "Magic Plus 拖拽创建：一个 + 按钮按落点决定语义（插哪、建什么），用空间手势替代菜单层级，零额外 UI。轻量面板可保留\"+ 拖到某天=设那天开始\"这一条最甜的交互",
+        "粘贴 bullet list 自动转 checklist：把别处复制来的步骤一秒变子任务，极低摩擦的批量录入，值得直接抄",
+        "圆形完成圈 + 延时滑出归档：完成有明确的物理反馈且不立即消失（给撤销/确认感），动效服务于\"已完成\"的情绪闭环，而非炫技",
+        "克制的信息密度：每条待办默认只一行（标题+可选标签/日期角标），点开才展开 notes/checklist/日期——\"折叠为默认、展开为按需\"正是持久面板该有的层级"
+      ],
+      "bloat_to_cut": [
+        "Areas（项目分组的上一级）：两级组织对常驻轻量面板过重，胶囊只需扁平清单或单层分组",
+        "Projects 的进度环 / 大型项目管理：母体是极简胶囊，不该承担 GTD 式项目经理职责——砍掉 Project 概念，最多保留\"清单分组\"",
+        "Headings（项目内分区标题）：依附于 Project 概念，面板无 Project 即不需要",
+        "Repeaters 的复杂重复规则编辑器：完整重复规则（每月第N个周几等）是重型配置，轻量面板最多保留\"每天/每周\"两档或直接不做",
+        "多日历源集成（Personal/Family/Work 勾选）：是与系统日历深度耦合的功能，超出\"待办\"母体范畴，胶囊不该变日历客户端",
+        "Logbook 完整归档浏览：完成项滑出即可，不需要一个可翻阅的历史库视图",
+        "Slim Mode / 侧边栏折叠：面板本身就是\"点开才在、点关才收\"，不需要再做内部侧栏收放这层",
+        "Quick Entry 全局捕获（Mail-to-Things、系统级悬浮录入）：是独立的系统集成体系，胶囊母体自己就是常驻入口，不必再叠一套全局捕获",
+        "标签系统的完整管理（标签层级、批量管理）：轻量面板保留\"贴个标签 + 按标签筛\"即可，不做标签的增删改管理界面"
+      ],
+      "motion_ui_highlights": [
+        "完成勾选：点圆圈→打勾→条目短暂停留后平滑滑出收入 Logbook（完成有情绪闭环，且留出反悔窗口，不是瞬间消失）",
+        "Task Card 展开：点一条待办时它\"弹出\"成卡片浮起、其余列表淡化退到背景（焦点态用景深+淡出表达，而非整页跳转）",
+        "Magic Plus 拖拽 + Taptic 触感：拿起 + 按钮和拖动任务时配合 Taptic Engine 震动，手势与触感\"完美联姻\"，让对象有实体感",
+        "下拉唤起搜索的\"pop\"反馈：下拉到位时有一个令人满足的弹性收束动作",
+        "长按拾起任务拖动：长按让条目\"浮起\"可自由拖拽，营造\"在操作实物\"而非编辑文本的体感",
+        "拖拽改期（Upcoming 内拖条目到另一天）：直接空间操作改日期，所见即所得，无弹窗",
+        "整体动效哲学：所有动效都服务于\"状态变化的可理解性\"（完成/聚焦/改期/创建），克制、有物理感、不喧宾夺主——这是 Apple Design Award 级别的\"动效即反馈\"范式，最值得母体借鉴",
+        "圆形进度/勾选圈作为统一视觉母题：圆圈既是 checkbox 又是 Project 进度环，视觉语言高度统一"
+      ],
+      "sources": [
+        "https://culturedcode.com/things/features/",
+        "https://culturedcode.com/things/support/articles/4001304/",
+        "https://culturedcode.com/things/support/articles/2785159/",
+        "https://culturedcode.com/things/support/articles/2803579/",
+        "https://www.macstories.net/reviews/things-3-beauty-and-delight-in-a-task-manager/",
+        "https://www.macstories.net/reviews/things-3-17-overhauls-the-apps-shortcuts-actions/"
+      ]
+    },
+    {
+      "app": "Todoist",
+      "main_view_capabilities": [
+        "Quick Add 自然语言解析栏：一行输入 'Submit report every Friday 9am p1 #Work @email' 即自动拆出日期/重复/优先级/项目/标签",
+        "Today / Upcoming 两个智能视图（Today=当日聚焦，Upcoming=按天分列的周视图，可拖动重排做负载均衡）",
+        "项目 Projects + 分区 Sections（同一项目下分阶段/分类的栏目）+ 子任务 Sub-tasks（多层嵌套折叠）",
+        "四档优先级 P1-P4（颜色旗标，决定排序与高亮）",
+        "标签 Labels（@语法，跨项目按情境/能量/工具分类）",
+        "过滤视图 Filters（自定义查询语言 + Filter Assist 自然语言生成过滤器）",
+        "三种布局切换：List / Board(看板) / Calendar(日历，付费)",
+        "Board 看板：每个 Section 渲染成一列，卡片可列内重排、跨列拖动改归属，列头可拖动重排",
+        "任务详情：描述(富文本/链接)、评论(Comments，可附文件/语音)、提醒 Reminders",
+        "重复任务 Recurring（自然语言 'every 3rd Tuesday' 或新版可视化重复调度器）",
+        "协作：共享项目、任务指派(assignee)、Workspaces 区分团队/个人",
+        "完成态：勾选动效、已完成任务归档、Karma 生产力分与 Activity history",
+        "Ramble 语音转任务、邮件转任务(Email Assist 自动抽取日期与行动项)",
+        "AI Assistant：拆解复杂任务为子任务、智能排程建议(付费)"
+      ],
+      "standout_well_done": [
+        "Quick Add 自然语言一行输入——这是 Todoist 的灵魂能力。捕获摩擦接近零，无需弹日期选择器/下拉菜单，'明天3点 p1 #工作' 直接成型。对一个常驻胶囊面板，这正是'不打扰'的极致：一个输入框 + 实时高亮解析(输入时 #项目/@标签/p1/日期 即时变成彩色 token)，应当几乎原样抄过来",
+        "实时解析的视觉反馈：在你打字时把识别出的日期/项目/标签/优先级即时染色成 token，让用户当场确认解析对不对——这把'自然语言可能猜错'的最大风险用极轻的视觉手段化解，值得抄",
+        "Today 视图的'纯粹聚焦'设计：默认只给当天该做的，逾期项单独折叠提示。轻量面板的主视图应该就是这种'今天 + 逾期'的极简默认，而不是一上来全量列表",
+        "优先级用颜色旗标而非数字标签：P1 红/P2 橙/P3 蓝，扫一眼就知轻重，且直接驱动排序。轻量面板可只留 P1/普通两档(甚至旗标点击即切)，保留扫视性、砍掉四档的认知负担",
+        "勾选完成的微动效 + 'undo' 浮条：完成任务有满足感的划除动画，且立刻给 5 秒撤销条防误删。这是低成本高回报的情感化细节，必抄",
+        "Filter Assist / 自然语言建过滤器：把 Todoist 自创的查询语法(高门槛)用自然语言包一层，'本周到期且高优先' 直接生成视图。若面板要给'过滤'能力，这是唯一值得抄的形态——别暴露查询语法"
+      ],
+      "bloat_to_cut": [
+        "Karma 生产力分与等级系统：独立研究显示开启 Karma 的用户完成率几乎无差异(62.3% vs 62.1%)、任务放弃率反而高 0.8%、重复条目多 12%(刷分行为)，且 61% 付费用户按'得分高低'而非'重要性'选任务——是反向激励的虚荣游戏，与'极简不打扰'母体直接冲突，坚决不要",
+        "看板 Board 视图：依赖 Section 分列 + 大量拖拽，是重型项目管理范式；且看板里看不到子任务。对一个常驻轻量面板属于过度复杂，砍掉",
+        "日历 Calendar 布局 + 时间块 + Google/Outlook 双向同步：完整日历是另一个产品，远超'看清单'诉求，不要塞进面板",
+        "AI Assistant 自动拆子任务/智能排程：付费墙后的'锦上添花'能力，可靠性参差，会把简单面板推向臃肿和订阅复杂度，砍掉",
+        "四档优先级 P1-P4 全保留：四档对轻量场景是认知过载，建议收敛为'重要/普通'两档",
+        "Workspaces / 团队协作 / 任务指派 / 共享项目：协作是多人产品维度，与单人桌面胶囊定位正交，整块砍掉",
+        "评论里的语音笔记、邮件转任务、Ramble 语音转任务：都是'入口扩张'类能力，每一个都增加表面积却偏离'看清单'核心，面板阶段不做",
+        "多层嵌套子任务 + 多层折叠：保留一层子任务足够；深层嵌套是项目管理膨胀，轻量面板不需要"
+      ],
+      "motion_ui_highlights": [
+        "输入时自然语言 token 实时高亮：边打字边把 #项目/@标签/日期/p1 染成彩色胶囊，给即时'我读懂了'的反馈",
+        "完成任务的划除动画 + 5 秒 undo 浮条(底部滑入)：满足感 + 防误删一体",
+        "Quick Add 浮层从底部/快捷键唤起的轻量弹入，输入完即收，零页面跳转——契合'不打扰'",
+        "Upcoming 周视图的按天分列 + 拖动任务跨天的平滑过渡，做负载均衡时动作连贯",
+        "优先级颜色旗标系统(红/橙/蓝/灰)作为统一的扫视性视觉语言，颜色即信息层级",
+        "Today 视图把逾期任务折叠成一个可展开的轻提示条，而非红色刷屏，克制的视觉处理值得借鉴",
+        "整体留白克制、单栏窄列、行高舒展的'清单呼吸感'排版——这是 Todoist 视觉上最被称道的极简底色，与胶囊母体一致"
+      ],
+      "sources": [
+        "https://www.todoist.com/features",
+        "https://www.todoist.com/help/articles/use-task-quick-add-in-todoist-va4Lhpzz",
+        "https://www.todoist.com/help/articles/use-the-board-layout-in-todoist-AiAVsyEI",
+        "https://www.todoist.com/help/articles/plan-your-week-with-the-upcoming-view-OKOg1mR8",
+        "https://www.todoist.com/help/articles/use-the-calendar-layout-in-todoist-lPHRQTu0o",
+        "https://www.todoist.com/help/articles/changelog-entries-from-2025-SsEIOCtjK",
+        "https://www.todoist.com/help/articles/dictate-to-add-tasks-with-ramble-P1Raq7vVF",
+        "https://trophy.so/blog/todoist-gamification-case-study",
+        "https://hulry.com/firesides/gamification/",
+        "https://thesweetsetup.com/using-natural-language-with-todoist/"
+      ]
+    },
+    {
+      "app": "TickTick",
+      "main_view_capabilities": [
+        "智能清单（Smart Lists）：Inbox / Today / Tomorrow / Next 7 Days / Assigned to Me / Completed / Summary 等系统过滤视图",
+        "自定义 Smart Filters（按标签/清单/优先级/日期组合的保存过滤器）",
+        "层级结构：Folder > List > Section > Task > Subtask（多级任务拆分）",
+        "Tags 标签（彩色，可多标签、可作为过滤维度）",
+        "优先级（高/中/低/无，列表中以彩色旗标显示）",
+        "Quick Add + Smart Recognition：自然语言解析日期/时间，自动设提醒（如「明天下午3点开会」）",
+        "日期与提醒：多次提醒、Constant Reminder（持续提醒至完成）、Repeat Reminder、Location Reminder(iOS)",
+        "循环任务（每日/每周/每月/自定义如「每2周周一到周四」，可选基于完成时间或固定时间生成下次）",
+        "番茄钟/专注（Pomo 倒计时 + 正计时秒表 + 17 种白噪音）",
+        "习惯追踪（Habit Tracker + 连续打卡 streak + 统计）",
+        "多种视图：List（三栏）/ Kanban 看板 / Timeline（轻 Gantt）/ Calendar（年/月/周/Agenda/多日/多周）",
+        "Eisenhower Matrix 四象限",
+        "Countdown 重要日期倒数",
+        "可拖动的 + 悬浮添加按钮（拖放到列表某位置即在该处建任务）",
+        "协作：清单共享、任务指派",
+        "Statistics 统计（任务/专注/习惯）+ 40+ 主题"
+      ],
+      "standout_well_done": [
+        "Smart Recognition / 自然语言 Quick Add：在一行输入里同时完成「建任务+设日期+设提醒」，解析后日期文字高亮可点改——这是最高频动作，决定了「不打扰」体验，胶囊面板的快速捕获栏几乎必抄",
+        "智能清单 Today / Next 7 Days：零配置就给出「今天该干嘛」的聚焦视图，不需要用户先建结构。轻量持久面板的默认视图就该是这个 Today，而非全量清单",
+        "可自定义 Smart Filters（保存的过滤器）：把「标签+日期+优先级」的组合存成一个可点视图，让重度用户自组织而不增加 UI 复杂度——一个能力同时满足轻量默认与进阶定制",
+        "拖拽完成度手势（长按时间条左右滑标记任务完成百分比 / 复选框 drag-and-release）：把「打勾」从二元变成有触感的连续动作，完成感强，契合母体「动效好」定位",
+        "番茄钟与任务绑定 + 白噪音：专注会话直接挂在某个任务上并回写专注统计，形成「计划→执行→回看」闭环，比独立计时器有价值；但面板里只需极简入口（见臃肿项）",
+        "循环任务的「基于完成 vs 基于固定时间」二选一：解决了真实痛点（健身房这种漏一次不该顺延 vs 缴费这种必须固定日），是少见但高价值的细节"
+      ],
+      "bloat_to_cut": [
+        "Eisenhower Matrix 四象限：独立视图、与优先级字段功能重叠，多数用户不维护四象限，纯增重——砍",
+        "Kanban 看板 + Timeline/Gantt：项目管理向，个人桌面胶囊不需要，与「极简轻量」冲突——砍",
+        "全套日历模式（年/月/Agenda/多日/多周/Gantt）：保留一个轻量周视图或月视图即可，6 种模式是 PM 工具的堆料——大砍只留一种",
+        "习惯追踪（Habit Tracker）：本质是另一个产品域（习惯≠待办），带来独立统计/打卡 UI，建议不进面板或仅作可选——默认砍",
+        "协作/任务指派/清单共享：单机个人胶囊场景无关——砍",
+        "40+ 主题 + 清单背景图 + 17 种白噪音 + 木鱼音效：定制项过度，留 1 套精致默认 + 浅/深即可——大幅削",
+        "Countdown 重要日期倒数、Statistics 多维统计面板：低频炫技，与核心「看清单」无关——砍",
+        "邮件提醒 / Location Reminder / 各种集成（Notion/Zapier/IFTTT/Slack）：渠道堆料，与本地常驻面板定位无关——砍"
+      ],
+      "motion_ui_highlights": [
+        "复选框完成动效：勾选时的「划掉」过渡 + drag-and-release 手势，给打勾一个有触感的微动画（可借 Lottie tick 风格）",
+        "长按时间条后左右滑动调完成百分比，进度以滑动连续反馈——把完成度做成手势而非弹窗",
+        "可拖动的 + 悬浮添加按钮：拖到列表任意位置落点即建任务，添加位置所见即所得",
+        "Quick Add 输入时被识别的日期/时间文字实时高亮变色（可点击修正），给「系统懂你」的即时视觉反馈",
+        "周视图左右滑动切换日程，方向性手势贴合时间轴心智",
+        "专注全屏模式左滑切到 Pixel Clock 像素时钟样式——专注态的氛围切换",
+        "整体 UI 走「fresh / cleaner / lighter」清淡留白风，圆角、轻阴影、彩色优先级旗标作为唯一强色点缀——克制用色值得借鉴"
+      ],
+      "sources": [
+        "https://ticktick.com/features?language=en_us",
+        "https://help.ticktick.com/articles/7081924556310446080",
+        "https://help.ticktick.com/articles/7055782422935240704",
+        "https://blog.ticktick.com/2020/12/08/20-lesser-known-ticktick-features/",
+        "https://upbase.io/blog/ticktick-review/",
+        "https://tidbits.com/2025/08/14/ticktick-provides-a-focused-daily-task-list-and-more/",
+        "https://blog.ticktick.com/2020/05/06/brand-new-focus-experience-ticktick/",
+        "https://appleinsider.com/articles/23/01/10/ticktick-6420-review-prioritized-to-do-list-with-focus-timer",
+        "https://help.ticktick.com/external/articles/7155128685119406080"
+      ]
+    },
+    {
+      "app": "Superlist",
+      "main_view_capabilities": [
+        "统一节点编辑器：一条列表里任务、纯文本、子标题、图片、附件是同一种可编辑「node」，光标在节点间自由移动（同 Notion 的 block 模型）",
+        "行内任务录入：在列表里直接打字 + Return 连续建任务；输入 / 唤出格式菜单选 Task/Text/标题等",
+        "行内 Markdown 即时转换：节点开头打 - 变项目符号、** 变粗体、# 变标题、[ ] 变复选框（边打边转，非选中后套用）",
+        "无限层级子任务（子任务/sublists/checklists），子任务带完成进度指示器（x/y 已完成）",
+        "任务详情面板：到期日、标签(labels)、负责人(assignee)、子任务、富文本笔记、行内图片、附件(≤25MB)、讨论评论线程",
+        "笔记↔任务双向融合：笔记里能直接生成任务，任务里能写整篇富文本笔记，无需切应用",
+        "悬停出复选框 + 点击完成；Tasks > Done 集中看已完成",
+        "侧栏导航：Today / Inbox / 各 List / Tasks(含 Done)；侧栏可直接新建独立任务(C 键)",
+        "Today 视图聚合 + Google Calendar 同步进 Today",
+        "快捷捕获：Cmd+K / Shift+Option+Space 全局快速建任务进 Inbox",
+        "右键上下文菜单（删除任务=连带删子任务与详情）",
+        "重复任务、提醒、协作共享(共享 list、指派、评论)、公开分享链接",
+        "短链识别：google.com 这类无 www/https 的也自动变可点击链接"
+      ],
+      "standout_well_done": [
+        "统一 node 模型——任务与文本是同一种可编辑块、光标在它们之间无缝穿行：这是 Superlist 区别于普通 todo 的根本手感，让「记一句话」和「这句话变成任务」之间没有模式切换成本。轻量持久面板最该抄这个：一个可连续输入的列表区，任意一行可一键升格为任务",
+        "行内 Markdown 即时转换（行首 - / ** / # / [ ] 当场变样式）：零工具栏、零模式切换、键盘流不中断，正是「轻量但能富文本」的最优解——不需要 Notion 那套重型 block 工具栏就拿到 90% 表达力",
+        "/ 斜杠菜单作为唯一的「升级入口」：默认极简纯文本，需要结构时才 / 唤出，把复杂度藏在按需触发后面，符合母体「不打扰」原则",
+        "子任务进度指示器（x/y）：用一个极小的视觉元素就把「这条还有多少没做完」表达清楚，持久面板里一眼可扫，信息密度高且不吵",
+        "悬停才出复选框：静止态干净（像纯笔记），交互态才显功能，视觉噪音最低——常驻面板尤其需要这种「静则隐、动则现」",
+        "Today 作为单一聚合落点 + 日历同步：给「持久面板」一个天然默认视图（今天该干嘛），不必让用户先选 list",
+        "全局快速捕获(Cmd+K)直落 Inbox：胶囊母体最该保留的「秒记不丢」能力，面板只是它的展开态"
+      ],
+      "bloat_to_cut": [
+        "AI 会议记录(AI Meeting Notes，自动录 Zoom/Meet/Teams 并转写生成任务)：重型、依赖云、与「桌面常驻轻量胶囊」气质完全冲突，砍",
+        "语音助手(说话转任务/提醒/笔记)：锦上添花但增加权限与复杂度，非核心，砍",
+        "团队协作全家桶（共享 list、指派他人、评论线程、公开分享、@协作者）：个人轻量面板里属过度能力，最多保留「自己给自己加备注」，砍多人协作",
+        "CSV 导出 / 自定义 app 图标徽章 / 第三方集成(Gmail/Slack/GitHub/Figma 建任务)：企业向边缘功能，与极简胶囊无关，砍",
+        "附件上传(≤25MB)/ 行内图片：对常驻轻面板偏重，存储与渲染成本高，建议只留纯文本+链接，砍富媒体",
+        "无限层级嵌套：表达力强但易让轻面板变成项目管理工具；建议限制到 1 层子任务即可，砍深层嵌套"
+      ],
+      "motion_ui_highlights": [
+        "「real-life 物理手感」是 Superlist 公认卖点：动效用弹簧物理而非线性缓动，让拖拽/完成有真实质感——常驻面板的展开/收起、勾选都该上 spring",
+        "勾选完成的微交互：复选框打勾 + 该行轻微下沉/划除的过渡，给予明确「做完了」的正反馈（micro-interaction，短时长、不喧宾夺主）",
+        "Task ↔ List 状态切换动画（60fps 收录的 Task to List Switch）：节点在「行内任务」与「展开详情」间有连续形变过渡，值得借鉴为面板里行→详情的展开",
+        "悬停渐显复选框：opacity/scale 的轻过渡，静止干净、悬停才浮现",
+        "整体「每一节平滑导向下一节」的视觉层次 + 克制留白：动效服务于流畅而非炫技，符合「最好的动效用户几乎察觉不到」原则——这是给轻量面板定调的核心准则",
+        "加载/路径线条动画(Loading Line Path)、卡片 spin 等品牌级转场：可借鉴其「轻盈、线性流动」的品牌动效语言，但持久面板应只取最克制的子集"
+      ],
+      "sources": [
+        "https://www.superlist.com/",
+        "https://www.superlist.com/feature-lists",
+        "https://help.superlist.com/en/articles/23853-create-tasks-and-subtasks",
+        "https://www.superlist.com/updates/improved-markdown",
+        "https://www.superlist.com/blog/how-to-replace-5-apps-with-superlist",
+        "https://www.superlist.com/feature-meeting-notes",
+        "https://www.superlist.com/updates",
+        "https://60fps.design/apps/superlist",
+        "https://max-productive.ai/ai-tools/superlist/",
+        "https://theorganizednotebook.com/blogs/blog/superlist-best-task-management-app-review-tutorial-2025",
+        "https://medium.com/@mariamomiteru/live-web-wednesdays-real-websites-real-ui-ux-907383ffca37"
+      ]
+    },
+    {
+      "app": "Notion / Notion Calendar",
+      "main_view_capabilities": [
+        "待办两种形态：① 页面内 /to-do 复选块（轻量、内联、纯文本+勾选框，可嵌套、可拖拽缩进）；② Database 中的任务记录（每条是一个可打开成整页的对象）",
+        "Database 五大视图：Table（表格）、List（列表）、Board（看板/按状态分列）、Calendar（日历）、Gallery（卡片），外加 Timeline / Feed（2025 新增滚动流视图）",
+        "内联属性编辑：直接点属性值就地编辑，无需打开页面（点 Status 切状态、点 Date 改日期、勾 Checkbox）",
+        "属性系统：Status（多态：To Do/In Progress/Done 可自定子类）、Checkbox（布尔）、Date/Due Date、Assignee（人）、Select/Multi-select 标签、Priority、关系/Rollup 等",
+        "Quick-add 多入口：每个视图右上角蓝色 New 按钮、表格/列表底部 + New、日历某天 hover 出 + 图标就地建",
+        "Peek 预览（侧滑抽屉）vs 全页打开：点行先以 peek 抽屉浮出，再点 ⤡ 展开整页（轻重两档打开）",
+        "每条任务是可承载正文/子块/嵌套内容的'页面'——待办即文档容器",
+        "视图级配置：每个视图独立控制显示/隐藏哪些属性、排序、筛选、分组",
+        "批量编辑（2025）：多选记录后一次性改状态/截止日/标签",
+        "Notion Calendar：把任务库的 Date 属性映射成日历事件，可拖拽改期、跨天/跨月拖动，改动双向同步回数据库",
+        "Notion Calendar：菜单栏 mini 窗口（常驻、看今日日程、一键进会议）",
+        "命令菜单 + 键盘快捷键驱动的快速操作"
+      ],
+      "standout_well_done": [
+        "内联就地编辑属性（点值即改，不打开页面）——这是 Notion 待办交互的核心爽点：状态/日期/勾选都在列表里一击完成，零上下文切换。一个轻面板必抄：清单行上的状态点、日期、勾选框都应直接可点改",
+        "/to-do 复选块的极简内联创建——一行文字+一个勾选框，回车继续下一条，Tab 缩进成子项。这是'轻笔记+待办'混排的黄金范式：在自由文本流里随手插一条可勾选项，待办和笔记不分家。轻面板的'轻笔记'部分应直接用这个模型",
+        "Peek 侧滑抽屉 vs 全页两档打开——既能快速瞄一眼细节又不丢失列表上下文。轻面板可借鉴：点一条待办从右侧滑出详情抽屉，而非粗暴跳页，关掉就回到清单",
+        "Status 属性的多态而非二元——To Do/In Progress/Done 三态比单纯勾选更贴真实工作流，且用颜色点直观。轻面板可保留一个'三态点'（待办/进行中/完成）作为唯一的状态维度，比纯 checkbox 信息量大又不臃肿",
+        "拖拽改期（日历里拖任务换天/换时段，自动同步）——直接操作时间轴的物理直觉极强。若面板带任何时间维度，拖拽改期比弹日期选择器优雅得多",
+        "Quick-add 的'就地建'（在列表底部/某天 hover 出 + 直接敲）——降低新增待办的摩擦到接近零。轻面板应让'加一条'永远一击可达，不弹模态框",
+        "菜单栏常驻 mini 窗口——和你的'胶囊常驻'母体哲学完全一致：不打扰、随时可瞄、点开才展开。证明'常驻小窗 + 点击展开大面板'是被验证过的成熟模式"
+      ],
+      "bloat_to_cut": [
+        "多视图切换（Table/Board/Calendar/Gallery/Timeline/Feed 六七种）——对轻面板是过载；一个常驻待办面板只需一种主清单视图，至多加一个可选的日历/时间分组",
+        "Relation / Rollup / Formula 等关系型属性——数据库级能力，重度且需要建模心智，轻面板完全不需要",
+        "可自定义无限属性的属性系统——Notion 让你加任意多列，结果是配置疲劳。轻面板应钉死极少数固定属性（状态、日期、也许一个标签），不开放自定义列",
+        "每条待办都是可嵌套整页文档——承载力太强会诱使用户把待办做成文档，偏离'轻'。轻面板的待办最多带一行备注，不做无限嵌套页面",
+        "视图级筛选/排序/分组配置面板——强大但是配置负担；轻面板用少量预设（今天/全部/已完成）即可，不暴露 filter builder",
+        "批量编辑多选改属性——团队/大列表才需要，个人轻面板用不上",
+        "Feed 视图、评论、emoji 反应、Assignee 协作——协作/团队特性，单人常驻待办纯属噪音",
+        "Database 的'两种待办形态并存'本身造成认知割裂（块 vs 记录到底用哪个）——轻面板要避免这种二义性，只保留一种待办模型"
+      ],
+      "motion_ui_highlights": [
+        "Peek 抽屉从右侧滑出的过渡——详情以抽屉浮层进出而非整页跳转，保留空间连续性，关闭即滑回清单",
+        "内联控件 hover 才显形（数据库控件/菜单默认隐藏，hover 才出；日历某天 hover 才浮 + 图标）——2025 改版的'更干净、更少干扰'方向，与你的极简母体完全契合：默认安静，悬停才露出操作",
+        "勾选完成时的勾选框微交互（点击即勾、状态点变色）——状态变化用颜色点而非文字，视觉轻",
+        "拖拽改期的实时跟随 + 落位（任务卡跟手拖动、释放即吸附到新时段/新天）——直接操作的物理反馈",
+        "2025 视觉降噪：表格更简、视觉更柔、干扰更少（gentler visuals, fewer distractions）——证明做减法本身是 Notion 当前的设计趋势，可作为面板视觉基调参考",
+        "菜单栏 mini 窗口的展开/收起——常驻小窗与完整面板之间的形态切换，正是你'胶囊→看清单大面板'的同构动效场景"
+      ],
+      "sources": [
+        "https://www.notion.com/help/intro-to-databases",
+        "https://www.notion.com/help/database-properties",
+        "https://www.notion.com/releases/2025-07-10",
+        "https://theorganizednotebook.com/blogs/blog/notion-new-ui-design-update-june-2025",
+        "https://www.notion.com/help/guides/status-property-gives-clarity-on-tasks",
+        "https://www.notion.com/product/calendar",
+        "https://www.notion.com/help/use-notion-calendar-with-notion",
+        "https://akiflow.com/blog/notion-calendar-integration-smarter-scheduling",
+        "https://www.notionapps.com/blog/notion-bulk-edit-2025"
+      ]
+    },
+    {
+      "app": "Apple 提醒事项 (Reminders) + Microsoft To Do — 联合盘点",
+      "main_view_capabilities": [
+        "Apple｜系统智能列表（Smart Lists）：今天(Today)、计划(Scheduled)、已标记(Flagged)、全部(All)、分配给我(Assigned to Me)、已完成(Completed)——常驻在顶部、自动聚合，无需手建",
+        "Apple｜今天列表的「按时间分组」(Group by Time)：无时间任务置顶，下分 上午/下午/晚上 三段；拖入某段自动赋默认时间(上午9点/下午3点/晚6点)；可一键关闭回到单列",
+        "Apple｜计划(Scheduled)：按日期自动展开未来安排；iOS18+ 与日历(Calendar)的 Scheduled Reminders 双向同步",
+        "Apple｜子任务(Subtasks)：缩进式拖拽生成层级",
+        "Apple｜分区(Sections)：同一列表内分组归类",
+        "Apple｜看板列视图(Column/Kanban view)：把一个项目的分区横向并排",
+        "Apple｜标签(Tags)系统 + 跨列表筛选；自定义智能列表按 标签/日期/时间/地点/旗标/优先级 组合规则",
+        "Apple｜旗标(Flag)、优先级(Priority 高/中/低)、备注(Notes)、URL、地点提醒、时间提醒、联系人提醒",
+        "Apple｜附件：拍照/相册/扫描文档直接挂到单条提醒",
+        "Apple｜模板(Templates)：把一个列表存成可复用模板(打包清单等)",
+        "Apple｜自然语言 / 快速输入解析日期时间；杂货(Grocery)列表按品类自动归类",
+        "MS｜My Day：每日聚焦清单，每晚自动清空(reset)归零",
+        "MS｜Suggestions(建议)面板：从顶部图标展开，汇集逾期/今天到期/昨日未完成项，逐条勾选加入 My Day",
+        "MS｜Steps(步骤)：父任务下的轻量子清单(纯 checklist)",
+        "MS｜Lists(列表) + Groups(分组)：列表可装进可折叠的分组",
+        "MS｜Important(重要)与 Planned(计划) 两个系统智能列表(星标聚合 / 按到期日聚合)",
+        "MS｜到期日、提醒、重复、备注、文件附件、任务共享、与 Outlook/Microsoft365 任务互通"
+      ],
+      "standout_well_done": [
+        "【My Day 每晚归零 + 隔日回流】(MS)：这是整个品类里最值得抄的机制。My Day 不是又一个列表，而是一个『今天我打算干什么』的临时聚焦面——每晚清空给你白纸，未完成项不丢、第二天自动进 Suggestions 等你重新挑。为什么好：它把『所有待办池』和『今日承诺』彻底解耦，天然对抗待办堆积焦虑，且零维护(系统自动 reset/回流)。对一个常驻胶囊面板来说，这正是『轻量、不打扰、每天给你一个干净起点』的灵魂机制。",
+        "【Suggestions 是 pull 而非 push】(MS)：建议项不会自动塞进你的当天清单，而是收在一个折叠面板里，你主动展开、逐条勾选才进 My Day。为什么好：保留了『系统帮你想起来』的价值，又把最终控制权留给用户——不打扰原则的范本。胶囊面板可照搬：默认只显示今日承诺，逾期/相关项收在一个可展开的『建议』抽屉。",
+        "【今天列表的「按时间分组」+ 拖拽赋时】(Apple)：上午/下午/晚上三段，把无时间任务和有时间任务分层，拖到某段就自动给个合理默认时间。为什么好：用极轻的交互(一次拖拽)解决『这条到底排在一天的哪个位置』，不需要弹日期选择器；而且分组可一键关。对持久面板：这是『结构感强但仍极简』的最佳平衡点，远胜逼用户手填时间。",
+        "【系统智能列表零配置常驻】(Apple 的 Today/Scheduled/Flagged)：用户不建任何东西，今天/计划/旗标就自动有内容。为什么好：减法的精髓——把最高频的几个视图做成内建、自动聚合，用户永远不必『组织』就能用。胶囊面板顶部值得固定 今天 / 计划(即将) / 旗标 三个零配置入口。",
+        "【子任务 + 分区两级、但都极克制】(Apple)：层级只到子任务，分区只是同列表内分组，没有无限嵌套。为什么好：给了组织能力又守住了简单，避免变成项目管理软件。轻量面板抄这个『最多两层』的硬边界刚好。",
+        "【拍照/扫描即附件、自然语言输入日期】(Apple)：单条任务上直接拍照或扫文档；输入框解析『明天下午3点』。为什么好：降低录入摩擦到接近零，符合『不打扰』。胶囊快速录入框抄自然语言解析价值最高(附件可作为 niche 选项后置)。",
+        "【旗标(Flag) 作为一个独立、跨列表的轻量标记维度】(Apple)：旗标不等于优先级、不等于标签，是一个一键的『盯一下』开关，并自动汇成一个智能列表。为什么好：比五花八门的优先级更轻，一个动作就能把一条捞进专属视图。胶囊面板抄这个『一键标记→自动成视图』的闭环非常划算。"
+      ],
+      "bloat_to_cut": [
+        "MS｜与 Outlook/Microsoft365/Planner 的深度互通与任务共享、协作分配——对单机常驻胶囊是纯负担，引入账号体系和同步复杂度，砍掉",
+        "MS｜Steps 与 My Day 概念重叠造成的认知负担：Steps 是子任务、My Day 又像今日子集，两套『把东西放进小清单』的心智模型。胶囊只保留 My-Day 式的『今日聚焦』一种，子任务用 Apple 那种缩进即可，不要再叠一个命名概念",
+        "MS｜被用户反复诟病的同步慢/卡/手动排序不跨设备、完成的任务又跳回来等可靠性问题——本质是云同步架构的代价；本地优先的胶囊应主动放弃多设备实时同步这条线，换取即时、可信的本地响应",
+        "Apple｜看板列视图(Column/Kanban)：这是把任务清单往项目管理拽，重、占空间、与极简母体冲突——砍",
+        "Apple｜模板(Templates)：低频高复杂的能力，对轻量面板是过度功能，砍或最多作为隐藏项",
+        "Apple｜地点提醒 / 联系人提醒 / 时区调整：依赖系统级权限与传感器，桌面常驻胶囊场景几乎用不到，砍",
+        "Apple｜杂货(Grocery)按品类自动归类：很妙但极垂直(只服务买菜场景)，不该进通用主面板，砍",
+        "通用｜多级优先级(高/中/低) + 标签 + 旗标 三套并行的标记体系：对轻量面板是冗余，三选一(建议保留旗标式一键标记)，其余砍",
+        "通用｜可嵌套的 Groups/分组 + 无限自定义智能列表规则编辑器：规则构建器是典型的『能力换复杂度』，主面板只留系统内建的几个智能视图，不开放规则编辑器"
+      ],
+      "motion_ui_highlights": [
+        "Apple｜勾选完成的动效：圆形 checkbox 填色 + 文字轻微划除/淡出，随后该行平滑上滑离场——『完成』的即时正反馈做得克制又满足，值得逐帧抄",
+        "Apple｜子任务用缩进 + 连接感的层级表达，拖拽时实时缩进预览，层级关系一眼可读且无弹窗",
+        "Apple｜按时间分组的拖拽：拖动时段间高亮目标分段、落下即赋默认时间，整个赋时无模态弹窗——『拖拽即编辑』的顺滑范例",
+        "Apple｜列表/智能列表用彩色圆形图标 + 数字角标，色彩是主要的辨识维度，整体留白大、字重对比清晰，符合极简美学",
+        "MS｜Suggestions 面板从顶部下滑展开/收起的抽屉式动效，以及任务从 Suggestions『加入 My Day』时的位移过渡——把『把它捡进今天』这一动作可视化",
+        "MS｜My Day 每晚归零本身可做成一个仪式感动效(隔日打开时的清空/焕新过渡)，强化『新的一天、干净起点』的情绪",
+        "通用｜整体偏向大圆角卡片、低饱和中性背景 + 单一品牌强调色作为勾选/旗标点缀色——值得作为胶囊持久面板的视觉基调"
+      ],
+      "sources": [
+        "https://support.apple.com/en-us/102484",
+        "https://support.apple.com/guide/iphone/use-smart-lists-iphe882772ed/ios",
+        "https://support.apple.com/guide/reminders/create-custom-smart-lists-remnfec66479/mac",
+        "https://support.apple.com/en-us/119953",
+        "https://www.geeky-gadgets.com/apple-reminders-2026-guide/",
+        "https://discussions.apple.com/thread/254419049",
+        "https://support.microsoft.com/en-us/office/my-day-and-suggestions-fc09a1b9-0854-4906-b166-f480ee97a139",
+        "https://support.microsoft.com/en-us/office/what-s-new-in-microsoft-to-do-e4385509-13af-4a55-ae17-1c5a61cf2d41",
+        "https://www.lucensoftware.com/blog/microsoft-to-do-tutorial",
+        "https://www.ctrl.blog/entry/microsoft-not-todo.html",
+        "https://techcommunity.microsoft.com/discussions/to-do/microsoft-todo---lag--extremely-slow/4079372"
+      ]
+    },
+    {
+      "app": "Bear / Apple Notes / Obsidian (笔记向能力盘点 — 面向桌面常驻胶囊待办的「看清单」持久面板)",
+      "main_view_capabilities": [
+        "Bear — Markdown 即时格式化：行首 `- ` 自动转 todo、`⌘T` 切换 checkbox、所见即所得（不显示原始语法）",
+        "Bear — 无限层级嵌套（推荐 3-4 层），Tab/Shift+Tab 缩进，子任务归到主任务下",
+        "Bear — 完成项自动沉底（2.4 起，Preferences 可开关）",
+        "Bear — 左侧边距 Side Action 区：拖拽小圆点重排、hover chevron 折叠/展开嵌套列表",
+        "Bear — 富内容同note混排：文字/图片/表格/todo 在一条笔记里",
+        "Bear — 标签（#tag 内联，支持嵌套标签 #work/项目），侧栏标签树 + Pinned 置顶区（本地置顶 / 全局置顶）",
+        "Bear — 全文搜索 + 标签筛选",
+        "Apple Notes — 交互式 checklist：勾选即标记完成，完成项可自动沉底（Settings 可设 Manually/Automatically）",
+        "Apple Notes — 滑动缩进：右滑加一级缩进、左滑减一级，可连续滑动多级",
+        "Apple Notes — 拖拽小圆点重排列表项",
+        "Apple Notes — Quick Note 速记：控制中心/锁屏一键新建，跨设备即时落点",
+        "Apple Notes — 与 Reminders 双向打通：checklist 项可转成 Reminders 任务",
+        "Apple Notes — 富文本 + 附件（扫描/图片/手写）、文件夹 + 标签双重组织",
+        "Apple Notes — iOS26/Apple Intelligence：自动从邮件/笔记里抽 to-do、自动按类别分组（grocery/errand/work）",
+        "Obsidian Tasks — 纯 Markdown checkbox（`- [ ]` / `- [x]`）作底层，人类可读",
+        "Obsidian Tasks — emoji 元数据：截止 📅、计划 ⏰、优先级 ⏫🔼🔽⏬、重复 🔁every week、完成日期 ✅",
+        "Obsidian Tasks — 交互式编辑 modal（不用记 emoji 语法，弹窗填日期/优先级）",
+        "Obsidian Tasks — query 块按条件聚合跨笔记任务（due before、has tag 等），Kanban/日历视图",
+        "Obsidian Daily Note + QuickAdd — 单命令把带时间戳的一行追加到「今日」笔记，作为统一 inbox/捕获点"
+      ],
+      "standout_well_done": [
+        "完成项自动沉底（Bear 2.4 / Apple Notes 都做了）：未完成永远在视线顶部，完成的不删除但让路。对常驻小面板尤其关键——空间有限，活跃任务永远可见、已完成留痕但不占注意力。是「轻量但有秩序」的标杆行为，且可作为开关。",
+        "Markdown 即时格式化（Bear）：行首敲 `- ` 立刻变 todo、所见即所得不暴露原始语法。键盘流速记的黄金体验——不打断输入节奏、零鼠标、零模式切换。胶囊待办的「快速记」应直接抄这个：聚焦输入框敲一行即成任务。",
+        "Quick Note 一键速记（Apple Notes）：锁屏/控制中心瞬间落点，跨设备同步。证明「捕获摩擦=0」是待办工具的命门。胶囊本身就是常驻入口，应保证全局快捷键/点胶囊即聚焦输入，灵感不丢。",
+        "左侧边距拖拽圆点重排 + hover chevron 折叠（Bear）：重排和折叠的控件藏在左边距，平时不可见、hover/触摸才浮现。既给了手动排序和层级折叠的能力，又不让按钮污染极简界面——正是「能力丰富但视觉克制」的范本。",
+        "Apple Notes 滑动缩进（右滑进、左滑退，可连滑多级）：用一个自然手势替代缩进按钮，零 UI 成本表达层级。桌面面板可映射为 Tab/Shift+Tab 或拖拽缩进，避免摆一排缩进按钮。",
+        "Obsidian Tasks 的交互式编辑 modal：底层是纯文本 emoji 语法，但给一个弹窗填日期/优先级，普通用户不必背 📅🔁 语法。这套「强能力藏在轻交互后面」的分层很值得抄——面板默认极简，需要设截止/优先级时弹一个小卡片，不把元数据塞满主行。",
+        "嵌套标签 + 置顶区（Bear）：#work/项目 形成标签树，Pinned 区把高频项拎出来。对待办面板，轻量版=少量标签做快速筛选 + 把几个关键任务置顶常驻顶部，不需要完整文件夹体系。"
+      ],
+      "bloat_to_cut": [
+        "Obsidian Tasks 的 query 块 / 自定义查询 DSL（due before AND has tag 等布尔逻辑）—— power-user 语法门槛高，违背极简母体，待办面板不应让用户写查询语句",
+        "Obsidian 的 Kanban / 日历 / 多视图切换 —— 重型视图体系，持久面板只需一个清单视图，多视图是范围膨胀",
+        "Obsidian 全套 emoji 元数据语法（要求用户手敲 📅⏰⏫🔁✅）—— 若引入截止/优先级，必须走弹窗 modal，绝不暴露原始 emoji 语法给用户记",
+        "Apple Notes 的 Reminders 双向同步 / Apple Intelligence 自动抽取任务 / 自动分类 —— 跨 app 集成与 AI 编排是另一个产品的体量，与「轻量不打扰」的胶囊定位冲突，不引入",
+        "Bear/Notes 的富文本 + 图片 + 表格 + 扫描 + 手写附件 —— 完整笔记编辑器能力。待办面板最多保留「一行备注/一个链接」，不要做成富文本编辑器",
+        "完整文件夹 + 嵌套标签树 + 本地/全局多档置顶（Bear 那套组织体系）—— 组织维度过多。轻量版只保留：少量扁平标签筛选 + 单层置顶，不做文件夹和嵌套标签",
+        "Bear 的无限层级嵌套（3-4 层子任务）—— 对小面板过深；建议最多 1 层子任务（父/子），更深即臃肿",
+        "Obsidian 的重复任务规则引擎（🔁 every/recurrence rule）—— 重复规则解析是大坑，轻量面板可先不做或只做最简单的「每天/每周」预设"
+      ],
+      "motion_ui_highlights": [
+        "完成项「沉底」过渡：勾选后任务带动画平滑滑到列表底部并淡为灰/划线态——给完成以即时正反馈，又不突兀地立刻消失。这是抄进面板的首选动效。",
+        "勾选 checkbox 的微动效：Apple Notes 勾选有打勾的弹性/填充动画，划线文字渐入。微小但让「完成」这一刻有满足感。",
+        "左边距控件的 hover 浮现：Bear 的拖拽圆点/折叠 chevron 平时隐形、hover 才淡入——控件按需出现，平时界面纯净。持久面板可用同样的「hover 才显操作」保持极简。",
+        "嵌套列表折叠/展开的高度过渡：chevron 点击后子项平滑收起/展开（高度动画），而非瞬间跳变。",
+        "拖拽重排的实时占位：拖动任务时其它项实时让位、有阴影抬起感（Bear/Notes 拖拽圆点重排），物理感强。",
+        "滑动缩进的渐进反馈（Apple Notes）：右滑/左滑时缩进随手指实时移动、可连续多级——手势与视觉同步，层级变化有连续感而非离散跳。",
+        "所见即所得的 inline 格式化瞬变（Bear）：敲完 `- ` 的一刻语法标记消失、变成 todo 样式，转换无延迟、无闪烁——值得抄进「敲一行即成任务」的输入体验。"
+      ],
+      "sources": [
+        "https://blog.bear.app/2025/05/bear-2-4-update-better-encryption-smarter-todo-and-more/",
+        "https://bear.app/faq/lists-and-todos-in-bear/",
+        "https://bear.app/",
+        "https://support.apple.com/en-us/102296",
+        "https://www.geeky-gadgets.com/apple-notes-tips-tricks-2025/",
+        "https://www.macrumors.com/2025/06/09/four-features-coming-to-apple-reminders-and-notes/",
+        "https://taskforge.md/blog/obsidian-tasks-guide/",
+        "https://taskforge.md/blog/obsidian-todo-list/",
+        "https://taskforge.md/blog/obsidian-daily-notes/",
+        "https://www.macrumors.com/how-to/create-checklists-apple-notes-app/"
+      ]
+    },
+    {
+      "app": "Amie / Akiflow / Sunsama (日程规划向三件套对比研究)",
+      "main_view_capabilities": [
+        "Amie 主视图: 日历 + 待办同屏, 把 todo 直接拖到日历生成 time block; 一屏内时间块与清单共存",
+        "Amie: 自然语言/AI 排程('周日做家务'自动分配数小时, 按任务类型推断时长)",
+        "Amie: 把邮件从收件箱拖进任务列表转成可排程项; 颜色编码区分事件类型",
+        "Akiflow 主视图: 统一 Inbox(汇聚 Todoist/Notion/Gmail 等) + 今日日历两栏, 任务拖到日历即 time block",
+        "Akiflow: Command Bar(键盘唤起, 自然语言+特殊字符快速建/移/排/snooze 任务, 不离键盘)",
+        "Akiflow: Time Slots(可命名时间槽, 把多个任务/整个项目拖进同一个槽; 可做 ideal-week 模板)",
+        "Akiflow: Time Frames(取代旧 snooze, 给任务设'在某时间范围内做')+ Replan Undone Tasks(把未完成自动推到下一个空档)",
+        "Akiflow: Rituals(可选的晨间规划 + 晚间 shutdown 流程)",
+        "Akiflow: 几乎每个动作都有 hotkey, 日期跳转快捷键",
+        "Sunsama 主视图: 按天的看板列 + 右侧日历, 任务可拖成 time block(timebox)",
+        "Sunsama: 引导式每日规划仪式(五步: Process/Plan/Prioritize/Prepare/Publish), 逐步带着选今日任务",
+        "Sunsama: 每任务时间估算 + 实际计时(actual vs estimated), 可按历史自动建议估时",
+        "Sunsama: 工作量护栏 — 累加今日计划时长对比 workload threshold, 超载时弹警告 + 时间线显示预计完成时间 vs 期望下班时间",
+        "Sunsama: 晚间 Shutdown 仪式(标记完成/未完成, 未完成可结转明天/改期/删除)",
+        "Sunsama: 未完成任务午夜自动 rollover 到明天(可选'手动勾选结转'); auto-archive 把连续多天没做的任务自动归档(Shift+A)",
+        "Sunsama: Channels 分类 + 用 $ 把任务关联到周目标(weekly objectives); Focus mode + 内置番茄钟; 计划可一键发到 Slack/Teams"
+      ],
+      "standout_well_done": [
+        "拖待办到时间轴直接生成 time block(三家共有的核心) — 好在它把'抽象清单'和'具体何时做'用一个手势统一, 心智负担最低; 持久面板里这是最该一比一抄的交互, 因为它正是'看清单'与'今日计划'的桥梁",
+        "Sunsama 工作量护栏(计划时长累加 vs 阈值, 超载即时视觉警告) — 好在它主动阻止'今天排了 14 小时'这种自欺, 用一条进度条就把'计划是否现实'变得可见; 轻量面板只需一根'今日已排 X/Y 小时'的迷你进度条即可复刻其 80% 价值",
+        "Sunsama 未完成任务一键结转/改期(rollover + shutdown 时逐条处置) — 好在它把'昨天没做完'变成一个明确的处置动作而非默默堆积, 制造'清账'的闭环感; 持久面板可做成一个小小的'昨日遗留'卡片, 点一下扫到今天",
+        "Sunsama auto-archive(连续多天没碰的任务自动归档) — 好在它替用户做了诚实的减法, 防止清单变成永不缩短的负罪感列表; 一个轻量面板尤其需要这个'自动瘦身', 否则会越用越重",
+        "Akiflow Command Bar / 全键盘流 — 好在熟手可以全程不碰鼠标完成捕获-排程-改期, 速度感本身就是愉悦; 持久面板值得抄'一个快捷键唤起输入框, 自然语言加任务并直接排今天'这一条最高频路径(不必抄全套 hotkey)",
+        "Akiflow Time Slots(把整组任务拖进一个命名时间槽) — 好在它支持'一段时间做一类事'而非逐个排, 降低排程颗粒度; 对极简面板可退化成'今日上午/下午/晚上'三段, 拖进去即可",
+        "Sunsama/Akiflow 的'引导式规划仪式'本身 — 好在它把规划变成有起止的一段短流程(5-15分钟)而非随时焦虑; 持久面板可保留极轻的一步'规划今天'入口(选今日要做的几条), 但不必做满五步",
+        "Amie 的'日历+待办同屏 + 自然语言排程' — 好在它证明了排程不必填表单, 一句话即可落到正确时长的块上; 持久面板的'加任务'框值得抄这种自然语言解析(时长/日期)"
+      ],
+      "bloat_to_cut": [
+        "Sunsama 五步'五个P'完整仪式(Process/Plan/Prioritize/Prepare/Publish) — 对极简常驻面板过重, 每天强制 10-20 分钟流程会劝退; 最多保留'选今日任务'一步",
+        "把计划 Publish 到 Slack/Teams — 团队协作功能, 个人轻量面板无关, 删",
+        "Channels + 周目标($ 关联 objectives)双层分类体系 — 项目管理化, 增加录入摩擦; 轻面板用一个'今天/本周'二分即可, 不要多层归类",
+        "实际计时(actual vs estimated time tracking)+ 番茄钟 — 是时间审计/自律工具, 与'不打扰的胶囊'气质冲突, 砍掉或最多留一个可选估时",
+        "Akiflow 的多源 Inbox 聚合(Todoist/Notion/Jira/Gmail 全接入) — 是'生产力中枢'定位, 与极简母体相悖; 不做集成聚合, 只做本地清单",
+        "Akiflow 全套 hotkey 体系 + Time Frames 这类细颗粒延迟语义 — 学习成本高, 普通用户用不到; 只留一个唤起键 + 自然语言",
+        "Amie 内置 CRM / 预约链接(scheduling links) — 完全是 B 端/约会场景, 与待办面板无关, 删",
+        "AI 自动全天排程/自动 reschedule(Amie/Motion 式) — 黑箱自动排程常让用户失去控制感且需要日历写权限; 轻面板让用户自己拖, 不做自动占满日历",
+        "重型双向日历同步(写回 Google/Outlook 事件) — 工程与权限成本高、易破坏'不打扰'; 持久面板可只做本地时间块, 日历只读叠加或干脆不接"
+      ],
+      "motion_ui_highlights": [
+        "Amie 整体被公认为最美日历: 干净排版 + 用心的配色, 事件块呈现本身就赏心悦目 — 值得抄'事件/任务块的圆角、留白、色彩克制'这套视觉语言",
+        "Amie '有目的的动效, 流畅顺滑, 高级感' — 强调动画服务于反馈而非炫技; 拖拽落位、块生成应有顺滑的弹性过渡, 这正是该母体追求的'动效好'",
+        "Amie 的拖拽建块手势(从清单拖到日历, 实时预览落点) — 拖动时显示半透明 ghost + 时间标签, 松手吸附到时间格, 是值得逐帧复刻的微交互",
+        "Amie 'joyful' 基调: emoji/反应等愉悦小细节, 让排程不枯燥 — 轻量面板可在'完成任务'时给一个克制的庆祝微动效",
+        "Sunsama 超载警告的可视化(时间线条 + 预计完成 vs 期望下班的对比) — 用一条时间线把抽象的'排太满'变直观, 值得抄成迷你进度条/超线变色",
+        "Akiflow 拖任务进 Time Slot 时的吸附与分组视觉, 以及 Command Bar 唤起的轻量浮层 — 浮层式快速输入比跳转页面更不打扰",
+        "三家通用: 把待办拖到'今天'时间轴时的落点高亮 + 吸附对齐 + 块尺寸随时长伸缩 — 是'看清单→今日计划'面板最核心、最值得打磨的一处动效"
+      ],
+      "sources": [
+        "https://amie.so/",
+        "https://efficient.app/apps/amie",
+        "https://clickup.com/blog/amie-calendar-review/",
+        "https://ellieplanner.com/comparisons/amie-calendar-review",
+        "https://cal.com/blog/meet-amie-a-joyful-productivity-tool",
+        "https://akiflow.com/",
+        "https://how-to-use-guide.akiflow.com/help/articles/3677363-time-blocking-101",
+        "https://how-to-use-guide.akiflow.com/rituals",
+        "https://product.akiflow.com/en/help/articles/3089241-time-slots",
+        "https://product.akiflow.com/changelog/goodbye-snooze-hello-time-frames",
+        "https://how-to-use-guide.akiflow.com/overview-the-command-bar",
+        "https://www.sunsama.com/features/daily-planning-and-shutdown",
+        "https://help.sunsama.com/docs/daily-planning",
+        "https://help.sunsama.com/docs/getting-started/basics/task-rollover-and-recurring-tasks-the-basics/",
+        "https://www.sunsama.com/blog/time-blocking",
+        "https://blog.rivva.app/p/sunsama-vs-akiflow"
+      ]
+    }
+  ],
+  "synthesis": "I now have the complete grounding: locked tokens (面板 `#232326`, Inter, accent `#34C75A`, 面板圆角14px, morph 180-220ms spring, 320px wide), the strict flat/no-date/no-org MVP, and the existing four-state morph (idle→peek→capture→confirm). The current \"panel\" is just the hover-peek (~320px). They now want a deliberately-opened **big panel** (click-open, persistent, only-close-to-dismiss).\n\nI have everything needed. Producing the decision-oriented Markdown deliverable now.\n\n---\n\n# todo-capsule「看清单」大面板 · 能力集设计\n\n> 母体已锁：深色 Granola 药丸（`#1E1E20`）/ 扁平无日期单桶 / 双入口（⌥Space 热键写 · hover peek 看）/ 勾掉即清 / Inter + accent `#34C75A` / morph 180–220ms spring。\n> 本文档定义的是**主动打开的大面板**（点击召唤、持久驻留、只有点关闭才收）——它是 hover-peek（~320px 一瞥）之上的**第三态深度**，不是另一个 app。原则：**宁可少而精**，跨 8 app 反复验证 + 真正契合「持久面板」者才留。\n\n---\n\n## 1. 该留的能力（KEEP，共 7 条，按价值排序）\n\n### K1 · 聚焦输入框 + 实时 NL 解析 token（面板内顶部常驻）\n- **来自**：Todoist（一行解析 + 实时染色 token）、TickTick（Smart Recognition 高亮可点改）、Things 3（Jump Start）、Quick Add（全员共识）。\n- **为什么**：研究已认定「全局热键召唤捕获」是母体灵魂；大面板打开后，输入框就该**已获焦、光标已闪**，打字即记、回车即落、连续记多条不离手。这是面板存在的第一理由——把「记」和「看」放进同一个持久面。\n- **轻量化**：面板顶部一条常驻输入框（非弹模态）。**MVP 严守纯扁平无日期**，所以这里**只解析标题**，不抄 Todoist 的 `#项目/@标签/p1/日期` 全套染色——保留输入框 + 实时高亮的「视觉骨架」，但 v1 高亮目标为空（为未来留接口、当前不暴露）。回车落到顶部，输入框清空保持焦点。\n\n### K2 · 完成项「划线 + 4s 撤销 + 沉底/移出」闭环\n- **来自**：Todoist（划除 + 5s undo 浮条）、Bear/Apple Notes（完成自动沉底）、Things 3（延时滑入 Logbook 留反悔窗口）、Apple Reminders（填色 + 上滑离场）。\n- **为什么**：这是母体已锁的 D-006「勾掉即清 + ~4s 撤销」的**面板放大版**。小胶囊里勾完直接走；大面板因为停留更久、一次处理多条，**需要一个可见的撤销条 + 完成项短暂沉底**，给批量勾选时的安全感和「我清掉了一批」的成就闭环。\n- **轻量化**：勾选 → 划线 + 行下沉到「今日已完成」轻分隔下方（灰、划线）→ 底部滑入一条「已完成 · 撤销」浮条（4s）→ 超时移出活跃流，静止计数 −1。**v1 不做可翻阅 Logbook**（Things/Todoist 的历史库一律砍），沉底只是离场前的缓冲。\n\n### K3 · 静则隐 / 动则现的悬停操作（hover 才出复选框与控件）\n- **来自**：Superlist（悬停才出复选框，静止像纯笔记）、Bear（左边距拖拽圆点/折叠 chevron hover 才浮现）、Notion（2025 内联控件 hover 才显形）。\n- **为什么**：持久面板长时间在眼前，**静止态必须极干净**才不打扰（母体第一约束）。把复选框、行内编辑、删除、拖拽手柄全部收进 hover 态，平时每行只有一行文字，信息密度逼近纯清单。\n- **轻量化**：行默认 = 纯标题（13px `#F2F2F4`）。行 hover → 左侧淡入圆形复选框（120ms opacity）+ 右侧淡入「⋯」轻操作（删除/置顶）。不做 Bear 的拖拽圆点常驻——拖拽手柄也藏在 hover。\n\n### K4 · 圆形勾选 + 物理感微动效（spring，非线性）\n- **来自**：Things 3（圆圈→打勾→延时滑出，ADA 级动效即反馈）、Superlist（弹簧物理手感）、Apple Notes（打勾弹性填充 + 划线渐入）、TickTick（drag-and-release tick）。\n- **为什么**：母体五大约束含「动效好」，且圆形勾选圈是这一品类的**统一视觉母题**。大面板里勾选是最高频动作，必须有满足感的物理反馈。\n- **轻量化**：单一圆形 checkbox（accent `#34C75A` 填充）；点击 = 填色 + 内描勾 + 该行 spring 轻微下沉。复用母体已定的 180–220ms spring，**不引入 Lottie**（自绘 SwiftUI 即可，避免依赖）。\n\n### K5 · 行内即时编辑（双击/单击进入，回车提交，无弹窗）\n- **来自**：Notion（内联就地编辑，零上下文切换）、Superlist（行内连续建任务 + Markdown 即时转）、Bear（所见即所得 inline 格式化）。代码侧已实现双击行内编辑。\n- **为什么**：大面板的核心是「在原地处理清单」。改一条措辞、补一条、删一条都不该跳页或开抽屉——否则它就退化成需要管理的 app，违背「轻量」。\n- **轻量化**：双击行 → 当场变可编辑文本，回车提交 / Esc 取消。**不抄 Superlist 的 `/` 斜杠菜单和 Markdown block 模型**（那是富文本编辑器，过重）；纯单行纯文本编辑即可。\n\n### K6 · 拖拽排序 + 单层「置顶/pin」\n- **来自**：Bear（左边距拖拽圆点重排 + Pinned 置顶区）、Notion（拖拽改归属）、Apple Notes（拖拽小圆点重排，实时让位）。代码侧已实现 `List.onMove` 拖拽排序。\n- **为什么**：纯扁平清单变长后，唯一不增加结构复杂度的「整理」手段就是**手动排序 + 把一两条关键的钉在顶部**。比标签/分组/优先级四档都轻，却覆盖 90% 的「这条最要紧」诉求。\n- **轻量化**：拖拽手柄藏在 hover（见 K3），拖动时其它行 spring 让位 + 被拖行轻微抬起阴影。pin = hover「⋯」里一个动作，钉住的行带一个极小 accent 圆点常驻顶部。**不做** Bear 的本地/全局双档置顶，只一档。\n\n### K7 · 友好「清零」空态 + 引导\n- **来自**：MS To Do（My Day 每日干净起点）、Things 3 / 母体已锁 D-009「今日清零 ✓」。\n- **为什么**：持久面板每天都会被看到，空的时候不能是冷白板。一个温暖的「清零」态既是情绪奖励，又是教学位（提示热键、提示 hover）。\n- **轻量化**：无未完成项 → 面板中部显示「今日清零 ✓ · ⌥Space 记一条」，首启一次性带 hover 提示。直接复用母体已定文案与 token，零额外设计。\n\n> **被认真考虑但落选的边界候选**（说明克制取舍）：\n> - MS To Do 的 **My Day 每晚归零 + Suggestions pull 回流**——机制极优，但需要「全部待办池 vs 今日承诺」两个层，而母体是**纯单桶**，引入即破坏扁平。**落为 v2 候选，v1 不做**。\n> - Apple 的 **今天按上午/下午/晚上分时段**——优雅，但依赖「时间」维度，母体已锁**无日期**。**v1 不做**。\n> - Sunsama 的 **工作量进度条 / 未完成结转卡**——需要时间估算或日期，与无日期母体冲突。**v1 不做**。\n\n---\n\n## 2. 明确砍掉（CUT）\n\n| 砍掉的能力 | 来自 | 砍的原因 |\n|---|---|---|\n| **项目 / Area / Folder / Section 多级组织** | Things 3, Todoist, TickTick, Notion | 母体已锁纯扁平单桶。两级组织把胶囊变成 GTD 项目经理，头号失败模式（scope creep）。 |\n| **多视图切换（看板 / 日历 / 时间线 / 画廊 / 矩阵）** | Todoist, TickTick, Notion, Obsidian | 持久面板只需「一个清单视图」。多视图是 PM 工具堆料，与极简持久面板直接冲突。 |\n| **日期 / 截止 / 提醒 / 重复规则** | 全员 | 母体已锁无日期。重复规则解析是大坑；提醒是另一套系统权限。v1 一律不做。 |\n| **四档优先级 / 标签系统 / 旗标三套并行标记** | Todoist, TickTick, Apple | 标记体系冗余。大面板只保留「pin 置顶」一个一键标记维度（K6），其余砍。 |\n| **自定义过滤器 / 查询 DSL / 智能列表规则编辑器** | TickTick, Todoist, Obsidian, Apple | 规则构建器=能力换复杂度。单桶清单无需过滤；最多一个搜索框（见 §3 备注，非 KEEP）。 |\n| **协作 / 共享 / 指派 / 评论 / Workspaces** | Todoist, Superlist, Notion, MS, Sunsama | 单机个人胶囊，协作维度正交，整块砍。 |\n| **番茄钟 / 习惯追踪 / 时间估算计时 / 统计 / Karma** | TickTick, Sunsama | 另一个产品域；Karma 经证实是反向激励虚荣游戏，与「不打扰」直接冲突。 |\n| **富媒体（图片 / 附件 / 表格 / 扫描 / 富文本 block）** | Superlist, Bear, Notion, Apple | 待办行最多带「一行纯文本」，不做富文本编辑器。存储与渲染成本高、偏离「看清单」。 |\n| **多层嵌套子任务 / 无限层级** | 全员 | v1 连一层子任务都暂不做（保持每行一条）；嵌套是项目管理膨胀。 |\n| **AI 拆解 / 自动排程 / 会议记录 / 语音转任务** | Todoist, Superlist, Sunsama, Apple | 研究已判 not_suitable（纯 GUI 产品）；引入即破坏轻量与本地优先。 |\n| **多源 Inbox 聚合 / 第三方集成 / 邮件转任务 / 日历双向同步** | Akiflow, Amie, Notion, MS | 「生产力中枢」定位，与本地常驻胶囊相悖。只做本地清单。 |\n| **可翻阅的历史库（Logbook / Completed 浏览）** | Things 3, Todoist, Bear | 完成项沉底缓冲即可（K2），不做可翻阅历史视图。 |\n| **多主题 / 背景图 / 白噪音 / 自定义图标徽章** | TickTick, Superlist | 一套精致深色默认即可，定制是噪音。 |\n\n---\n\n## 3. 大面板信息架构与交互\n\n### 3.1 面板分区（自上而下，单栏）\n```\n┌─────────────────────────────┐  ← 面板 #232326 / 圆角14px / 描边 rgba(255,255,255,.08)\n│ ▸ 顶栏：标题\"今天\" · 计数 · [✕]│  L3 引导/计数 + 关闭按钮（右上）\n├─────────────────────────────┤\n│ ⌥Space  [ 记一条…           ]│  ← K1 常驻聚焦输入框（打开即获焦）\n├─────────────────────────────┤\n│ ○ 待办行（hover 出复选/⋯/拖手）│  ← K3/K4/K5/K6 活跃流（pin 项在最上，带 accent 点）\n│ ○ 待办行                      │\n│ ○ 待办行                      │\n│   … 内滚（max-height min(70vh)）│\n├─────────────────────────────┤  ← 轻分隔线（仅在有已完成项时出现）\n│ ⊘ 已完成（划线·灰·短暂沉底）   │  ← K2 离场缓冲区\n└─────────────────────────────┘\n        [ 已完成 · 撤销 ]          ← K2 撤销浮条（4s，底部滑入）\n```\n- 宽度 ~360–400px（比 peek 的 320px 略宽，因常驻输入框 + 操作控件需要呼吸）；高度 max-height `min(70vh, 内容)` 内滚。\n- 空态（K7）：活跃流区替换为居中「今日清零 ✓ · ⌥Space 记一条」。\n\n### 3.2 与小胶囊的分工（三态深度，职责不重叠）\n| 形态 | 触发 | 职责 | 是否可写 | 是否持久 |\n|---|---|---|---|---|\n| **idle 药丸** | 默认 | 一眼看未完成数（零文字泄漏） | 否 | 是（边缘常驻） |\n| **peek 一瞥**（已有） | hover 驻留 150–250ms | 快速扫今日有哪些（行 hover 高亮，无输入光标） | 否（只看） | 否（移开自动收） |\n| **大面板**（本文档） | **单击药丸 / 菜单栏图标 / 热键再次召唤** | 深度处理：连续记、勾、编辑、排序、看全 | **是** | **是（只有点 ✕ 或 Esc 才收）** |\n| **热键 capture**（已有） | ⌥Space | 极速记一条即走 | 是（一次性） | 否（confirm 一闪即收） |\n\n- **关键边界**：peek 是「被动一瞥、自动收」，大面板是「主动打开、不自动收」。这是 hover 脆弱性的兜底——D-002 已定「单击药丸 = 等价兜底入口」，大面板正是这个兜底的归宿，看清单不 100% 依赖 hover。\n- 热键 ⌥Space 默认仍走极速 capture（母体不变）；**当大面板已打开时**，⌥Space = 聚焦面板内输入框（不另弹 capture），避免双重捕获面。\n\n### 3.3 打开 / 关闭交互（含关闭按钮）\n- **打开**：单击 idle 药丸 → 药丸 spring 形变长成大面板（灵动岛同源形变，180–220ms spring，从药丸所在右缘锚点长出）；输入框**立即获焦**、光标闪烁。\n- **关闭**（三条等价路径，都明确）：\n  1. **右上角 ✕**（hover 才加深，静止态轻 `#9B9BA1`）——满足「只有点关闭才收」的字面承诺；\n  2. **Esc**——键盘流离场（若输入框有内容，第一次 Esc 先清空输入、第二次才关面板）;\n  3. **点击面板外**——可选关闭（**默认开**，符合「不打扰、随手点开点关」；但因 non-activating 写入特性，需 spike 验证点外关闭不误伤；若不稳则降级为「仅 ✕/Esc 关」）。\n- **关闭动效**：面板 spring 缩回药丸（缩回到原锚点，保留「缩回哪」的因果），计数同步更新。\n- **绝不**：不做最小化、不做内部侧栏折叠（母体本身就是点开才在），不做 Slim Mode（CUT 已列）。\n\n### 3.4 键盘流（Type Travel 精神，面板获焦即可全键盘）\n- 打开即焦点在输入框：**直接打字即记**（抄 Things 3 Type Travel / TickTick 即输即记）。\n- `Enter` 落一条、输入框清空保持焦点（连续记，抄 Superlist 行内连续建）；\n- `↑/↓` 在行间移动焦点（输入框为空时按 ↓ 进入列表）；\n- 焦点在某行：`Space`/`⌘K` 勾选完成、`Enter` 进入行内编辑、`⌘⌫` 删除、`⌘↑/⌘↓` 拖动排序、`⌘P` 置顶；\n- `⌘Z` 撤销刚才的完成/删除（呼应 4s 撤销条）；\n- `Esc` 两段式离场（见上）。\n\n> **搜索/过滤**：长清单时**可选**保留一个极轻的「即输即筛」——但**不暴露查询语法**（CUT 已砍 DSL）。鉴于母体是单桶且 v1 清单预期不长，**搜索列为 v2 候选，v1 不做**（避免顶栏再加一个常驻控件）。\n\n---\n\n## 4. UI 与动效主张\n\n### 4.1 视觉（深色 Granola 体系，复用已锁 token，零新增色板）\n- **面**：面板 `#232326` / 描边 `rgba(255,255,255,.08)` / 柔影 `0 8px 24px rgba(0,0,0,.35)` / 圆角 **14px**。\n- **字（Inter）**：待办 13px/400 `#F2F2F4`；计数 12px/600 accent；次要（顶栏标题/引导）12px/400 `#9B9BA1`；占位 13px `#6E6E74`。\n- **accent**：`#34C75A`（呼应 Granola 绿；勾选填充、计数、pin 圆点统一用它——抄 Things 3「圆圈作为统一视觉母题」）。\n- **密度**（抄 Attio 三层 + Notion 2025 降噪）：行高 ~32px、8pt 栅格、面板内距 12–16px。静止态每行只一行文字 + 圆 checkbox 轮廓，**留白克制、单栏窄列、行高舒展**（Todoist「清单呼吸感」）。已完成项 = 灰 `#6E6E74` + 划线。\n- **怎么好看的关键**：① 默认极安静（hover 才出控件，K3）；② 唯一强色是 accent 绿，作为勾选/pin/计数的统一点缀（颜色即层级，抄 Todoist 旗标语言）；③ 深色面板长清单对比度需在原型实测调校（design-brief 已记 deferred）。\n\n### 4.2 动效（全部服务于「状态变化的可理解性」，复用母体 spring，附 reduced-motion 双规格）\n| 动作 | 默认动效 | 时长 / 缓动 | reduced-motion 降级 |\n|---|---|---|---|\n| **打开**（药丸→面板） | 灵动岛同源 spring 形变，从右缘锚点长出，内容淡入 | 180–220ms spring | 120ms 透明度+尺寸渐变，保留「从哪长出」因果 |\n| **关闭**（面板→药丸） | spring 缩回原锚点 | 180–220ms spring | 120ms 渐变 |\n| **新增一行**（回车落条） | 新行从输入框处轻微下滑入位 + 既有行 spring 让位 | 160ms ease-out / spring | 100ms 透明度渐入 |\n| **勾选完成**（K4） | 圆圈填 accent + 内描勾 + 该行轻微下沉 | 150ms spring | 静态填色 + 划线，无位移 |\n| **完成沉底**（K2） | 划线 + 平滑滑到「已完成」分隔下方并淡灰 | 200ms ease-in-out | 直接置灰沉底，无滑动 |\n| **撤销浮条** | 底部弹性滑入、4s 后滑出 | 入 200ms / 出 160ms | 透明度淡入淡出 |\n| **删除一行** | 行向右淡出 + 下方行 spring 上移补位 | 160ms | 透明度淡出 |\n| **拖拽排序**（K6） | 拖行抬起阴影、其它行实时让位（物理跟手） | 跟手 / 落位 spring | 跟手 / 落位无弹性 |\n| **hover 出控件**（K3） | 复选框/⋯/拖手柄 opacity 0→1 | 120ms ease | 同（纯透明度，本就无位移） |\n\n- **动效哲学**（抄 Superlist「最好的动效用户几乎察觉不到」+ Things 3「动效即反馈、不炫技」）：弹簧物理而非线性缓动；克制、有实体感、绝不喧宾夺主。母体已锁「morph 180–220ms spring / reduced-motion 120ms 渐变」，本面板所有形变**严格沿用同一套参数**，保证 idle↔peek↔面板三态形变手感统一（同一个元素在长大/缩小，不是不同窗口）。\n\n---\n\n## 5. 与现有极简 MVP 的关系\n\n**核心原则：小胶囊（idle / peek / 热键 capture）一行不动，全部新增能力都关进「大面板专属」深度。** 母体的简单/不打扰由前三态守住；大面板是用户**主动选择进入**的深度态，深度不会泄漏到日常视野。\n\n| 能力 | 归属 | 说明 |\n|---|---|---|\n| idle 药丸（计数+对勾，零文字） | **MVP 不动** | 已实现，边缘常驻 |\n| peek 一瞥（hover 看清单） | **MVP 不动** | 已实现，被动看、自动收 |\n| ⌥Space 热键速记一条即走 | **MVP 不动** | 已实现，capture 一闪即收 |\n| 勾掉即清 + 4s 撤销 | **MVP 有，大面板增强** | 小胶囊勾完即走；大面板加可见撤销条 + 沉底缓冲（K2） |\n| 行内编辑（双击） | **代码已实现** | 大面板纳入键盘流，小胶囊不暴露 |\n| 拖拽排序 | **代码已实现** | 大面板 hover 出手柄 + 让位动效（K6），小胶囊不暴露 |\n| **常驻聚焦输入框（连续记）** | **大面板专属（新）** | K1，小胶囊保持「记完即走」 |\n| **完成沉底「已完成」缓冲区** | **大面板专属（新）** | K2，小胶囊勾完直接消失 |\n| **hover 才出复选/⋯/拖手柄** | **大面板专属（新）** | K3，让长清单可操作又不喧闹 |\n| **pin 置顶** | **大面板专属（新）** | K6，唯一新增的「标记」维度 |\n| **✕ / Esc / 点外关闭** | **大面板专属（新）** | §3.3，小胶囊无「关闭」概念（它本就常驻） |\n| **面板内全键盘流** | **大面板专属（新）** | §3.4 |\n\n**给 Stage 2（原生 SwiftUI）的落地提示**：大面板复用 idle↔peek 已有的 `MorphContainer` spring 参数，是「同一形变元素的第三档尺寸」，不是新窗口/新 NSPanel——避免再开一层焦点交接。non-activating 写入 + 点击面板外关闭的兼容性，并入 PROGRESS 里已挂的 NSPanel spike 一起真机验证。\n\n**v2 候选（明确不进 v1，记录以防遗忘）**：My Day 式「今日承诺 vs 待办池」双层回流（MS To Do）、即输即筛搜索、一层子任务、最简「每天/每周」重复。任一引入都需重新评估是否破坏「纯扁平」母体约束。\n\n---\n\n相关文件（绝对路径）：\n- 锁定 token 与状态机：`/Users/luca/Desktop/项目/todo-capsule/docs/decisions/2026-06-25-todo-capsule-design-brief.md`（§视觉 token / D-001~D-009）\n- 形变四态与焦点模型：`/Users/luca/Desktop/项目/todo-capsule/docs/decisions/2026-06-25-todo-capsule-interaction-architecture.md`\n- 现有原型（idle/peek/capture 形变参照）：`/Users/luca/Desktop/项目/todo-capsule/docs/prototype/2026-06-25-todo-capsule-prototype.html`\n- 已实现代码（行内编辑/拖拽排序基础）：`/Users/luca/Desktop/项目/todo-capsule/code/Sources/TodoCapsule/`（`CapsulePanel.swift` / `ContentView.swift` / `CapsuleController.swift`）",
+  "counts": {
+    "apps": 8
+  }
+}

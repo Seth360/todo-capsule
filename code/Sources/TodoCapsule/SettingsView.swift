@@ -19,24 +19,18 @@ struct SettingsView: View {
         HStack(spacing: 0) {
             sidebar
             Divider()
-            ZStack(alignment: .bottomTrailing) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 20) {
-                        HStack {
-                            Text(section.title)
-                                .font(.tc(24, weight: .semibold))
-                            Spacer()
-                            headerAction
-                        }
-                        sectionBody
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack {
+                        Text(section.title)
+                            .font(.tc(24, weight: .semibold))
+                        Spacer()
+                        headerAction
                     }
-                    .padding(24)
-                    .padding(.bottom, 34)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    sectionBody
                 }
-                versionLabel
-                    .padding(.trailing, 24)
-                    .padding(.bottom, 16)
+                .padding(24)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .frame(minWidth: 760, minHeight: 520)
@@ -54,13 +48,11 @@ struct SettingsView: View {
     private var versionLabel: some View {
         Text(appVersionText)
             .font(.tc(11, weight: .medium))
-            .foregroundStyle(.secondary.opacity(0.78))
-            .padding(.horizontal, 8)
+            .foregroundStyle(.secondary.opacity(0.72))
+            .lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.horizontal, 10)
             .padding(.vertical, 4)
-            .background(
-                Capsule()
-                    .fill(Color(nsColor: .windowBackgroundColor).opacity(0.72))
-            )
             .allowsHitTesting(false)
     }
 
@@ -97,6 +89,8 @@ struct SettingsView: View {
             if state.shouldShowSettingsUpdateNotice {
                 settingsUpdateNotice
             }
+            versionLabel
+                .padding(.top, 4)
         }
         .padding(12)
         .frame(width: 180)

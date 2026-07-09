@@ -59,6 +59,7 @@ struct ArchiveHistoryView: View {
     @State private var selectedTag: String?
     @State private var hoveredId: UUID?
     @State private var dragWindowOrigin: NSPoint?
+    @State private var archiveWindow: NSWindow?
 
     private var usesLightTheme: Bool {
         switch state.settings.theme {
@@ -115,6 +116,7 @@ struct ArchiveHistoryView: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 8)
+                .frame(width: 180)
                 .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(subtleFill))
 
                 tagFilterBar
@@ -153,20 +155,23 @@ struct ArchiveHistoryView: View {
         }
         .padding(22)
         .frame(width: 720, height: 620)
+        .background(
+            ArchiveWindowAccessor { window in
+                if archiveWindow !== window { archiveWindow = window }
+                window.isMovableByWindowBackground = true
+            }
+        )
     }
 
     private var tagFilterBar: some View {
         HStack(spacing: 8) {
-            Image(systemName: "number")
-                .font(.tc(12, weight: .semibold))
-                .foregroundStyle(txt3)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     archiveTagButton(title: "全部", selected: selectedTag == nil) {
                         selectedTag = nil
                     }
                     ForEach(availableTags, id: \.self) { tag in
-                        archiveTagButton(title: "#\(tag)", selected: selectedTag == tag) {
+                        archiveTagButton(title: tag, selected: selectedTag == tag) {
                             selectedTag = tag
                         }
                     }
@@ -257,7 +262,7 @@ struct ArchiveHistoryView: View {
     private var windowDragGesture: some Gesture {
         DragGesture(minimumDistance: 4, coordinateSpace: .global)
             .onChanged { value in
-                guard let window = NSApplication.shared.keyWindow ?? NSApplication.shared.mainWindow else { return }
+                guard let window = archiveWindow ?? NSApplication.shared.keyWindow ?? NSApplication.shared.mainWindow else { return }
                 let origin = dragWindowOrigin ?? window.frame.origin
                 dragWindowOrigin = origin
                 window.setFrameOrigin(NSPoint(x: origin.x + value.translation.width, y: origin.y - value.translation.height))
@@ -298,6 +303,24 @@ struct ArchiveHistoryView: View {
             let matchesSearch = query.isEmpty || item.text.localizedCaseInsensitiveContains(query)
             let matchesTag = selectedTag.map { item.tags.contains($0) } ?? true
             return matchesSearch && matchesTag
+        }
+    }
+}
+
+private struct ArchiveWindowAccessor: NSViewRepresentable {
+    let onResolve: (NSWindow) -> Void
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            if let window = view.window { onResolve(window) }
+        }
+        return view
+    }
+
+    func updateNSView(_ view: NSView, context: Context) {
+        DispatchQueue.main.async {
+            if let window = view.window { onResolve(window) }
         }
     }
 }

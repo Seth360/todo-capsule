@@ -69,18 +69,19 @@ extension ContentView {
 
     func smallCollectRow(_ item: CollectItem) -> some View {
         let hovered = hoveredRow == item.id || (Self.forceHover && item.id == state.collects.first?.id)
+        let editing = editingCollectId == item.id
         let revealed = revealedId == item.id
         let masked = item.sensitive && !revealed
         let display = masked ? "••••••••" : item.text
         let links = detectedLinks(in: item.text)
         return HStack(alignment: .top, spacing: 10) {
-            Image(systemName: item.sensitive ? "lock.fill" : "bookmark")
+            Image(systemName: item.pinned ? "pin.fill" : (item.sensitive ? "lock.fill" : "bookmark"))
                 .font(.tc(11))
                 .foregroundStyle(item.sensitive ? accent.opacity(0.85) : txt3)
                 .frame(width: 18, height: 22)
-            if editingCollectId == item.id {
+            if editing {
                 GrowingTextView(text: $editCollectText, height: $collectEditHeight,
-                                focusTick: collectEditFocusTick, maxLines: 5,
+                                focusTick: collectEditFocusTick, maxLines: 2,
                                 onSubmit: { commitCollectEdit(item) },
                                 onEndEditing: { commitCollectEdit(item) },
                                 onCancel: { cancelCollectEdit() })
@@ -98,45 +99,31 @@ extension ContentView {
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .background(RoundedRectangle(cornerRadius: 8).fill(hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001)))
+        .background(RoundedRectangle(cornerRadius: 8).fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001))))
         .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }
         .onTapGesture { copy(item) }
         .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
         .pointingHandCursor()
         .contextMenu {
-            collectJumpMenuItems(links)
-            Button { copy(item) } label: {
-                Label("复制整条", systemImage: "doc.on.doc")
-            }
-            if item.sensitive {
-                Button {
-                    withAnimation(anim) { revealedId = revealed ? nil : item.id }
-                } label: {
-                    Label(revealed ? "隐藏" : "显示", systemImage: revealed ? "eye.slash" : "eye")
-                }
-            }
-            Button(role: .destructive) {
-                withAnimation(anim) { state.deleteCollect(item.id) }
-            } label: {
-                Label("删除", systemImage: "trash")
-            }
+            collectContextMenuItems(item, links: links, revealed: revealed)
         }
     }
 
     private func collectRow(_ item: CollectItem) -> some View {
         let hovered = (hoveredRow == item.id) || (Self.forceHover && item.id == state.collects.first?.id)
+        let editing = editingCollectId == item.id
         let revealed = revealedId == item.id
         let masked = item.sensitive && !revealed
         let display = masked ? "••••••••" : item.text
         let links = detectedLinks(in: item.text)
         return HStack(alignment: .top, spacing: 10) {
-            Image(systemName: item.sensitive ? "lock.fill" : "doc.text")
+            Image(systemName: item.pinned ? "pin.fill" : (item.sensitive ? "lock.fill" : "doc.text"))
                 .font(.tc(11)).foregroundStyle(item.sensitive ? accent.opacity(0.85) : txt3)
                 .frame(width: 16, height: 19)
-            if editingCollectId == item.id {
+            if editing {
                 // 编辑也用独立 NSTextView：多行可见、Return=换行、⌘Return=存、失焦落定、Esc 取消
                 GrowingTextView(text: $editCollectText, height: $collectEditHeight,
-                                focusTick: collectEditFocusTick, maxLines: 8,
+                                focusTick: collectEditFocusTick, maxLines: 2,
                                 onSubmit: { commitCollectEdit(item) },
                                 onEndEditing: { commitCollectEdit(item) },
                                 onCancel: { cancelCollectEdit() })
@@ -151,7 +138,7 @@ extension ContentView {
                     .textSelection(.enabled)                     // 划词选中部分文本 → ⌘C 复制（整条用复制按钮）
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            if editingCollectId != item.id {
+            if !editing {
                 HStack(spacing: 0) {
                     if item.sensitive {
                         Button { withAnimation(anim) { revealedId = revealed ? nil : item.id } } label: {
@@ -183,27 +170,12 @@ extension ContentView {
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
         .background(RoundedRectangle(cornerRadius: 8)
-            .fill(hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001)))
+            .fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001))))
         .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }
         .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
         .pointingHandCursor()
         .contextMenu {
-            collectJumpMenuItems(links)
-            Button { copy(item) } label: {
-                Label("复制整条", systemImage: "doc.on.doc")
-            }
-            if item.sensitive {
-                Button {
-                    withAnimation(anim) { revealedId = revealed ? nil : item.id }
-                } label: {
-                    Label(revealed ? "隐藏" : "显示", systemImage: revealed ? "eye.slash" : "eye")
-                }
-            }
-            Button(role: .destructive) {
-                withAnimation(anim) { state.deleteCollect(item.id) }
-            } label: {
-                Label("删除", systemImage: "trash")
-            }
+            collectContextMenuItems(item, links: links, revealed: revealed)
         }
     }
 
@@ -271,6 +243,43 @@ extension ContentView {
             } label: {
                 Label("跳转", systemImage: "arrow.up.forward.app")
             }
+        }
+    }
+
+    @ViewBuilder
+    private func collectContextMenuItems(_ item: CollectItem, links: [URL], revealed: Bool) -> some View {
+        Button {
+            withAnimation(anim) { state.toggleCollectPin(item.id) }
+        } label: {
+            Label(item.pinned ? "取消置顶" : "置顶", systemImage: item.pinned ? "pin.slash" : "pin")
+        }
+        Menu {
+            ForEach(state.lists) { list in
+                Button {
+                    withAnimation(anim) { state.moveCollectToTodo(item.id, to: list.id) }
+                } label: {
+                    Label(list.name, systemImage: "tray.and.arrow.down")
+                }
+            }
+        } label: {
+            Label("转移", systemImage: "folder")
+        }
+        Divider()
+        collectJumpMenuItems(links)
+        Button { copy(item) } label: {
+            Label("复制整条", systemImage: "doc.on.doc")
+        }
+        if item.sensitive {
+            Button {
+                withAnimation(anim) { revealedId = revealed ? nil : item.id }
+            } label: {
+                Label(revealed ? "隐藏" : "显示", systemImage: revealed ? "eye.slash" : "eye")
+            }
+        }
+        Button(role: .destructive) {
+            withAnimation(anim) { state.deleteCollect(item.id) }
+        } label: {
+            Label("删除", systemImage: "trash")
         }
     }
 

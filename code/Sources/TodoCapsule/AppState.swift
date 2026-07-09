@@ -376,7 +376,8 @@ final class AppState: ObservableObject {
     func moveToCollect(_ todo: Todo) {
         guard let i = todos.firstIndex(where: { $0.id == todo.id }) else { return }
         let item = todos.remove(at: i)
-        collects.insert(CollectItem(text: item.text), at: 0)
+        let index = collects.firstIndex { !$0.pinned } ?? collects.count
+        collects.insert(CollectItem(text: item.text), at: index)
         persistAll()
         relayout()
     }
@@ -488,7 +489,8 @@ final class AppState: ObservableObject {
     func submitCollect() {
         let v = collectDraft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !v.isEmpty else { return }
-        collects.insert(CollectItem(text: v), at: 0)
+        let index = collects.firstIndex { !$0.pinned } ?? collects.count
+        collects.insert(CollectItem(text: v), at: index)
         collectDraft = ""
         persistAll()
         relayout()
@@ -505,6 +507,35 @@ final class AppState: ObservableObject {
         guard let index = collects.firstIndex(where: { $0.id == id }) else { return }
         let item = collects.remove(at: index)
         armCollect(item, index: index)
+        persistAll()
+        relayout()
+    }
+
+    func toggleCollectPin(_ id: UUID) {
+        guard let index = collects.firstIndex(where: { $0.id == id }) else { return }
+        var item = collects.remove(at: index)
+        item.pinned.toggle()
+        if item.pinned {
+            collects.insert(item, at: 0)
+        } else {
+            let firstUnpinned = collects.firstIndex { !$0.pinned } ?? collects.count
+            collects.insert(item, at: firstUnpinned)
+        }
+        persistAll()
+        relayout()
+    }
+
+    func moveCollectToTodo(_ id: UUID, to listId: String) {
+        guard lists.contains(where: { $0.id == listId }),
+              let index = collects.firstIndex(where: { $0.id == id }) else { return }
+        let item = collects.remove(at: index)
+        let parsed = parseTodoLine(item.text)
+        let text = parsed.text.isEmpty ? item.text : parsed.text
+        todos.insert(Todo(text: text, listId: listId, tags: parsed.tags), at: 0)
+        ensureTags(parsed.tags)
+        selectedListId = listId
+        panelTab = .today
+        showingArchive = false
         persistAll()
         relayout()
     }

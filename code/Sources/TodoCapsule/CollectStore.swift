@@ -6,17 +6,23 @@ struct CollectItem: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var text: String
     var sensitive: Bool = false
+    var pinned: Bool = false
     var createdAt: Date = Date()
 
-    init(text: String, sensitive: Bool = false) { self.text = text; self.sensitive = sensitive }
+    init(text: String, sensitive: Bool = false, pinned: Bool = false) {
+        self.text = text
+        self.sensitive = sensitive
+        self.pinned = pinned
+    }
 
-    enum CodingKeys: String, CodingKey { case id, text, sensitive, createdAt }
+    enum CodingKeys: String, CodingKey { case id, text, sensitive, pinned, createdAt }
     // 宽松解码：缺/坏字段一律给默认，单条坏数据不致整盘解码失败（对齐 Todo）。
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = (try? c.decode(UUID.self, forKey: .id)) ?? UUID()
         text = (try? c.decode(String.self, forKey: .text)) ?? ""
         sensitive = (try? c.decode(Bool.self, forKey: .sensitive)) ?? false
+        pinned = (try? c.decode(Bool.self, forKey: .pinned)) ?? false
         createdAt = (try? c.decode(Date.self, forKey: .createdAt)) ?? Date()
     }
 }

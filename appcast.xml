@@ -3,20 +3,20 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>0.1.8</title>
-            <pubDate>Thu, 09 Jul 2026 15:16:44 +0800</pubDate>
+            <title>0.1.9</title>
+            <pubDate>Thu, 09 Jul 2026 16:05:41 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>9</sparkle:version>
-            <sparkle:shortVersionString>0.1.8</sparkle:shortVersionString>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>0.1.9</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.8
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.9
 
-- 修复设置页新版本提示和当前版本号重叠的问题。
-- 新版本号显示在“发现新版本”下方。
-- 只有检测到新版本时才显示更新提示，无更新时显示当前版本号。
+- 回收箱支持按本周优先展示完成项。
+- 回收箱每条项目 hover 后可直接永久删除。
+- “查看全部”可打开完整回收箱记录，按周分组，并支持搜索和标签过滤。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.8/todo-capsule-v0.1.8.dmg" length="2728070" type="application/octet-stream" sparkle:edSignature="qyywn9cf0Dje9W9/N4038ZzrghMZMriPNQUaXX2g4Mg/khGeroTM/ltctL9SYWIcnxkYSuOdi7gRBQWeQekvBQ=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.9/todo-capsule-v0.1.9.dmg" length="2836719" type="application/octet-stream" sparkle:edSignature="eGAWhzazOHrcMMPYZGa7CB5AzTfy9QVmaTrGHzz6u6B4qACu18vNECzQ4R/TR8+MzWJoLfaqJO00Pr7TIyjGCA=="/>
         </item>
     </channel>
 </rss>

@@ -24,6 +24,7 @@ struct ContentView: View {
     @State var revealedId: UUID?      // 当前临时显形的敏感收藏
     @State var copiedFlash: UUID?     // 刚复制 → 底部「已复制」提示
     @State var confirmingClearArchive = false
+    @State var showingArchiveHistory = false
     // 拖拽重排（自定义 DragGesture：被拖行裸绑偏移跟手，其它行 spring 实时让位）
     @State var draggingId: UUID?
     @State var draggingFrom: Int?
@@ -92,6 +93,11 @@ struct ContentView: View {
                 }
             }
             .preferredColorScheme(preferredScheme)
+            .sheet(isPresented: $showingArchiveHistory) {
+                ArchiveHistoryView()
+                    .environmentObject(state)
+                    .preferredColorScheme(preferredScheme)
+            }
     }
 
     private var capsule: some View {

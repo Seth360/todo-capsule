@@ -600,6 +600,12 @@ final class AppState: ObservableObject {
         relayout()
     }
 
+    func deleteFromArchive(_ todo: Todo) {
+        completedArchive.removeAll { $0.id == todo.id }
+        persistAll()
+        relayout()
+    }
+
     func clearArchive() {
         completedArchive.removeAll()
         showingArchive = false

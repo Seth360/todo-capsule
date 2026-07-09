@@ -174,12 +174,35 @@ extension ContentView {
                     .foregroundStyle(txt3)
                     .frame(maxWidth: .infinity, minHeight: 96)
             } else {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        ForEach(state.completedArchive) { archiveRow($0) }
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("本周")
+                        .font(.tc(11, weight: .semibold))
+                        .foregroundStyle(txt3)
+                        .padding(.horizontal, 2)
+                    if archiveCurrentWeekItems.isEmpty {
+                        Text("本周暂无完成项目")
+                            .font(.tc(12))
+                            .foregroundStyle(txt3)
+                            .frame(maxWidth: .infinity, minHeight: 76)
+                    } else {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ForEach(archiveCurrentWeekItems) { archiveRow($0) }
+                            }
+                        }
+                        .frame(maxHeight: 204)
                     }
+                    Button {
+                        showingArchiveHistory = true
+                    } label: {
+                        Text("查看全部")
+                            .font(.tc(12, weight: .semibold))
+                            .foregroundStyle(accent)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 6)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .frame(maxHeight: 238)
             }
         }
         .padding(14)
@@ -200,26 +223,54 @@ extension ContentView {
     }
 
     private func archiveRow(_ todo: Todo) -> some View {
-        Button {
-            withAnimation(anim) { state.restoreFromArchive(todo) }
-        } label: {
-            HStack(spacing: 10) {
+        let hovered = hoveredRow == todo.id || (Self.forceHover && todo.id == archiveCurrentWeekItems.first?.id)
+        return HStack(spacing: 10) {
+            Button {
+                withAnimation(anim) { state.restoreFromArchive(todo) }
+            } label: {
                 Image(systemName: "arrow.uturn.backward.circle")
                     .font(.tc(13, weight: .semibold))
                     .foregroundStyle(accent)
                     .frame(width: 24, height: 24)
-                Text(linkedText(todo.text))
-                    .font(.tc(13))
-                    .foregroundStyle(txt2)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-            .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(subtleFill))
+            .buttonStyle(.plain)
+            .help("恢复到待办")
+            Text(linkedText(todo.text))
+                .font(.tc(13))
+                .foregroundStyle(txt2)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            tagPills(todo.tags)
+            if hovered {
+                Button {
+                    withAnimation(anim) { state.deleteFromArchive(todo) }
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.tc(11, weight: .semibold))
+                        .foregroundStyle(txt3)
+                        .frame(width: 22, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("永久删除")
+            }
         }
-        .buttonStyle(.plain)
-        .help("恢复到待办")
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(hovered ? Color.white.opacity(0.07) : subtleFill))
+        .contentShape(Rectangle())
+        .onHover { h in hoveredRow = h ? todo.id : (hoveredRow == todo.id ? nil : hoveredRow) }
+        .contextMenu {
+            Button("恢复到待办") { withAnimation(anim) { state.restoreFromArchive(todo) } }
+            Button("永久删除", role: .destructive) { withAnimation(anim) { state.deleteFromArchive(todo) } }
+        }
+    }
+
+    var archiveCurrentWeekItems: [Todo] {
+        let interval = ArchiveDateGrouper.currentWeekInterval
+        return state.completedArchive
+            .filter { interval.contains($0.completedAt ?? $0.createdAt) }
+            .sorted { ($0.completedAt ?? $0.createdAt) > ($1.completedAt ?? $1.createdAt) }
     }
 
     // 顶栏(全宽留白)是拖动区；标题下拉与右侧工具按钮单独可点。

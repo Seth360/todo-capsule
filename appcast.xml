@@ -3,21 +3,19 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>0.1.4</title>
-            <pubDate>Thu, 09 Jul 2026 14:27:18 +0800</pubDate>
+            <title>0.1.5</title>
+            <pubDate>Thu, 09 Jul 2026 14:35:04 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>5</sparkle:version>
-            <sparkle:shortVersionString>0.1.4</sparkle:shortVersionString>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.4
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.5
 
-- 小窗口切换到收藏后，列表内容会同步显示收藏项。
-- 小窗口清单切换菜单移除选中对号，改为淡色背景标记当前项，并收紧下拉图标。
-- 小窗口默认展开高度调整为 240px。
-- 大窗口收藏页输入框与待办输入框保持一致，支持 Enter 直接保存并使用同样的高亮状态。
+- 应用启动后会自动在后台检查一次更新，不再只能等到定时检查或手动点击“检查更新…”。
+- 自动检查间隔从 24 小时调整为 1 小时。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.4/todo-capsule-v0.1.4.dmg" length="2680702" type="application/octet-stream" sparkle:edSignature="wI17r/sWHLOWAmd6oxy7GWmvYoKVLccbV+Y+b9Y4UWU2AoLfXa9q7TduIlJvBVfVcRlcRBnDUtxD/r7manD+CQ=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.5/todo-capsule-v0.1.5.dmg" length="2680646" type="application/octet-stream" sparkle:edSignature="UeeNdcpYPzAqQaBK5v8pV1isoszSdX8rgjUUWt9RhUh4PuGKwcltTtiNLS9/DXS29bhZljMcdC4qxGsbu7SZBw=="/>
         </item>
     </channel>
 </rss>

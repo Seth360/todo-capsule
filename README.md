@@ -6,7 +6,7 @@ Todo Capsule 是一个 macOS 桌面边缘待办胶囊。它用 SwiftUI + AppKit 
 
 下载最新版 DMG：
 
-[todo-capsule-v0.1.4.dmg](https://github.com/Seth360/todo-capsule/releases/download/v0.1.4/todo-capsule-v0.1.4.dmg)
+[todo-capsule-v0.1.5.dmg](https://github.com/Seth360/todo-capsule/releases/download/v0.1.5/todo-capsule-v0.1.5.dmg)
 
 所有版本见 [GitHub Releases](https://github.com/Seth360/todo-capsule/releases)。
 

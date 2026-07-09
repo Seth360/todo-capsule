@@ -30,6 +30,9 @@ final class UpdateController: NSObject, SPUUserDriver, SPUUpdaterDelegate {
     func start() {
         do {
             try updater.start()
+            if updater.automaticallyChecksForUpdates {
+                updater.checkForUpdatesInBackground()
+            }
         } catch {
             state.setUpdateError("更新器启动失败：\(error.localizedDescription)")
         }

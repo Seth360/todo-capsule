@@ -8,6 +8,7 @@
 - GitHub Releases 用来托管 DMG 安装包
 - Sparkle 更新源：`https://raw.githubusercontent.com/Seth360/todo-capsule/main/appcast.xml`
 - Sparkle 公钥写在 `code/Resources/Info.plist` 的 `SUPublicEDKey`
+- 自动检查策略：`SUScheduledCheckInterval` 当前为 `3600` 秒；应用启动后还会调用一次 `checkForUpdatesInBackground()`，让用户不必手动点“检查更新…”才发现新版。
 - Sparkle 私钥不能提交。当前本机有两处可用来源：
   - Keychain account: `todo-capsule`
   - 本地忽略文件：`code/.sparkle-private/todo-capsule-ed25519.key`

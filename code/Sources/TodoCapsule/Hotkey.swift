@@ -11,10 +11,7 @@ final class GlobalHotkey {
 
     func register(id: UInt32, keyCode: UInt32, modifiers: UInt32, handler: @escaping () -> Void) {
         installHandlerIfNeeded()
-        if let existing = refs[id] {
-            UnregisterEventHotKey(existing)
-            refs[id] = nil
-        }
+        unregister(id: id)
         handlers[id] = handler
         var ref: EventHotKeyRef?
         let hotID = EventHotKeyID(signature: OSType(0x54434150), id: id)
@@ -24,6 +21,14 @@ final class GlobalHotkey {
         } else {
             NSLog("todo-capsule: 全局热键注册失败(id=\(id), status=\(status))，该组合可能被系统/输入法占用")
         }
+    }
+
+    func unregister(id: UInt32) {
+        if let existing = refs[id] {
+            UnregisterEventHotKey(existing)
+            refs[id] = nil
+        }
+        handlers[id] = nil
     }
 
     private func installHandlerIfNeeded() {

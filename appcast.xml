@@ -3,21 +3,21 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>0.1.6</title>
-            <pubDate>Thu, 09 Jul 2026 14:55:11 +0800</pubDate>
+            <title>0.1.7</title>
+            <pubDate>Thu, 09 Jul 2026 15:13:00 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>7</sparkle:version>
-            <sparkle:shortVersionString>0.1.6</sparkle:shortVersionString>
+            <sparkle:version>8</sparkle:version>
+            <sparkle:shortVersionString>0.1.7</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.6
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.7
 
-- 设置页版本号改为左对齐。
-- 设置页新版本提示下移到底部，出现时覆盖版本号位置。
-- 新版本提示文案改为“发现新版本 + 版本号”，并去掉“点击查看更新”副文案。
-- 更新弹窗点击“取消”只关闭弹窗，不再隐藏更新提示；点击“跳过这个版本”才隐藏当前版本提示。
+- 菜单栏“记一条”的快捷键提示改为系统右侧对齐样式。
+- 菜单栏移除“看清单”和“热键”，新增“关于 Todo Capsule”，设置项不再显示快捷键。
+- 设置页“快捷键”文案调整为“唤起方式”和“快速记录”。
+- 快捷键支持预设、自定义和留空，快速记录说明改为“快速将复制文字回填到待办”。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.6/todo-capsule-v0.1.6.dmg" length="2681368" type="application/octet-stream" sparkle:edSignature="F/9p+pXG8FWonEWH/Iw2ms5mWBbxCrbSSOxr1h+NZiEsBDFMfPuInzmSsTI++pik3pSeytOHVqxNupPJGVGzDQ=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.7/todo-capsule-v0.1.7.dmg" length="2727703" type="application/octet-stream" sparkle:edSignature="CJYQCtyEv1JoAnkvHvcTFV7D86flMmkDBRQe6+ufAkRSgmCAZ/N8kWh7ORGgfnC2u1s5evVLE23AiebKH2wzBg=="/>
         </item>
     </channel>
 </rss>

@@ -6,6 +6,7 @@ struct SettingsView: View {
     @State private var section: SettingsSection = .general
     @State private var editingModel: ModelConfig?
     @State private var editingSummary: SummaryTemplateConfig?
+    @State private var recordingHotkey: HotkeyFieldKind?
 
     private var preferredScheme: ColorScheme? {
         switch state.settings.theme {
@@ -42,6 +43,22 @@ struct SettingsView: View {
         .sheet(item: $editingSummary) { template in
             SummaryTemplateEditorView(initial: template, lists: state.lists, onSave: saveSummaryTemplate)
                 .frame(width: 560, height: 600)
+        }
+        .sheet(item: $recordingHotkey) { kind in
+            HotkeyRecorderSheet(
+                title: kind.title,
+                onCancel: { recordingHotkey = nil },
+                onSave: { option in
+                    switch kind {
+                    case .summon:
+                        state.settings.summonHotkey = option
+                    case .quickRecord:
+                        state.settings.quickRecordHotkey = option
+                    }
+                    recordingHotkey = nil
+                }
+            )
+            .frame(width: 380, height: 230)
         }
     }
 
@@ -182,17 +199,25 @@ struct SettingsView: View {
 
     private var hotkeySection: some View {
         Form {
-            Picker("唤起窗口方式", selection: $state.settings.summonHotkeyIndex) {
-                ForEach(Settings.hotkeyOptions.indices, id: \.self) { i in
-                    Text(Settings.hotkeyOptions[i].name).tag(i)
-                }
-            }
-            Picker("一键记录", selection: $state.settings.quickRecordHotkeyIndex) {
-                ForEach(Settings.quickRecordHotkeyOptions.indices, id: \.self) { i in
-                    Text(Settings.quickRecordHotkeyOptions[i].name).tag(i)
-                }
-            }
-            Text("一键记录会读取当前剪贴板文本，并按行拆分写入“待办”。")
+            HotkeyPickerRow(
+                title: "唤起方式",
+                selection: Binding(
+                    get: { state.settings.summonHotkey ?? Settings.hotkeyOptions[0] },
+                    set: { state.settings.summonHotkey = $0 }
+                ),
+                presets: Settings.hotkeyOptions,
+                onCustom: { recordingHotkey = .summon }
+            )
+            HotkeyPickerRow(
+                title: "快速记录",
+                selection: Binding(
+                    get: { state.settings.quickRecordHotkey ?? Settings.quickRecordHotkeyOptions[0] },
+                    set: { state.settings.quickRecordHotkey = $0 }
+                ),
+                presets: Settings.quickRecordHotkeyOptions,
+                onCustom: { recordingHotkey = .quickRecord }
+            )
+            Text("快速将复制文字回填到待办")
                 .font(.tc(12))
                 .foregroundStyle(.secondary)
         }
@@ -437,6 +462,168 @@ struct SettingsView: View {
         panel.allowsMultipleSelection = false
         if panel.runModal() == .OK, let url = panel.url {
             state.settings.obsidianVaultPath = url.path
+        }
+    }
+}
+
+private enum HotkeyFieldKind: String, Identifiable {
+    case summon
+    case quickRecord
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .summon: return "自定义唤起方式"
+        case .quickRecord: return "自定义快速记录"
+        }
+    }
+}
+
+private struct HotkeyPickerRow: View {
+    let title: String
+    @Binding var selection: HotkeyOption
+    let presets: [HotkeyOption]
+    let onCustom: () -> Void
+
+    var body: some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Menu {
+                Button {
+                    selection = Settings.noHotkey
+                } label: {
+                    hotkeyMenuLabel(title: "无", systemImage: "minus.circle", selected: selection.isEmpty)
+                }
+                Divider()
+                ForEach(presets, id: \.self) { option in
+                    Button {
+                        selection = option
+                    } label: {
+                        hotkeyMenuLabel(title: option.name, systemImage: "keyboard", selected: selection == option)
+                    }
+                }
+                Divider()
+                Button(action: onCustom) {
+                    Label("自定义快捷键…", systemImage: "keyboard.badge.ellipsis")
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "keyboard")
+                        .font(.tc(12, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                    Text(selection.name)
+                        .font(.tc(13, weight: .semibold))
+                        .monospaced()
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.tc(10, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 9)
+                .padding(.vertical, 5)
+                .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Color.secondary.opacity(0.10)))
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
+        }
+    }
+
+    private func hotkeyMenuLabel(title: String, systemImage: String, selected: Bool) -> some View {
+        Label {
+            Text(title)
+        } icon: {
+            Image(systemName: selected ? "checkmark" : systemImage)
+        }
+    }
+}
+
+private struct HotkeyRecorderSheet: View {
+    let title: String
+    let onCancel: () -> Void
+    let onSave: (HotkeyOption) -> Void
+    @State private var captured: HotkeyOption?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(title)
+                .font(.tc(20, weight: .semibold))
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.secondary.opacity(0.10))
+                VStack(spacing: 8) {
+                    Image(systemName: "keyboard")
+                        .font(.tc(22, weight: .semibold))
+                        .foregroundStyle(Color(hex: 0x32D158))
+                    Text(captured?.name ?? "按下新的快捷键")
+                        .font(.tc(18, weight: .semibold))
+                        .monospaced()
+                    Text("可包含 Option、Command、Control、Shift")
+                        .font(.tc(12))
+                        .foregroundStyle(.secondary)
+                }
+                HotkeyCaptureView { event in
+                    let modifiers = Settings.carbonModifiers(from: event.modifierFlags)
+                    let keyCode = UInt32(event.keyCode)
+                    guard keyCode != 0 else { return }
+                    captured = HotkeyOption(
+                        name: Settings.displayName(keyCode: keyCode, modifiers: modifiers),
+                        keyCode: keyCode,
+                        modifiers: modifiers
+                    )
+                }
+                .frame(width: 1, height: 1)
+                .opacity(0.01)
+            }
+            .frame(height: 104)
+
+            HStack {
+                Button("清空") {
+                    onSave(Settings.noHotkey)
+                }
+                Spacer()
+                Button("取消") {
+                    onCancel()
+                }
+                Button("保存") {
+                    if let captured {
+                        onSave(captured)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(captured == nil)
+            }
+        }
+        .padding(22)
+    }
+}
+
+private struct HotkeyCaptureView: NSViewRepresentable {
+    let onKeyDown: (NSEvent) -> Void
+
+    func makeNSView(context: Context) -> KeyCaptureNSView {
+        let view = KeyCaptureNSView()
+        view.onKeyDown = onKeyDown
+        DispatchQueue.main.async {
+            view.window?.makeFirstResponder(view)
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: KeyCaptureNSView, context: Context) {
+        nsView.onKeyDown = onKeyDown
+        DispatchQueue.main.async {
+            nsView.window?.makeFirstResponder(nsView)
+        }
+    }
+
+    final class KeyCaptureNSView: NSView {
+        var onKeyDown: ((NSEvent) -> Void)?
+
+        override var acceptsFirstResponder: Bool { true }
+
+        override func keyDown(with event: NSEvent) {
+            onKeyDown?(event)
         }
     }
 }

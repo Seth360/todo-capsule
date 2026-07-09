@@ -125,6 +125,8 @@ struct AppSettings: Codable, Equatable {
 
     var summonHotkeyIndex: Int = 0
     var quickRecordHotkeyIndex: Int = 0
+    var summonHotkey: HotkeyOption?
+    var quickRecordHotkey: HotkeyOption?
 
     var modelProviderName: String = "OpenAI Compatible"
     var modelBaseURL: String = ""
@@ -149,6 +151,14 @@ struct AppSettings: Codable, Equatable {
     var syncAppleNotes: Bool = false
 
     mutating func normalize() {
+        summonHotkeyIndex = normalizedIndex(summonHotkeyIndex, count: Settings.hotkeyOptions.count)
+        quickRecordHotkeyIndex = normalizedIndex(quickRecordHotkeyIndex, count: Settings.quickRecordHotkeyOptions.count)
+        if summonHotkey == nil {
+            summonHotkey = Settings.hotkeyOptions[summonHotkeyIndex]
+        }
+        if quickRecordHotkey == nil {
+            quickRecordHotkey = Settings.quickRecordHotkeyOptions[quickRecordHotkeyIndex]
+        }
         if models.isEmpty {
             if modelBaseURL.isEmpty && modelAPIKey.isEmpty && modelName.isEmpty {
                 models = ModelConfig.defaults
@@ -179,6 +189,11 @@ struct AppSettings: Codable, Equatable {
 
     var activeSummaryTemplate: SummaryTemplateConfig {
         summaryTemplates.first(where: { $0.id == activeSummaryTemplateId }) ?? SummaryTemplateConfig.week
+    }
+
+    private func normalizedIndex(_ value: Int, count: Int) -> Int {
+        guard count > 0 else { return 0 }
+        return min(max(0, value), count - 1)
     }
 }
 

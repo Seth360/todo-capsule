@@ -404,27 +404,18 @@ final class CapsuleController: NSObject {
     }
     private func rebuildMenu() {
         let menu = NSMenu()
-        let summon = Settings.hotkeyOptions[min(max(0, state.settings.summonHotkeyIndex), Settings.hotkeyOptions.count - 1)]
-        let cap = NSMenuItem(title: "记一条  \(summon.name)", action: #selector(captureAction), keyEquivalent: "")
+        let cap = NSMenuItem(title: "记一条", action: #selector(captureAction), keyEquivalent: state.settings.summonHotkey?.menuKeyEquivalent ?? "")
+        cap.keyEquivalentModifierMask = Settings.eventModifierFlags(from: state.settings.summonHotkey?.modifiers ?? 0)
         cap.target = self; menu.addItem(cap)
-        let peek = NSMenuItem(title: "看清单", action: #selector(openPanelAction), keyEquivalent: "")
-        peek.target = self; menu.addItem(peek)
-        let settings = NSMenuItem(title: "设置…", action: #selector(settingsAction), keyEquivalent: ",")
+        let settings = NSMenuItem(title: "设置…", action: #selector(settingsAction), keyEquivalent: "")
         settings.target = self; menu.addItem(settings)
+        let about = NSMenuItem(title: "关于 Todo Capsule", action: #selector(aboutAction), keyEquivalent: "")
+        about.target = self; menu.addItem(about)
         menu.addItem(.separator())
         let update = NSMenuItem(title: "检查更新…", action: #selector(UpdateController.checkForUpdates), keyEquivalent: "")
         update.target = updateController
         menu.addItem(update)
         menu.addItem(.separator())
-        let hkItem = NSMenuItem(title: "热键", action: nil, keyEquivalent: "")
-        let hkMenu = NSMenu()
-        for (i, opt) in Settings.hotkeyOptions.enumerated() {
-            let it = NSMenuItem(title: opt.name, action: #selector(selectHotkey(_:)), keyEquivalent: "")
-            it.target = self; it.representedObject = i
-            it.state = (i == state.settings.summonHotkeyIndex) ? .on : .off
-            hkMenu.addItem(it)
-        }
-        hkItem.submenu = hkMenu; menu.addItem(hkItem)
         let login = NSMenuItem(title: "开机自启", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
         login.target = self
         login.state = state.settings.launchAtLogin ? .on : .off
@@ -435,28 +426,43 @@ final class CapsuleController: NSObject {
     }
     private func applyHotkey() { applyHotkeys() }
     private func applyHotkeys() {
-        let summon = Settings.hotkeyOptions[min(max(0, state.settings.summonHotkeyIndex), Settings.hotkeyOptions.count - 1)]
-        GlobalHotkey.shared.register(id: 1, keyCode: summon.keyCode, modifiers: summon.modifiers) { [weak self] in
-            guard let self = self else { return }
-            if self.state.mode == .panel {
-                self.panel.makeKeyAndOrderFront(nil)
-            } else {
-                self.state.enterCapture()
-                self.panel.makeKeyAndOrderFront(nil)
+        if let summon = state.settings.summonHotkey, !summon.isEmpty {
+            GlobalHotkey.shared.register(id: 1, keyCode: summon.keyCode, modifiers: summon.modifiers) { [weak self] in
+                guard let self = self else { return }
+                if self.state.mode == .panel {
+                    self.panel.makeKeyAndOrderFront(nil)
+                } else {
+                    self.state.enterCapture()
+                    self.panel.makeKeyAndOrderFront(nil)
+                }
             }
+        } else {
+            GlobalHotkey.shared.unregister(id: 1)
         }
 
-        let record = Settings.quickRecordHotkeyOptions[min(max(0, state.settings.quickRecordHotkeyIndex), Settings.quickRecordHotkeyOptions.count - 1)]
-        GlobalHotkey.shared.register(id: 2, keyCode: record.keyCode, modifiers: record.modifiers) { [weak self] in
-            self?.recordClipboardText()
+        if let record = state.settings.quickRecordHotkey, !record.isEmpty {
+            GlobalHotkey.shared.register(id: 2, keyCode: record.keyCode, modifiers: record.modifiers) { [weak self] in
+                self?.recordClipboardText()
+            }
+        } else {
+            GlobalHotkey.shared.unregister(id: 2)
         }
     }
     @objc private func captureAction() { state.enterCapture(); panel.makeKeyAndOrderFront(nil) }
     @objc private func openPanelAction() { state.enterPanel(); panel.makeKeyAndOrderFront(nil) }
     @objc private func settingsAction() { openSettingsWindow() }
+    @objc private func aboutAction() {
+        NSApp.orderFrontStandardAboutPanel(options: [
+            .applicationName: "Todo Capsule",
+            .applicationVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
+            .version: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
+        ])
+        NSApp.activate(ignoringOtherApps: true)
+    }
     @objc private func selectHotkey(_ sender: NSMenuItem) {
         guard let i = sender.representedObject as? Int else { return }
         state.settings.summonHotkeyIndex = i
+        state.settings.summonHotkey = Settings.hotkeyOptions[i]
     }
     @objc private func toggleLaunchAtLogin() {
         state.settings.launchAtLogin.toggle()

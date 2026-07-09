@@ -154,11 +154,11 @@ struct ContentView: View {
         }
         .padding(11)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .overlay(alignment: .bottom) { if state.undoItem != nil { undoBar } }
+        .overlay(alignment: .bottom) { if state.hasUndo { undoBar } }
         .overlay(alignment: .bottom) {
             if state.shouldShowUpdateBanner {
                 updateNoticeBanner
-                    .padding(.bottom, state.undoItem != nil ? 38 : 0)
+                    .padding(.bottom, state.hasUndo ? 38 : 0)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
@@ -434,7 +434,7 @@ struct ContentView: View {
     }
 
     // MARK: 文本内 URL 识别 → 渲染为可点击链接（系统 NSDataDetector，点击用默认浏览器打开）
-    private static let linkDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+    static let linkDetector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
     func linkedText(_ raw: String) -> AttributedString {
         var attr = AttributedString(raw)
         guard let detector = Self.linkDetector else { return attr }
@@ -447,6 +447,16 @@ struct ContentView: View {
             attr[attrRange].underlineStyle = .single
         }
         return attr
+    }
+
+    func detectedLinks(in raw: String) -> [URL] {
+        guard let detector = Self.linkDetector else { return [] }
+        var seen = Set<String>()
+        return detector.matches(in: raw, range: NSRange(raw.startIndex..., in: raw)).compactMap { match in
+            guard let url = match.url else { return nil }
+            let key = url.absoluteString
+            return seen.insert(key).inserted ? url : nil
+        }
     }
 
     // 保留这个函数名，供面板和一瞥视图共用文本渲染。
@@ -655,7 +665,7 @@ struct ContentView: View {
         HStack(spacing: 8) {
             Text("\(state.undoVerb)「\(shortText)」").font(.tc(12)).foregroundStyle(txt2).lineLimit(1)
             Spacer()
-            Button("撤销") { withAnimation(anim) { state.performUndo() } }
+            Button("撤回") { withAnimation(anim) { state.performUndo() } }
                 .buttonStyle(.plain)
                 .font(.tc(12, weight: .semibold))
                 .foregroundStyle(accent)
@@ -668,7 +678,7 @@ struct ContentView: View {
     }
 
     private var shortText: String {
-        let t = state.undoItem?.text ?? ""
+        let t = state.undoItemText
         return t.count > 8 ? String(t.prefix(8)) + "…" : t
     }
 

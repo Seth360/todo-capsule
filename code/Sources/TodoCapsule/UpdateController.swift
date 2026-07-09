@@ -118,7 +118,7 @@ final class UpdateController: NSObject, SPUUserDriver, SPUUpdaterDelegate {
     func showUpdateReleaseNotesFailedToDownloadWithError(_ error: Error) {}
 
     func showUpdateNotFoundWithError(_ error: Error, acknowledgement: @escaping () -> Void) {
-        state.setUpdateError("当前已经是最新版本。")
+        state.setUpdateUpToDate()
         state.openUpdateDialog()
         acknowledgement()
     }

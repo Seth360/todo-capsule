@@ -65,13 +65,26 @@ struct ModelConfig: Identifiable, Codable, Equatable {
     var customHeaders: String = ""
     var supportsRouting: Bool = true
 
+    var isAppPreset: Bool {
+        id == Self.appPresetId || providerName == "FX共享" || baseURL.localizedCaseInsensitiveContains("firstshare.cn")
+    }
+
+    var displayTitle: String {
+        isAppPreset ? "预设" : title
+    }
+
     var initial: String {
+        if isAppPreset { return "P" }
         let words = title.split(separator: " ").prefix(2)
         let value = words.map { String($0.prefix(1)) }.joined()
         return value.isEmpty ? "AI" : value.uppercased()
     }
 
+    static let appPresetId = "fx-shared-preset"
+    static let appPreset = ModelConfig(id: appPresetId, title: "预设", providerName: "FX共享", baseURL: "https://aihub.firstshare.cn/v1", apiKey: "", modelName: "", supportsRouting: true)
+
     static let defaults: [ModelConfig] = [
+        appPreset,
         ModelConfig(id: "openai-official", title: "OpenAI Official", providerName: "OpenAI", baseURL: "https://api.openai.com", apiKey: "", modelName: "gpt-4.1", supportsRouting: false),
         ModelConfig(id: "deepseek", title: "DeepSeek", providerName: "DeepSeek", baseURL: "https://api.deepseek.com", apiKey: "", modelName: "deepseek-chat"),
         ModelConfig(id: "qwen", title: "通义千问", providerName: "通义千问", baseURL: "https://dashscope.aliyuncs.com/compatible-mode", apiKey: "", modelName: "qwen-plus"),
@@ -134,7 +147,7 @@ struct AppSettings: Codable, Equatable {
     var modelName: String = ""
     var modelCustomHeaders: String = ""
     var models: [ModelConfig] = ModelConfig.defaults
-    var activeModelId: String = "openai-official"
+    var activeModelId: String = ModelConfig.appPresetId
 
     var summaryTemplate: String = """
     请根据以下待办内容，生成一份简洁的周总结。请按「本周完成」「进行中」「风险与阻塞」「下周建议」四段输出。
@@ -166,8 +179,9 @@ struct AppSettings: Codable, Equatable {
                 models = [ModelConfig(title: modelProviderName, providerName: modelProviderName, baseURL: modelBaseURL, apiKey: modelAPIKey, modelName: modelName, customHeaders: modelCustomHeaders)]
             }
         }
+        normalizeAppPreset()
         if !models.contains(where: { $0.id == activeModelId }) {
-            activeModelId = models.first?.id ?? "openai-official"
+            activeModelId = models.first?.id ?? ModelConfig.appPresetId
         }
         if summaryTemplates.isEmpty {
             var migrated = SummaryTemplateConfig.week
@@ -194,6 +208,32 @@ struct AppSettings: Codable, Equatable {
     private func normalizedIndex(_ value: Int, count: Int) -> Int {
         guard count > 0 else { return 0 }
         return min(max(0, value), count - 1)
+    }
+
+    private mutating func normalizeAppPreset() {
+        let presetIndexes = models.indices.filter { models[$0].isAppPreset }
+        guard let firstPresetIndex = presetIndexes.first else {
+            models.insert(ModelConfig.appPreset, at: 0)
+            return
+        }
+
+        let preferredIndex = presetIndexes.first {
+            !models[$0].apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            !models[$0].modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        } ?? firstPresetIndex
+        let wasActive = presetIndexes.contains { models[$0].id == activeModelId }
+        var preset = models[preferredIndex]
+        preset.id = ModelConfig.appPresetId
+        preset.title = "预设"
+        preset.providerName = "FX共享"
+        preset.baseURL = preset.baseURL.isEmpty ? ModelConfig.appPreset.baseURL : preset.baseURL
+        preset.supportsRouting = true
+
+        for index in presetIndexes.reversed() {
+            models.remove(at: index)
+        }
+        models.insert(preset, at: 0)
+        if wasActive { activeModelId = ModelConfig.appPresetId }
     }
 }
 

@@ -14,6 +14,7 @@ enum AppUpdatePhase: Equatable {
     case readyToRestart
     case installing
     case checking
+    case upToDate
     case error
 }
 
@@ -60,8 +61,15 @@ final class AppState: ObservableObject {
     }
     @Published private var undoVersion = 0
 
-    private enum UndoKind { case completed, deleted }
-    private struct Pending { let kind: UndoKind; let item: Todo; let afterId: UUID?; let work: DispatchWorkItem }
+    private enum UndoKind { case completed, deleted, collectDeleted }
+    private struct Pending {
+        let kind: UndoKind
+        let item: Todo?
+        let collectItem: CollectItem?
+        let afterId: UUID?
+        let collectIndex: Int?
+        let work: DispatchWorkItem
+    }
     private var pending: [UUID: Pending] = [:]
     private var pendingOrder: [UUID] = []
     private var summaryToastWork: DispatchWorkItem?
@@ -132,10 +140,15 @@ final class AppState: ObservableObject {
         todos.filter { !$0.done }.count
     }
 
+    var hasUndo: Bool { _ = undoVersion; return pendingOrder.last.flatMap { pending[$0] } != nil }
     var undoItem: Todo? { _ = undoVersion; return pendingOrder.last.flatMap { pending[$0]?.item } }
+    var undoItemText: String {
+        guard let id = pendingOrder.last, let p = pending[id] else { return "" }
+        return p.item?.text ?? p.collectItem?.text ?? ""
+    }
     var undoVerb: String {
         guard let id = pendingOrder.last, let p = pending[id] else { return "已完成" }
-        return p.kind == .deleted ? "已删除" : "已完成"
+        return p.kind == .completed ? "已完成" : "已删除"
     }
 
     var shouldShowUpdateBanner: Bool {
@@ -145,7 +158,8 @@ final class AppState: ObservableObject {
     }
 
     var shouldShowSettingsUpdateNotice: Bool {
-        updateInfo != nil
+        guard let phase = updateInfo?.phase else { return false }
+        return phase != .upToDate
     }
 
     func relayout() { onLayout?(mode) }
@@ -236,6 +250,19 @@ final class AppState: ObservableObject {
             phase: .error,
             progress: 0,
             statusText: message
+        )
+        dismissedUpdateBannerVersion = nil
+        relayout()
+    }
+
+    func setUpdateUpToDate() {
+        updateInfo = AppUpdateInfo(
+            version: "",
+            title: "你的应用已经是最新版本",
+            notes: "",
+            phase: .upToDate,
+            progress: 0,
+            statusText: "无需更新。"
         )
         dismissedUpdateBannerVersion = nil
         relayout()
@@ -345,7 +372,17 @@ final class AppState: ObservableObject {
         pendingOrder.removeAll { $0 == id }
         pendingOrder.append(id)
         let work = DispatchWorkItem { [weak self] in self?.expire(id) }
-        pending[id] = Pending(kind: kind, item: item, afterId: afterId, work: work)
+        pending[id] = Pending(kind: kind, item: item, collectItem: nil, afterId: afterId, collectIndex: nil, work: work)
+        undoVersion &+= 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + undoWindow, execute: work)
+    }
+
+    private func armCollect(_ item: CollectItem, index: Int) {
+        pending[item.id]?.work.cancel()
+        pendingOrder.removeAll { $0 == item.id }
+        pendingOrder.append(item.id)
+        let work = DispatchWorkItem { [weak self] in self?.expire(item.id) }
+        pending[item.id] = Pending(kind: .collectDeleted, item: nil, collectItem: item, afterId: nil, collectIndex: index, work: work)
         undoVersion &+= 1
         DispatchQueue.main.asyncAfter(deadline: .now() + undoWindow, execute: work)
     }
@@ -355,8 +392,8 @@ final class AppState: ObservableObject {
         if p.kind == .completed, let done = todos.first(where: { $0.id == id && $0.done }) {
             completedArchive.insert(done, at: 0)
             todos.removeAll { $0.id == id && $0.done }
-        } else if p.kind == .deleted {
-            completedArchive.insert(p.item, at: 0)
+        } else if p.kind == .deleted, let item = p.item {
+            completedArchive.insert(item, at: 0)
         }
         pending[id] = nil
         pendingOrder.removeAll { $0 == id }
@@ -375,7 +412,15 @@ final class AppState: ObservableObject {
                 todos[i].completedAt = nil
             }
         case .deleted:
-            todos.insert(p.item, at: insertIndex(afterId: p.afterId))
+            if let item = p.item {
+                todos.insert(item, at: insertIndex(afterId: p.afterId))
+            }
+        case .collectDeleted:
+            if let item = p.collectItem {
+                let index = min(max(p.collectIndex ?? 0, 0), collects.count)
+                collects.insert(item, at: index)
+                panelTab = .collect
+            }
         }
         pending[id] = nil
         pendingOrder.removeAll { $0 == id }
@@ -443,7 +488,9 @@ final class AppState: ObservableObject {
     }
 
     func deleteCollect(_ id: UUID) {
-        collects.removeAll { $0.id == id }
+        guard let index = collects.firstIndex(where: { $0.id == id }) else { return }
+        let item = collects.remove(at: index)
+        armCollect(item, index: index)
         persistAll()
         relayout()
     }

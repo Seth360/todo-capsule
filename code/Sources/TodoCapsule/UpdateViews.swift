@@ -9,7 +9,7 @@ struct UpdateDialogView: View {
             HStack(spacing: 10) {
                 Image(systemName: icon)
                     .font(.tc(22, weight: .semibold))
-                    .foregroundStyle(Color(hex: 0x32D158))
+                    .foregroundStyle(iconColor)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(title)
                         .font(.tc(18, weight: .semibold))
@@ -35,44 +35,53 @@ struct UpdateDialogView: View {
                     .controlSize(.small)
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("更新说明")
-                    .font(.tc(13, weight: .semibold))
-                ScrollView {
-                    Text(notes)
-                        .font(.tc(13))
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
+            if state.updateInfo?.phase != .upToDate {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("更新说明")
+                        .font(.tc(13, weight: .semibold))
+                    ScrollView {
+                        Text(notes)
+                            .font(.tc(13))
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                    .frame(minHeight: 110)
                 }
-                .frame(minHeight: 110)
             }
 
             Spacer(minLength: 0)
 
             HStack {
-                Button("取消") {
+                Button(closeTitle) {
+                    if state.updateInfo?.phase == .upToDate {
+                        state.dismissUpdate()
+                    }
                     NSApp.keyWindow?.close()
                 }
                 .disabled(isBusy)
 
-                Button("跳过这个版本") {
-                    state.skipUpdate()
-                    NSApp.keyWindow?.close()
-                }
-                .disabled(isBusy || state.updateInfo?.phase == .readyToRestart)
-
-                Spacer()
-
-                Button(primaryTitle) {
-                    if state.updateInfo?.phase == .readyToRestart {
-                        state.restartForUpdate()
-                    } else {
-                        state.installUpdate()
+                if state.updateInfo?.phase != .upToDate {
+                    Button("跳过这个版本") {
+                        state.skipUpdate()
+                        NSApp.keyWindow?.close()
                     }
+                    .disabled(isBusy || state.updateInfo?.phase == .readyToRestart)
+
+                    Spacer()
+
+                    Button(primaryTitle) {
+                        if state.updateInfo?.phase == .readyToRestart {
+                            state.restartForUpdate()
+                        } else {
+                            state.installUpdate()
+                        }
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(!canPrimaryAction)
+                } else {
+                    Spacer()
                 }
-                .keyboardShortcut(.defaultAction)
-                .disabled(!canPrimaryAction)
             }
         }
         .padding(22)
@@ -96,11 +105,16 @@ struct UpdateDialogView: View {
 
     private var icon: String {
         switch state.updateInfo?.phase {
+        case .upToDate: return "checkmark.circle.fill"
         case .readyToRestart: return "checkmark.circle.fill"
         case .downloading: return "arrow.down.circle.fill"
         case .error: return "exclamationmark.triangle.fill"
         default: return "sparkles"
         }
+    }
+
+    private var iconColor: Color {
+        state.updateInfo?.phase == .error ? Color.orange : Color(hex: 0x32D158)
     }
 
     private var isBusy: Bool {
@@ -109,6 +123,10 @@ struct UpdateDialogView: View {
 
     private var primaryTitle: String {
         state.updateInfo?.phase == .readyToRestart ? "重启应用" : "立即更新"
+    }
+
+    private var closeTitle: String {
+        state.updateInfo?.phase == .upToDate ? "关闭" : "取消"
     }
 
     private var canPrimaryAction: Bool {

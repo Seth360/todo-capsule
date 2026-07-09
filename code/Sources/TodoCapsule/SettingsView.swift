@@ -396,6 +396,7 @@ struct SettingsView: View {
     }
 
     private func duplicateModel(_ model: ModelConfig) {
+        guard !model.isAppPreset else { return }
         var copy = model
         copy.id = UUID().uuidString
         copy.title = "\(model.title) 副本"
@@ -404,6 +405,7 @@ struct SettingsView: View {
 
     private func deleteModel(_ id: String) {
         state.updateSettings { settings in
+            guard settings.models.first(where: { $0.id == id })?.isAppPreset != true else { return }
             settings.models.removeAll { $0.id == id }
             if settings.models.isEmpty { settings.models = ModelConfig.defaults }
             if settings.activeModelId == id { settings.activeModelId = settings.models.first?.id ?? "" }
@@ -411,6 +413,7 @@ struct SettingsView: View {
     }
 
     private func saveModel(_ model: ModelConfig) {
+        guard !model.isAppPreset else { return }
         state.updateSettings { settings in
             if let i = settings.models.firstIndex(where: { $0.id == model.id }) {
                 settings.models[i] = model
@@ -642,6 +645,7 @@ private struct ModelCard: View {
     let onDelete: () -> Void
 
     var body: some View {
+        let protected = model.isAppPreset
         HStack(spacing: 14) {
             Image(systemName: "line.3.horizontal")
                 .foregroundStyle(.secondary.opacity(0.65))
@@ -651,11 +655,13 @@ private struct ModelCard: View {
             }
             .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: 5) {
-                Text(model.title).font(.tc(17, weight: .semibold))
-                Text(model.baseURL.isEmpty ? "未配置 Base URL" : model.baseURL)
-                    .font(.tc(14))
-                    .foregroundStyle(.blue)
-                    .lineLimit(1)
+                Text(model.displayTitle).font(.tc(17, weight: .semibold))
+                if !protected {
+                    Text(model.baseURL.isEmpty ? "未配置 Base URL" : model.baseURL)
+                        .font(.tc(14))
+                        .foregroundStyle(.blue)
+                        .lineLimit(1)
+                }
             }
             Spacer()
             if active {
@@ -668,9 +674,11 @@ private struct ModelCard: View {
                 }
                 .buttonStyle(.borderedProminent)
             }
-            Button(action: onEdit) { Image(systemName: "square.and.pencil") }
-            Button(action: onDuplicate) { Image(systemName: "square.on.square") }
-            Button(role: .destructive, action: onDelete) { Image(systemName: "trash") }
+            if !protected {
+                Button(action: onEdit) { Image(systemName: "square.and.pencil") }
+                Button(action: onDuplicate) { Image(systemName: "square.on.square") }
+                Button(role: .destructive, action: onDelete) { Image(systemName: "trash") }
+            }
         }
         .buttonStyle(.borderless)
         .padding(18)

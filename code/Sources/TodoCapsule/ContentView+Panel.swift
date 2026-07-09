@@ -89,7 +89,7 @@ extension ContentView {
             }
         }
         .overlay(alignment: .bottom) {
-            if state.panelTab == .today, state.undoItem != nil {
+            if state.hasUndo {
                 undoBar.zIndex(6)
             }
             else if state.panelTab == .collect, copiedFlash != nil { copiedToast }
@@ -97,7 +97,7 @@ extension ContentView {
         .overlay(alignment: .bottom) {
             if state.shouldShowUpdateBanner {
                 updateNoticeBanner
-                    .padding(.bottom, state.undoItem != nil ? 38 : 0)
+                    .padding(.bottom, state.hasUndo ? 38 : 0)
                     .zIndex(7)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }

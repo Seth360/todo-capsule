@@ -71,6 +71,7 @@ extension ContentView {
         let revealed = revealedId == item.id
         let masked = item.sensitive && !revealed
         let display = masked ? "••••••••" : item.text
+        let links = detectedLinks(in: item.text)
         return HStack(alignment: .top, spacing: 10) {
             Image(systemName: item.sensitive ? "lock.fill" : "bookmark")
                 .font(.tc(11))
@@ -89,6 +90,7 @@ extension ContentView {
         .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.001)))
         .onTapGesture { copy(item) }
         .contextMenu {
+            collectJumpMenuItems(links)
             Button("复制整条") { copy(item) }
             if item.sensitive {
                 Button(revealed ? "隐藏" : "显示") {
@@ -106,6 +108,7 @@ extension ContentView {
         let revealed = revealedId == item.id
         let masked = item.sensitive && !revealed
         let display = masked ? "••••••••" : item.text
+        let links = detectedLinks(in: item.text)
         return HStack(alignment: .top, spacing: 10) {
             Image(systemName: item.sensitive ? "lock.fill" : "doc.text")
                 .font(.tc(11)).foregroundStyle(item.sensitive ? accent.opacity(0.85) : txt3)
@@ -137,18 +140,7 @@ extension ContentView {
                             .frame(width: 20, height: 22).contentShape(Rectangle())
                     }.buttonStyle(.plain).help(revealed ? "隐藏" : "显示")
                 }
-                Button {
-                    let wasSensitive = item.sensitive
-                    withAnimation(anim) { state.toggleCollectSensitive(item.id); if !wasSensitive { revealedId = nil } }
-                } label: {
-                    Image(systemName: item.sensitive ? "lock.open" : "lock")
-                        .font(.tc(11)).foregroundStyle(txt3)
-                        .frame(width: 20, height: 22).contentShape(Rectangle())
-                }.buttonStyle(.plain).help(item.sensitive ? "取消敏感" : "标为敏感(打码)")
-                Button { startCollectEdit(item) } label: {
-                    Image(systemName: "pencil").font(.tc(11)).foregroundStyle(txt3)
-                        .frame(width: 20, height: 22).contentShape(Rectangle())
-                }.buttonStyle(.plain).help("编辑")
+                collectJumpControl(links)
                 Button { copy(item) } label: {
                     Image(systemName: "doc.on.doc").font(.tc(11)).foregroundStyle(txt3)
                         .frame(width: 20, height: 22).contentShape(Rectangle())
@@ -164,11 +156,14 @@ extension ContentView {
         .background(RoundedRectangle(cornerRadius: 8)
             .fill(hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001)))
         .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }
+        .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
         .contextMenu {
-            Button("编辑") { startCollectEdit(item) }
+            collectJumpMenuItems(links)
             Button("复制整条") { copy(item) }
-            Button(item.sensitive ? "取消敏感" : "标为敏感") {
-                state.toggleCollectSensitive(item.id)
+            if item.sensitive {
+                Button(revealed ? "隐藏" : "显示") {
+                    withAnimation(anim) { revealedId = revealed ? nil : item.id }
+                }
             }
             Button("删除", role: .destructive) {
                 withAnimation(anim) { state.deleteCollect(item.id) }
@@ -197,6 +192,59 @@ extension ContentView {
             if copiedFlash == id { withAnimation(anim) { copiedFlash = nil } }
         }
     }
+
+    @ViewBuilder
+    private func collectJumpControl(_ links: [URL]) -> some View {
+        if links.count == 1, let url = links.first {
+            Button { openLink(url) } label: {
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.tc(11)).foregroundStyle(txt3)
+                    .frame(width: 20, height: 22).contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help("跳转")
+        } else if links.count > 1 {
+            Menu {
+                ForEach(Array(links.enumerated()), id: \.offset) { _, url in
+                    Button(linkTitle(url)) { openLink(url) }
+                }
+            } label: {
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.tc(11)).foregroundStyle(txt3)
+                    .frame(width: 20, height: 22).contentShape(Rectangle())
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .help("选择链接跳转")
+        }
+    }
+
+    @ViewBuilder
+    private func collectJumpMenuItems(_ links: [URL]) -> some View {
+        if links.count == 1, let url = links.first {
+            Button { openLink(url) } label: {
+                Label("跳转", systemImage: "arrow.up.forward.app")
+            }
+        } else if links.count > 1 {
+            Menu {
+                ForEach(Array(links.enumerated()), id: \.offset) { _, url in
+                    Button(linkTitle(url)) { openLink(url) }
+                }
+            } label: {
+                Label("跳转", systemImage: "arrow.up.forward.app")
+            }
+        }
+    }
+
+    private func openLink(_ url: URL) {
+        NSWorkspace.shared.open(url)
+    }
+
+    private func linkTitle(_ url: URL) -> String {
+        let value = url.absoluteString
+        return value.count > 64 ? String(value.prefix(61)) + "..." : value
+    }
+
     private func startCollectEdit(_ item: CollectItem) {
         state.isEditing = true
         editCollectText = item.text

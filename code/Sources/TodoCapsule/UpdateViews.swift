@@ -52,7 +52,6 @@ struct UpdateDialogView: View {
 
             HStack {
                 Button("取消") {
-                    state.dismissUpdate()
                     NSApp.keyWindow?.close()
                 }
                 .disabled(isBusy)

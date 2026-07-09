@@ -50,7 +50,7 @@ struct SettingsView: View {
             .font(.tc(11, weight: .medium))
             .foregroundStyle(.secondary.opacity(0.72))
             .lineLimit(1)
-            .frame(maxWidth: .infinity, alignment: .center)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
             .allowsHitTesting(false)
@@ -86,11 +86,13 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
             Spacer()
-            if state.shouldShowSettingsUpdateNotice {
-                settingsUpdateNotice
+            ZStack(alignment: .bottomLeading) {
+                versionLabel
+                if state.shouldShowSettingsUpdateNotice {
+                    settingsUpdateNotice
+                }
             }
-            versionLabel
-                .padding(.top, 4)
+            .frame(maxWidth: .infinity, minHeight: 70, alignment: .bottomLeading)
         }
         .padding(12)
         .frame(width: 180)
@@ -105,15 +107,9 @@ struct SettingsView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.down.circle.fill")
                         .foregroundStyle(Color(hex: 0x32D158))
-                    Text("发现新版本")
-                        .font(.tc(13, weight: .semibold))
+                    Text(settingsUpdateTitle)
+                        .font(.tc(14, weight: .semibold))
                     Spacer(minLength: 0)
-                }
-                if let info = state.updateInfo {
-                    Text(info.phase == .readyToRestart ? "重启后生效" : "点击查看更新")
-                        .font(.tc(11))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
                 }
             }
             .padding(10)
@@ -128,6 +124,11 @@ struct SettingsView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    private var settingsUpdateTitle: String {
+        guard let info = state.updateInfo, !info.version.isEmpty else { return "发现新版本" }
+        return "发现新版本 \(info.version)"
     }
 
     @ViewBuilder

@@ -3,19 +3,21 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>0.1.5</title>
-            <pubDate>Thu, 09 Jul 2026 14:35:04 +0800</pubDate>
+            <title>0.1.6</title>
+            <pubDate>Thu, 09 Jul 2026 14:55:11 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>6</sparkle:version>
-            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.1.6</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.5
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.6
 
-- 应用启动后会自动在后台检查一次更新，不再只能等到定时检查或手动点击“检查更新…”。
-- 自动检查间隔从 24 小时调整为 1 小时。
+- 设置页版本号改为左对齐。
+- 设置页新版本提示下移到底部，出现时覆盖版本号位置。
+- 新版本提示文案改为“发现新版本 + 版本号”，并去掉“点击查看更新”副文案。
+- 更新弹窗点击“取消”只关闭弹窗，不再隐藏更新提示；点击“跳过这个版本”才隐藏当前版本提示。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.5/todo-capsule-v0.1.5.dmg" length="2680646" type="application/octet-stream" sparkle:edSignature="UeeNdcpYPzAqQaBK5v8pV1isoszSdX8rgjUUWt9RhUh4PuGKwcltTtiNLS9/DXS29bhZljMcdC4qxGsbu7SZBw=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.6/todo-capsule-v0.1.6.dmg" length="2681368" type="application/octet-stream" sparkle:edSignature="F/9p+pXG8FWonEWH/Iw2ms5mWBbxCrbSSOxr1h+NZiEsBDFMfPuInzmSsTI++pik3pSeytOHVqxNupPJGVGzDQ=="/>
         </item>
     </channel>
 </rss>

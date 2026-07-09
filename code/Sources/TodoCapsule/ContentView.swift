@@ -142,6 +142,13 @@ struct ContentView: View {
         .padding(11)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .overlay(alignment: .bottom) { if state.undoItem != nil { undoBar } }
+        .overlay(alignment: .bottom) {
+            if state.shouldShowUpdateBanner {
+                updateNoticeBanner
+                    .padding(.bottom, state.undoItem != nil ? 38 : 0)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
     }
 
     private var header: some View {

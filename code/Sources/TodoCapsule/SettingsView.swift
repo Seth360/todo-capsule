@@ -67,10 +67,46 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
             Spacer()
+            if state.shouldShowSettingsUpdateNotice {
+                settingsUpdateNotice
+            }
         }
         .padding(12)
         .frame(width: 180)
         .background(Color(nsColor: .windowBackgroundColor).opacity(0.92))
+    }
+
+    private var settingsUpdateNotice: some View {
+        Button {
+            state.openUpdateDialog()
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.down.circle.fill")
+                        .foregroundStyle(Color(hex: 0x32D158))
+                    Text("发现新版本")
+                        .font(.tc(13, weight: .semibold))
+                    Spacer(minLength: 0)
+                }
+                if let info = state.updateInfo {
+                    Text(info.phase == .readyToRestart ? "重启后生效" : "点击查看更新")
+                        .font(.tc(11))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(Color(hex: 0x32D158).opacity(0.13))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .strokeBorder(Color(hex: 0x32D158).opacity(0.36), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder

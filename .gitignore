@@ -19,6 +19,7 @@ code/TodoCapsule.app/
 agent-report-*.html
 progress.html
 code/sparkle-updates/
+code/.sparkle-private/
 
 # Node dependencies, if temporary tooling is added locally
 node_modules/

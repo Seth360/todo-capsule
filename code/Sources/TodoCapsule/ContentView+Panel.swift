@@ -39,6 +39,12 @@ extension ContentView {
         }
         .padding(11)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .overlay(alignment: .bottom) {
+            if state.shouldShowUpdateBanner {
+                updateNoticeBanner
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
     }
 
     private func peekRow(_ todo: Todo) -> some View {
@@ -93,6 +99,14 @@ extension ContentView {
                 undoBar.zIndex(6)
             }
             else if state.panelTab == .collect, copiedFlash != nil { copiedToast }
+        }
+        .overlay(alignment: .bottom) {
+            if state.shouldShowUpdateBanner {
+                updateNoticeBanner
+                    .padding(.bottom, state.undoItem != nil ? 38 : 0)
+                    .zIndex(7)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .alert("清空回收箱？", isPresented: $confirmingClearArchive) {
             Button("取消", role: .cancel) {}

@@ -3,20 +3,20 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>0.1.1</title>
-            <pubDate>Thu, 09 Jul 2026 12:18:31 +0800</pubDate>
+            <title>0.1.2</title>
+            <pubDate>Thu, 09 Jul 2026 12:43:00 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>2</sparkle:version>
-            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>0.1.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.1
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.2
 
-- 接入 Sparkle 自动更新。
-- 菜单栏新增“检查更新…”。
-- 更新包包含 Sparkle.framework，并配置 GitHub appcast。
+- 新增 App 内更新通知：设置页底部、大窗底部、小窗底部都会提示新版本。
+- 新增自定义更新弹窗：取消、跳过这个版本、立即更新。
+- 立即更新后显示下载进度；下载完成后提示新版已就绪，可重启应用生效。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.1/todo-capsule-v0.1.1.dmg" length="2608204" type="application/octet-stream" sparkle:edSignature="WI83qNRX5S14VlGNz21Zm9PabBDGxvmCVgb1spg5zLalC7Gn3I3d1Egf3NJfs9WyTKFAMDMTwTwPS0Mor4jWDA=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.2/todo-capsule-v0.1.2.dmg" length="2678306" type="application/octet-stream" sparkle:edSignature="/tOHMD9FuoMDZVvQDdGAdRki7scvmDZgUSEQpUWmRSKtJ7Wqs8jFCYgm4d+Urr8tiHEWEiRJ3k871pOsgem5Ag=="/>
         </item>
     </channel>
 </rss>

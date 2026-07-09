@@ -8,6 +8,24 @@ enum CapsuleMode { case idle, peek, capture, panel }
 /// 大面板主内容：清单与收藏是并行空间；清单内部再由 selectedListId 切换目录。
 enum PanelTab { case today, collect }
 
+enum AppUpdatePhase: Equatable {
+    case available
+    case downloading
+    case readyToRestart
+    case installing
+    case checking
+    case error
+}
+
+struct AppUpdateInfo: Equatable {
+    var version: String
+    var title: String
+    var notes: String
+    var phase: AppUpdatePhase
+    var progress: Double
+    var statusText: String
+}
+
 private let undoWindow: TimeInterval = 4
 private let windowPinnedKey = "todoCapsule.windowPinned.v1"
 
@@ -29,6 +47,8 @@ final class AppState: ObservableObject {
     @Published var summaryToast: String?
     @Published var showingArchive: Bool = false
     @Published var summaries: [SummaryRecord] = []
+    @Published var updateInfo: AppUpdateInfo?
+    @Published var dismissedUpdateBannerVersion: String?
     @Published var settings: AppSettings = AppSettingsStore.load() {
         didSet {
             AppSettingsStore.save(settings)
@@ -53,6 +73,12 @@ final class AppState: ObservableObject {
     var onPinnedChanged: ((Bool) -> Void)?
     var onSettingsChanged: (() -> Void)?
     var onOpenSettings: (() -> Void)?
+    var onOpenUpdateDialog: (() -> Void)?
+    var onCheckForUpdates: (() -> Void)?
+    var onInstallUpdate: (() -> Void)?
+    var onDismissUpdate: (() -> Void)?
+    var onSkipUpdate: (() -> Void)?
+    var onRestartForUpdate: (() -> Void)?
 
     init() {
         lists = ChecklistStore.load()
@@ -112,6 +138,16 @@ final class AppState: ObservableObject {
         return p.kind == .deleted ? "已删除" : "已完成"
     }
 
+    var shouldShowUpdateBanner: Bool {
+        guard let info = updateInfo else { return false }
+        guard dismissedUpdateBannerVersion != info.version else { return false }
+        return info.phase == .available || info.phase == .downloading || info.phase == .readyToRestart
+    }
+
+    var shouldShowSettingsUpdateNotice: Bool {
+        updateInfo != nil
+    }
+
     func relayout() { onLayout?(mode) }
 
     func setMode(_ m: CapsuleMode) {
@@ -128,6 +164,88 @@ final class AppState: ObservableObject {
     }
     func collapseFromPeek() { guard mode == .peek else { return }; setMode(.idle) }
     func openSettings() { onOpenSettings?() }
+    func openUpdateDialog() { onOpenUpdateDialog?() }
+    func checkForUpdates() { onCheckForUpdates?() }
+    func installUpdate() { onInstallUpdate?() }
+    func dismissUpdate() { onDismissUpdate?() }
+    func skipUpdate() { onSkipUpdate?() }
+    func restartForUpdate() { onRestartForUpdate?() }
+
+    func dismissUpdateBanner() {
+        dismissedUpdateBannerVersion = updateInfo?.version
+    }
+
+    func setUpdateAvailable(version: String, title: String, notes: String) {
+        updateInfo = AppUpdateInfo(
+            version: version,
+            title: title.isEmpty ? "Todo Capsule \(version)" : title,
+            notes: notes.isEmpty ? "这个版本包含改进和修复。" : notes,
+            phase: .available,
+            progress: 0,
+            statusText: "发现新版本 \(version)"
+        )
+        dismissedUpdateBannerVersion = nil
+        relayout()
+    }
+
+    func setUpdateChecking() {
+        if updateInfo == nil {
+            updateInfo = AppUpdateInfo(
+                version: "",
+                title: "正在检查更新",
+                notes: "",
+                phase: .checking,
+                progress: 0,
+                statusText: "正在检查更新..."
+            )
+        } else {
+            updateInfo?.phase = .checking
+            updateInfo?.statusText = "正在检查更新..."
+        }
+    }
+
+    func setUpdateDownloadProgress(_ progress: Double) {
+        guard updateInfo != nil else { return }
+        let clamped = min(max(progress, 0), 1)
+        updateInfo?.phase = .downloading
+        updateInfo?.progress = clamped
+        updateInfo?.statusText = "正在下载 \(Int(clamped * 100))%"
+        relayout()
+    }
+
+    func setUpdateReady() {
+        guard updateInfo != nil else { return }
+        updateInfo?.phase = .readyToRestart
+        updateInfo?.progress = 1
+        updateInfo?.statusText = "新版已就绪，重启后生效"
+        dismissedUpdateBannerVersion = nil
+        relayout()
+    }
+
+    func setUpdateInstalling() {
+        guard updateInfo != nil else { return }
+        updateInfo?.phase = .installing
+        updateInfo?.statusText = "正在重启应用..."
+    }
+
+    func setUpdateError(_ message: String) {
+        updateInfo = AppUpdateInfo(
+            version: updateInfo?.version ?? "",
+            title: "更新失败",
+            notes: updateInfo?.notes ?? "",
+            phase: .error,
+            progress: 0,
+            statusText: message
+        )
+        dismissedUpdateBannerVersion = nil
+        relayout()
+    }
+
+    func clearUpdate() {
+        updateInfo = nil
+        dismissedUpdateBannerVersion = nil
+        relayout()
+    }
 
     func setPanelTab(_ t: PanelTab) {
         panelTab = t

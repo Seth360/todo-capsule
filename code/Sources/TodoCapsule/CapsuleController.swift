@@ -2,12 +2,12 @@ import AppKit
 import SwiftUI
 import Carbon.HIToolbox
 import ServiceManagement
-import Sparkle
 
 /// 组装：胶囊面板 + SwiftUI 内容 + 光标轮询 hover + 动态窗口 + 全局热键 + 菜单栏。
+@MainActor
 final class CapsuleController: NSObject {
     private let state = AppState()
-    private let updaterController = SPUStandardUpdaterController(updaterDelegate: nil, userDriverDelegate: nil)
+    private lazy var updateController = UpdateController(state: state)
     private var panel: CapsulePanel!
     private var statusItem: NSStatusItem!
     private var escMonitor: Any?
@@ -16,6 +16,7 @@ final class CapsuleController: NSObject {
     private var shrinkWork: DispatchWorkItem?
     private var screenObserver: NSObjectProtocol?
     private var settingsWindow: NSWindow?
+    private var updateWindow: NSWindow?
     private var clipboardChangeCount = NSPasteboard.general.changeCount
     private var debugFreeze = false   // 调试截图时锁住展开
     private var lastMode: CapsuleMode = .idle   // 大面板尺寸变化时锚定位置用
@@ -67,6 +68,7 @@ final class CapsuleController: NSObject {
             self?.rebuildMenu()
         }
         state.onOpenSettings = { [weak self] in self?.openSettingsWindow() }
+        state.onOpenUpdateDialog = { [weak self] in self?.openUpdateWindow() }
         applyLayout(mode: .idle)
         applyPinned(state.windowPinned)
         if let text = NSPasteboard.general.string(forType: .string) {
@@ -74,6 +76,7 @@ final class CapsuleController: NSObject {
         }
         panel.orderFrontRegardless()
 
+        updateController.start()
         applyHotkey()
 
         // Esc 取消
@@ -106,15 +109,19 @@ final class CapsuleController: NSObject {
         }
 
         // 40ms 光标轮询：可靠的 hover 进入/离开（替代不可靠的 SwiftUI onHover）
-        let t = Timer.scheduledTimer(withTimeInterval: dt, repeats: true) { [weak self] _ in self?.tick() }
+        let t = Timer.scheduledTimer(withTimeInterval: dt, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.tick() }
+        }
         RunLoop.main.add(t, forMode: .common)
         pollTimer = t
 
         buildStatusItem()
         screenObserver = NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification,
                                                object: nil, queue: .main) { [weak self] _ in
-            guard let self = self else { return }
-            self.applyLayout(mode: self.state.mode)
+            Task { @MainActor in
+                guard let self = self else { return }
+                self.applyLayout(mode: self.state.mode)
+            }
         }
 
         // 调试：直接进某态 / 自测删除，便于截图核对
@@ -405,8 +412,8 @@ final class CapsuleController: NSObject {
         let settings = NSMenuItem(title: "设置…", action: #selector(settingsAction), keyEquivalent: ",")
         settings.target = self; menu.addItem(settings)
         menu.addItem(.separator())
-        let update = NSMenuItem(title: "检查更新…", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "")
-        update.target = updaterController
+        let update = NSMenuItem(title: "检查更新…", action: #selector(UpdateController.checkForUpdates), keyEquivalent: "")
+        update.target = updateController
         menu.addItem(update)
         menu.addItem(.separator())
         let hkItem = NSMenuItem(title: "热键", action: nil, keyEquivalent: "")
@@ -500,6 +507,27 @@ final class CapsuleController: NSObject {
         win.center()
         win.isReleasedWhenClosed = false
         settingsWindow = win
+        win.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private func openUpdateWindow() {
+        if let updateWindow {
+            updateWindow.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        let root = UpdateDialogView().environmentObject(state)
+        let hosting = NSHostingView(rootView: root)
+        let win = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 480, height: 360),
+                           styleMask: [.titled, .closable],
+                           backing: .buffered,
+                           defer: false)
+        win.title = "Todo Capsule 更新"
+        win.contentView = hosting
+        win.center()
+        win.isReleasedWhenClosed = false
+        updateWindow = win
         win.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }

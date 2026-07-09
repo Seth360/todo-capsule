@@ -2,10 +2,12 @@ import AppKit
 import SwiftUI
 import Carbon.HIToolbox
 import ServiceManagement
+import Sparkle
 
 /// 组装：胶囊面板 + SwiftUI 内容 + 光标轮询 hover + 动态窗口 + 全局热键 + 菜单栏。
 final class CapsuleController: NSObject {
     private let state = AppState()
+    private let updaterController = SPUStandardUpdaterController(updaterDelegate: nil, userDriverDelegate: nil)
     private var panel: CapsulePanel!
     private var statusItem: NSStatusItem!
     private var escMonitor: Any?
@@ -402,6 +404,10 @@ final class CapsuleController: NSObject {
         peek.target = self; menu.addItem(peek)
         let settings = NSMenuItem(title: "设置…", action: #selector(settingsAction), keyEquivalent: ",")
         settings.target = self; menu.addItem(settings)
+        menu.addItem(.separator())
+        let update = NSMenuItem(title: "检查更新…", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: "")
+        update.target = updaterController
+        menu.addItem(update)
         menu.addItem(.separator())
         let hkItem = NSMenuItem(title: "热键", action: nil, keyEquivalent: "")
         let hkMenu = NSMenu()

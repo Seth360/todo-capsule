@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>TodoCapsule</title>
+        <item>
+            <title>0.1.1</title>
+            <pubDate>Thu, 09 Jul 2026 12:18:31 +0800</pubDate>
+            <link>https://github.com/Seth360/todo-capsule</link>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.1
+
+- 接入 Sparkle 自动更新。
+- 菜单栏新增“检查更新…”。
+- 更新包包含 Sparkle.framework，并配置 GitHub appcast。
+]]></description>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.1/todo-capsule-v0.1.1.dmg" length="2608204" type="application/octet-stream" sparkle:edSignature="WI83qNRX5S14VlGNz21Zm9PabBDGxvmCVgb1spg5zLalC7Gn3I3d1Egf3NJfs9WyTKFAMDMTwTwPS0Mor4jWDA=="/>
+        </item>
+    </channel>
+</rss>

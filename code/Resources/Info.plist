@@ -15,9 +15,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.1.0</string>
+    <string>0.1.1</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>2</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>NSPrincipalClass</key>
@@ -27,5 +27,13 @@
     <!-- Accessory app：无 Dock 图标、不进 Cmd-Tab（与 setActivationPolicy(.accessory) 一致） -->
     <key>LSUIElement</key>
     <true/>
+    <key>SUFeedURL</key>
+    <string>https://raw.githubusercontent.com/Seth360/todo-capsule/main/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>iVOBAGlHhNbV8wz3Fo29fy8ALRm3kCCx6oN+elF+7SU=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>86400</integer>
 </dict>
 </plist>

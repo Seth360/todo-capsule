@@ -8,10 +8,19 @@ swift build -c release
 
 APP="TodoCapsule.app"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
 cp .build/release/TodoCapsule "$APP/Contents/MacOS/TodoCapsule"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+
+SPARKLE_FRAMEWORK=".build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
+if [[ -d "$SPARKLE_FRAMEWORK" ]]; then
+  cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/"
+  install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/TodoCapsule" 2>/dev/null || true
+else
+  echo "ERROR: Sparkle.framework 未找到。请先运行 swift build -c release。" >&2
+  exit 1
+fi
 
 # 真实跑出来的问题：ad-hoc 签名（-sign -）的签名值是基于二进制内容算的哈希，每次改代码重新打包
 # 签名就会变——macOS TCC 的授权记录是按"bundle ID + 签名身份"认的，签名一变就被当成"新app"，

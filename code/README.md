@@ -29,6 +29,10 @@ open ./TodoCapsule.app
 ./package-dmg.sh
 ```
 
+## 自动更新
+
+应用通过 Sparkle 检查 `https://raw.githubusercontent.com/Seth360/todo-capsule/main/appcast.xml`。发布新版本时，先打包 DMG，再用 `.build/artifacts/sparkle/Sparkle/bin/generate_appcast --account todo-capsule ...` 生成新的 `appcast.xml`，然后把 DMG 上传到同版本 GitHub Release。
+
 ## 主要源码
 
 - `CapsuleController.swift`: NSPanel 生命周期、布局、热键和菜单栏入口

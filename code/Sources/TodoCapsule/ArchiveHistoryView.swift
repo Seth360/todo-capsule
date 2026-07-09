@@ -58,6 +58,7 @@ struct ArchiveHistoryView: View {
     @State private var searchText = ""
     @State private var selectedTag: String?
     @State private var hoveredId: UUID?
+    @State private var dragWindowOrigin: NSPoint?
 
     private var usesLightTheme: Bool {
         switch state.settings.theme {
@@ -97,7 +98,10 @@ struct ArchiveHistoryView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(txt3)
+                .pointingHandCursor()
             }
+            .contentShape(Rectangle())
+            .gesture(windowDragGesture)
 
             HStack(spacing: 10) {
                 HStack(spacing: 7) {
@@ -112,7 +116,7 @@ struct ArchiveHistoryView: View {
                 .padding(.vertical, 8)
                 .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(subtleFill))
 
-                tagFilterMenu
+                tagFilterBar
             }
 
             if filteredItems.isEmpty {
@@ -150,42 +154,42 @@ struct ArchiveHistoryView: View {
         .frame(width: 720, height: 620)
     }
 
-    private var tagFilterMenu: some View {
-        Menu {
-            Button {
-                selectedTag = nil
-            } label: {
-                Label("全部标签", systemImage: selectedTag == nil ? "checkmark" : "number")
-            }
-            if !availableTags.isEmpty {
-                Divider()
-                ForEach(availableTags, id: \.self) { tag in
-                    Button {
-                        selectedTag = tag
-                    } label: {
-                        Label("#\(tag)", systemImage: selectedTag == tag ? "checkmark" : "number")
+    private var tagFilterBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "number")
+                .font(.tc(12, weight: .semibold))
+                .foregroundStyle(txt3)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    archiveTagButton(title: "全部", selected: selectedTag == nil) {
+                        selectedTag = nil
+                    }
+                    ForEach(availableTags, id: \.self) { tag in
+                        archiveTagButton(title: "#\(tag)", selected: selectedTag == tag) {
+                            selectedTag = tag
+                        }
                     }
                 }
             }
-        } label: {
-            HStack(spacing: 7) {
-                Image(systemName: "number")
-                    .font(.tc(12, weight: .semibold))
-                Text(selectedTag.map { "#\($0)" } ?? "标签")
-                    .font(.tc(13, weight: .semibold))
-                    .lineLimit(1)
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.tc(9, weight: .semibold))
-                    .foregroundStyle(txt3)
-            }
-            .foregroundStyle(txt2)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(subtleFill))
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
+        .frame(width: 280, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(subtleFill))
+    }
+
+    private func archiveTagButton(title: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.tc(11.5, weight: .semibold))
+                .foregroundStyle(selected ? accent : txt2)
+                .lineLimit(1)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Capsule().fill((selected ? accent : txt3).opacity(selected ? 0.16 : 0.10)))
+        }
+        .buttonStyle(.plain)
+        .pointingHandCursor()
     }
 
     private func archiveHistoryRow(_ item: Todo) -> some View {
@@ -203,6 +207,7 @@ struct ArchiveHistoryView: View {
             }
             .buttonStyle(.plain)
             .help("恢复到待办")
+            .pointingHandCursor()
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.text)
@@ -218,21 +223,21 @@ struct ArchiveHistoryView: View {
                 }
             }
 
-            if hovered {
-                Button {
-                    withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
-                        state.deleteFromArchive(item)
-                    }
-                } label: {
-                    Image(systemName: "trash")
-                        .font(.tc(11, weight: .semibold))
-                        .foregroundStyle(txt3)
-                        .frame(width: 24, height: 24)
-                        .contentShape(Rectangle())
+            Button {
+                withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
+                    state.deleteFromArchive(item)
                 }
-                .buttonStyle(.plain)
-                .help("永久删除")
+            } label: {
+                Image(systemName: "trash")
+                    .font(.tc(11, weight: .semibold))
+                    .foregroundStyle(txt3)
+                    .frame(width: 24, height: 24)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .opacity(hovered ? 1 : 0)
+            .help("永久删除")
+            .pointingHandCursor()
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
@@ -240,9 +245,24 @@ struct ArchiveHistoryView: View {
         .contentShape(Rectangle())
         .onHover { h in hoveredId = h ? item.id : (hoveredId == item.id ? nil : hoveredId) }
         .contextMenu {
-            Button("恢复到待办") { state.restoreFromArchive(item) }
-            Button("永久删除", role: .destructive) { state.deleteFromArchive(item) }
+            Button { state.restoreFromArchive(item) } label: {
+                Label("恢复到待办", systemImage: "arrow.uturn.backward.circle")
+            }
+            Button(role: .destructive) { state.deleteFromArchive(item) } label: {
+                Label("永久删除", systemImage: "trash")
+            }
         }
+    }
+
+    private var windowDragGesture: some Gesture {
+        DragGesture(minimumDistance: 4, coordinateSpace: .global)
+            .onChanged { value in
+                guard let window = NSApplication.shared.keyWindow else { return }
+                let origin = dragWindowOrigin ?? window.frame.origin
+                dragWindowOrigin = origin
+                window.setFrameOrigin(NSPoint(x: origin.x + value.translation.width, y: origin.y - value.translation.height))
+            }
+            .onEnded { _ in dragWindowOrigin = nil }
     }
 
     private func tagPills(_ tags: [String]) -> some View {

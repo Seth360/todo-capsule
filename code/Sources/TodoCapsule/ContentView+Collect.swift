@@ -77,11 +77,21 @@ extension ContentView {
                 .font(.tc(11))
                 .foregroundStyle(item.sensitive ? accent.opacity(0.85) : txt3)
                 .frame(width: 18, height: 22)
-            Text(linkedText(display))
-                .font(.tc(13))
-                .foregroundStyle(masked ? txt2 : txt)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if editingCollectId == item.id {
+                GrowingTextView(text: $editCollectText, height: $collectEditHeight,
+                                focusTick: collectEditFocusTick, maxLines: 5,
+                                onSubmit: { commitCollectEdit(item) },
+                                onEndEditing: { commitCollectEdit(item) },
+                                onCancel: { cancelCollectEdit() })
+                    .frame(height: collectEditHeight)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Text(linkedText(display))
+                    .font(.tc(13))
+                    .foregroundStyle(masked ? txt2 : txt)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 4)
@@ -89,16 +99,24 @@ extension ContentView {
         .contentShape(Rectangle())
         .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.001)))
         .onTapGesture { copy(item) }
+        .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
+        .pointingHandCursor()
         .contextMenu {
             collectJumpMenuItems(links)
-            Button("复制整条") { copy(item) }
+            Button { copy(item) } label: {
+                Label("复制整条", systemImage: "doc.on.doc")
+            }
             if item.sensitive {
-                Button(revealed ? "隐藏" : "显示") {
+                Button {
                     withAnimation(anim) { revealedId = revealed ? nil : item.id }
+                } label: {
+                    Label(revealed ? "隐藏" : "显示", systemImage: revealed ? "eye.slash" : "eye")
                 }
             }
-            Button("删除", role: .destructive) {
+            Button(role: .destructive) {
                 withAnimation(anim) { state.deleteCollect(item.id) }
+            } label: {
+                Label("删除", systemImage: "trash")
             }
         }
     }
@@ -139,16 +157,19 @@ extension ContentView {
                             .font(.tc(11)).foregroundStyle(txt3)
                             .frame(width: 20, height: 22).contentShape(Rectangle())
                     }.buttonStyle(.plain).help(revealed ? "隐藏" : "显示")
+                        .pointingHandCursor()
                 }
                 collectJumpControl(links)
                 Button { copy(item) } label: {
                     Image(systemName: "doc.on.doc").font(.tc(11)).foregroundStyle(txt3)
                         .frame(width: 20, height: 22).contentShape(Rectangle())
                 }.buttonStyle(.plain).help("复制整条")
+                    .pointingHandCursor()
                 Button { withAnimation(anim) { state.deleteCollect(item.id) } } label: {
                     Image(systemName: "xmark").font(.tc(11)).foregroundStyle(txt3)
                         .frame(width: 20, height: 22).contentShape(Rectangle())
                 }.buttonStyle(.plain).help("删除")
+                    .pointingHandCursor()
             }
         }
         .padding(.horizontal, 6).padding(.vertical, 5)
@@ -157,16 +178,23 @@ extension ContentView {
             .fill(hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001)))
         .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }
         .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
+        .pointingHandCursor()
         .contextMenu {
             collectJumpMenuItems(links)
-            Button("复制整条") { copy(item) }
+            Button { copy(item) } label: {
+                Label("复制整条", systemImage: "doc.on.doc")
+            }
             if item.sensitive {
-                Button(revealed ? "隐藏" : "显示") {
+                Button {
                     withAnimation(anim) { revealedId = revealed ? nil : item.id }
+                } label: {
+                    Label(revealed ? "隐藏" : "显示", systemImage: revealed ? "eye.slash" : "eye")
                 }
             }
-            Button("删除", role: .destructive) {
+            Button(role: .destructive) {
                 withAnimation(anim) { state.deleteCollect(item.id) }
+            } label: {
+                Label("删除", systemImage: "trash")
             }
         }
     }
@@ -203,6 +231,7 @@ extension ContentView {
             }
             .buttonStyle(.plain)
             .help("跳转")
+            .pointingHandCursor()
         } else if links.count > 1 {
             Menu {
                 ForEach(Array(links.enumerated()), id: \.offset) { _, url in
@@ -216,6 +245,7 @@ extension ContentView {
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
             .help("选择链接跳转")
+            .pointingHandCursor()
         }
     }
 

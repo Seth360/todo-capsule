@@ -156,6 +156,7 @@ extension ContentView {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .pointingHandCursor()
         }
         .padding(.leading, 10)
         .padding(.trailing, 5)
@@ -174,6 +175,7 @@ extension ContentView {
         .onTapGesture {
             state.openUpdateDialog()
         }
+        .pointingHandCursor()
     }
 
     private var updateNoticeText: String {

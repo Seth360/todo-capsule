@@ -159,7 +159,7 @@ final class AppState: ObservableObject {
 
     var shouldShowSettingsUpdateNotice: Bool {
         guard let phase = updateInfo?.phase else { return false }
-        return phase != .upToDate
+        return phase != .upToDate && phase != .error
     }
 
     func relayout() { onLayout?(mode) }
@@ -243,6 +243,10 @@ final class AppState: ObservableObject {
     }
 
     func setUpdateError(_ message: String) {
+        if Self.isUpToDateMessage(message) {
+            setUpdateUpToDate()
+            return
+        }
         updateInfo = AppUpdateInfo(
             version: updateInfo?.version ?? "",
             title: "更新失败",
@@ -253,6 +257,16 @@ final class AppState: ObservableObject {
         )
         dismissedUpdateBannerVersion = nil
         relayout()
+    }
+
+    static func isUpToDateMessage(_ message: String) -> Bool {
+        let value = message.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return value.contains("up to date") ||
+            value.contains("already up-to-date") ||
+            value.contains("already up to date") ||
+            value.contains("当前已经是最新版本") ||
+            value.contains("已经是最新版本") ||
+            value.contains("已是最新版本")
     }
 
     func setUpdateUpToDate() {

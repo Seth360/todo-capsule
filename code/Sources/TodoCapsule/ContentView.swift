@@ -181,6 +181,7 @@ struct ContentView: View {
             }
             .buttonStyle(.plain)
             .help("最大化")
+            .pointingHandCursor()
         }
         .padding(.horizontal, 4)
         .highPriorityGesture(TapGesture(count: 2).onEnded {
@@ -227,6 +228,7 @@ struct ContentView: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .pointingHandCursor()
     }
 
     @ViewBuilder
@@ -293,6 +295,7 @@ struct ContentView: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .help("更多")
+        .pointingHandCursor()
     }
 
     var smallWindowDragGesture: some Gesture {
@@ -370,6 +373,7 @@ struct ContentView: View {
                             .background(Capsule().fill(accent.opacity(0.14)))
                     }
                     .buttonStyle(.plain)
+                    .pointingHandCursor()
                 }
             }
             .padding(.leading, 24)
@@ -478,6 +482,7 @@ struct ContentView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .pointingHandCursor()
 
             if editing {
                 editTextArea(todo)
@@ -521,6 +526,7 @@ struct ContentView: View {
             }
             .buttonStyle(.plain)
             .help("取消置顶")
+            .pointingHandCursor()
         }
     }
 
@@ -552,6 +558,7 @@ struct ContentView: View {
                         tagPillLabel(tag.name, removable: false, color: tagColor(tag.name))
                     }
                     .buttonStyle(.plain)
+                    .pointingHandCursor()
                 }
             }
         }
@@ -586,6 +593,7 @@ struct ContentView: View {
                     tagPillLabel(tag, removable: true, color: tagColor(tag))
                 }
                 .buttonStyle(.plain)
+                .pointingHandCursor()
             }
         }
         .fixedSize()
@@ -669,6 +677,7 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 .font(.tc(12, weight: .semibold))
                 .foregroundStyle(accent)
+                .pointingHandCursor()
         }
         .padding(.horizontal, 11).padding(.vertical, 8)
         .background(RoundedRectangle(cornerRadius: 10).fill(usesLightTheme ? Color(hex: 0xF1F1F3) : Color(hex: 0x2C2C30)))

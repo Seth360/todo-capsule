@@ -22,6 +22,7 @@ extension ContentView {
                 }
                 .buttonStyle(.plain)
                 .help("最大化")
+                .pointingHandCursor()
             }
             .padding(.horizontal, 4).padding(.top, 2)
             .highPriorityGesture(TapGesture(count: 2).onEnded {
@@ -49,6 +50,7 @@ extension ContentView {
                     .frame(width: 18, height: 18).frame(width: 24, height: 24).contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .pointingHandCursor()
             if editing {
                 editTextArea(todo)
             } else {
@@ -156,6 +158,7 @@ extension ContentView {
                 .foregroundStyle(txt3)
                 .disabled(state.completedArchive.isEmpty)
                 .help("清空回收箱")
+                .pointingHandCursor()
                 Button {
                     withAnimation(anim) { state.showingArchive = false }
                 } label: {
@@ -167,6 +170,7 @@ extension ContentView {
                 .buttonStyle(.plain)
                 .foregroundStyle(txt3)
                 .help("关闭")
+                .pointingHandCursor()
             }
             if state.completedArchive.isEmpty {
                 Text("回收箱为空")
@@ -202,6 +206,7 @@ extension ContentView {
                             .padding(.vertical, 6)
                     }
                     .buttonStyle(.plain)
+                    .pointingHandCursor()
                 }
             }
         }
@@ -235,25 +240,26 @@ extension ContentView {
             }
             .buttonStyle(.plain)
             .help("恢复到待办")
+            .pointingHandCursor()
             Text(linkedText(todo.text))
                 .font(.tc(13))
                 .foregroundStyle(txt2)
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
             tagPills(todo.tags)
-            if hovered {
-                Button {
-                    withAnimation(anim) { state.deleteFromArchive(todo) }
-                } label: {
-                    Image(systemName: "trash")
-                        .font(.tc(11, weight: .semibold))
-                        .foregroundStyle(txt3)
-                        .frame(width: 22, height: 22)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .help("永久删除")
+            Button {
+                withAnimation(anim) { state.deleteFromArchive(todo) }
+            } label: {
+                Image(systemName: "trash")
+                    .font(.tc(11, weight: .semibold))
+                    .foregroundStyle(txt3)
+                    .frame(width: 22, height: 22)
+                    .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .opacity(hovered ? 1 : 0)
+            .help("永久删除")
+            .pointingHandCursor()
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -261,8 +267,12 @@ extension ContentView {
         .contentShape(Rectangle())
         .onHover { h in hoveredRow = h ? todo.id : (hoveredRow == todo.id ? nil : hoveredRow) }
         .contextMenu {
-            Button("恢复到待办") { withAnimation(anim) { state.restoreFromArchive(todo) } }
-            Button("永久删除", role: .destructive) { withAnimation(anim) { state.deleteFromArchive(todo) } }
+            Button { withAnimation(anim) { state.restoreFromArchive(todo) } } label: {
+                Label("恢复到待办", systemImage: "arrow.uturn.backward.circle")
+            }
+            Button(role: .destructive) { withAnimation(anim) { state.deleteFromArchive(todo) } } label: {
+                Label("永久删除", systemImage: "trash")
+            }
         }
     }
 
@@ -361,6 +371,7 @@ extension ContentView {
             .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
+        .pointingHandCursor()
     }
 
     private func listColor(_ id: String) -> Color {
@@ -398,6 +409,7 @@ extension ContentView {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .pointingHandCursor()
     }
 
     private func headerIcon(_ symbol: String, help: String, action: @escaping () -> Void) -> some View {
@@ -410,6 +422,7 @@ extension ContentView {
         }
         .buttonStyle(.plain)
         .help(help)
+        .pointingHandCursor()
     }
 
     private var panelFooterTools: some View {
@@ -435,6 +448,7 @@ extension ContentView {
         }
         .buttonStyle(.plain)
         .help(help)
+        .pointingHandCursor()
     }
 
     // 旧分段切换保留为内部构件，目前入口改为标题下拉。
@@ -460,6 +474,7 @@ extension ContentView {
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .pointingHandCursor()
     }
 
     private var completedSection: some View {
@@ -508,6 +523,7 @@ extension ContentView {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .pointingHandCursor()
 
             if editing {
                 editTextArea(todo)
@@ -540,6 +556,7 @@ extension ContentView {
         .zIndex(draggingId == todo.id ? 1 : 0)
         .gesture(reorderGesture(todo, at: idx))
         .simultaneousGesture(TapGesture(count: 2).onEnded { startEdit(todo) })
+        .animation(nil, value: hovered)
     }
 
     // MARK: 自定义拖拽重排（被拖行裸绑偏移=跟手；其它行 spring 实时让位；落下安定 + 触觉）

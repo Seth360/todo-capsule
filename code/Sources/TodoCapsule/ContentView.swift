@@ -470,6 +470,7 @@ struct ContentView: View {
 
     private func row(_ todo: Todo) -> some View {
         let editing = editingId == todo.id
+        let hovered = hoveredRow == todo.id || (Self.forceHover && todo.id == state.active.first?.id)
         return HStack(spacing: 10) {
             // 勾选框：整块 18×18 可点（contentShape 修掉"点不动"）
             Button {
@@ -504,7 +505,7 @@ struct ContentView: View {
         .padding(.horizontal, 6).padding(.vertical, 3)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .background(RoundedRectangle(cornerRadius: 8).fill(editing ? accent.opacity(0.10) : Color.white.opacity(0.001)))
+        .background(RoundedRectangle(cornerRadius: 8).fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001))))
         .onHover { h in hoveredRow = h ? todo.id : (hoveredRow == todo.id ? nil : hoveredRow) }
         .simultaneousGesture(TapGesture(count: 2).onEnded { startEdit(todo) })
         .contextMenu { todoContextMenu(todo) }

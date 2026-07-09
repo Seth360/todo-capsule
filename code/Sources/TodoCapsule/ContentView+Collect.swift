@@ -68,6 +68,7 @@ extension ContentView {
     }
 
     func smallCollectRow(_ item: CollectItem) -> some View {
+        let hovered = hoveredRow == item.id || (Self.forceHover && item.id == state.collects.first?.id)
         let revealed = revealedId == item.id
         let masked = item.sensitive && !revealed
         let display = masked ? "••••••••" : item.text
@@ -97,7 +98,8 @@ extension ContentView {
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.001)))
+        .background(RoundedRectangle(cornerRadius: 8).fill(hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001)))
+        .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }
         .onTapGesture { copy(item) }
         .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
         .pointingHandCursor()
@@ -144,36 +146,42 @@ extension ContentView {
                 Text(linkedText(display))
                     .font(.tc(13))
                     .foregroundStyle(masked ? txt2 : txt)
-                    .lineLimit(masked ? 1 : nil)                 // 收藏内容看全：非打码项自动换行显示全文
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(masked ? 1 : 2)
                     .multilineTextAlignment(.leading)
                     .textSelection(.enabled)                     // 划词选中部分文本 → ⌘C 复制（整条用复制按钮）
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            if hovered && editingCollectId != item.id {       // 编辑中不显 hover 控件，避免与编辑框挤一行
-                if item.sensitive {
-                    Button { withAnimation(anim) { revealedId = revealed ? nil : item.id } } label: {
-                        Image(systemName: revealed ? "eye.slash" : "eye")
-                            .font(.tc(11)).foregroundStyle(txt3)
+            if editingCollectId != item.id {
+                HStack(spacing: 0) {
+                    if item.sensitive {
+                        Button { withAnimation(anim) { revealedId = revealed ? nil : item.id } } label: {
+                            Image(systemName: revealed ? "eye.slash" : "eye")
+                                .font(.tc(11)).foregroundStyle(txt3)
+                                .frame(width: 20, height: 22).contentShape(Rectangle())
+                        }.buttonStyle(.plain).help(revealed ? "隐藏" : "显示")
+                            .pointingHandCursor()
+                    } else {
+                        Color.clear.frame(width: 20, height: 22)
+                    }
+                    collectJumpControl(links)
+                    Button { copy(item) } label: {
+                        Image(systemName: "doc.on.doc").font(.tc(11)).foregroundStyle(txt3)
                             .frame(width: 20, height: 22).contentShape(Rectangle())
-                    }.buttonStyle(.plain).help(revealed ? "隐藏" : "显示")
+                    }.buttonStyle(.plain).help("复制整条")
+                        .pointingHandCursor()
+                    Button { withAnimation(anim) { state.deleteCollect(item.id) } } label: {
+                        Image(systemName: "xmark").font(.tc(11)).foregroundStyle(txt3)
+                            .frame(width: 20, height: 22).contentShape(Rectangle())
+                    }.buttonStyle(.plain).help("删除")
                         .pointingHandCursor()
                 }
-                collectJumpControl(links)
-                Button { copy(item) } label: {
-                    Image(systemName: "doc.on.doc").font(.tc(11)).foregroundStyle(txt3)
-                        .frame(width: 20, height: 22).contentShape(Rectangle())
-                }.buttonStyle(.plain).help("复制整条")
-                    .pointingHandCursor()
-                Button { withAnimation(anim) { state.deleteCollect(item.id) } } label: {
-                    Image(systemName: "xmark").font(.tc(11)).foregroundStyle(txt3)
-                        .frame(width: 20, height: 22).contentShape(Rectangle())
-                }.buttonStyle(.plain).help("删除")
-                    .pointingHandCursor()
+                .opacity(hovered ? 1 : 0)
+                .disabled(!hovered)
             }
         }
-        .padding(.horizontal, 6).padding(.vertical, 5)
+        .padding(.horizontal, 6).padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
         .background(RoundedRectangle(cornerRadius: 8)
             .fill(hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001)))
         .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }

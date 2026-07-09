@@ -89,6 +89,7 @@ struct ArchiveHistoryView: View {
                     .background(Capsule().fill(accent.opacity(0.16)))
                 Spacer()
                 Button {
+                    state.showingArchive = false
                     dismiss()
                 } label: {
                     Image(systemName: "xmark")
@@ -175,7 +176,6 @@ struct ArchiveHistoryView: View {
         .frame(width: 280, alignment: .leading)
         .padding(.horizontal, 10)
         .padding(.vertical, 7)
-        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(subtleFill))
     }
 
     private func archiveTagButton(title: String, selected: Bool, action: @escaping () -> Void) -> some View {
@@ -257,7 +257,7 @@ struct ArchiveHistoryView: View {
     private var windowDragGesture: some Gesture {
         DragGesture(minimumDistance: 4, coordinateSpace: .global)
             .onChanged { value in
-                guard let window = NSApplication.shared.keyWindow else { return }
+                guard let window = NSApplication.shared.keyWindow ?? NSApplication.shared.mainWindow else { return }
                 let origin = dragWindowOrigin ?? window.frame.origin
                 dragWindowOrigin = origin
                 window.setFrameOrigin(NSPoint(x: origin.x + value.translation.width, y: origin.y - value.translation.height))
@@ -268,15 +268,22 @@ struct ArchiveHistoryView: View {
     private func tagPills(_ tags: [String]) -> some View {
         HStack(spacing: 4) {
             ForEach(tags.prefix(3), id: \.self) { tag in
+                let color = tagColor(tag)
                 Text("#\(tag)")
                     .font(.tc(10, weight: .semibold))
-                    .foregroundStyle(accent)
+                    .foregroundStyle(color)
                     .lineLimit(1)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(Capsule().fill(accent.opacity(0.14)))
+                    .background(Capsule().fill(color.opacity(0.16)))
             }
         }
+    }
+
+    private func tagColor(_ tag: String) -> Color {
+        let palette: [UInt32] = [0x32D158, 0x64D2FF, 0xBF8CFF, 0xFF9F0A, 0xFF5E7E, 0x5DE4C7]
+        let sum = tag.unicodeScalars.reduce(0) { $0 + Int($1.value) }
+        return Color(hex: palette[sum % palette.count])
     }
 
     private var availableTags: [String] {

@@ -643,6 +643,7 @@ private struct ModelCard: View {
     let onEdit: () -> Void
     let onDuplicate: () -> Void
     let onDelete: () -> Void
+    private let activeGreen = Color(hex: 0x32D158)
 
     var body: some View {
         let protected = model.isAppPreset
@@ -656,10 +657,15 @@ private struct ModelCard: View {
             .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: 5) {
                 Text(model.displayTitle).font(.tc(17, weight: .semibold))
-                if !protected {
+                if protected {
+                    Text("模型用量有限，随时可能失效，请及时更换自有模型API。")
+                        .font(.tc(12))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                } else {
                     Text(model.baseURL.isEmpty ? "未配置 Base URL" : model.baseURL)
                         .font(.tc(14))
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(activeGreen)
                         .lineLimit(1)
                 }
             }
@@ -667,12 +673,13 @@ private struct ModelCard: View {
             if active {
                 Label("启用中", systemImage: "checkmark.circle.fill")
                     .font(.tc(13, weight: .semibold))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(activeGreen)
             } else {
                 Button(action: onEnable) {
                     Label("启用", systemImage: "play")
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(activeGreen)
             }
             if !protected {
                 Button(action: onEdit) { Image(systemName: "square.and.pencil") }
@@ -682,8 +689,8 @@ private struct ModelCard: View {
         }
         .buttonStyle(.borderless)
         .padding(18)
-        .background(RoundedRectangle(cornerRadius: 10).fill(active ? Color.blue.opacity(0.08) : Color.clear))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(active ? Color.blue.opacity(0.75) : Color.secondary.opacity(0.22), lineWidth: active ? 1.5 : 1))
+        .background(RoundedRectangle(cornerRadius: 10).fill(active ? activeGreen.opacity(0.08) : Color.clear))
+        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(active ? activeGreen.opacity(0.75) : Color.secondary.opacity(0.22), lineWidth: active ? 1.5 : 1))
     }
 }
 
@@ -694,11 +701,12 @@ private struct SummaryTemplateCard: View {
     let onEnable: () -> Void
     let onEdit: () -> Void
     let onDelete: () -> Void
+    private let activeGreen = Color(hex: 0x32D158)
 
     var body: some View {
         HStack(spacing: 14) {
             Image(systemName: active ? "sparkles" : "doc.text")
-                .foregroundStyle(active ? .blue : .secondary)
+                .foregroundStyle(active ? activeGreen : .secondary)
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 5) {
                 Text(template.title).font(.tc(17, weight: .semibold))
@@ -708,15 +716,24 @@ private struct SummaryTemplateCard: View {
                     .lineLimit(1)
             }
             Spacer()
-            Button(active ? "启用中" : "启用", action: onEnable)
-                .disabled(active)
+            if active {
+                Label("启用中", systemImage: "checkmark.circle.fill")
+                    .font(.tc(13, weight: .semibold))
+                    .foregroundStyle(activeGreen)
+            } else {
+                Button(action: onEnable) {
+                    Label("启用", systemImage: "play")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(activeGreen)
+            }
             Button(action: onEdit) { Image(systemName: "square.and.pencil") }
             Button(role: .destructive, action: onDelete) { Image(systemName: "trash") }
         }
         .buttonStyle(.borderless)
         .padding(16)
-        .background(RoundedRectangle(cornerRadius: 10).fill(active ? Color.blue.opacity(0.08) : Color.clear))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(active ? Color.blue.opacity(0.75) : Color.secondary.opacity(0.22), lineWidth: active ? 1.5 : 1))
+        .background(RoundedRectangle(cornerRadius: 10).fill(active ? activeGreen.opacity(0.08) : Color.clear))
+        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(active ? activeGreen.opacity(0.75) : Color.secondary.opacity(0.22), lineWidth: active ? 1.5 : 1))
     }
 }
 

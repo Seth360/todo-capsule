@@ -3,20 +3,20 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>0.1.9</title>
-            <pubDate>Thu, 09 Jul 2026 16:05:41 +0800</pubDate>
+            <title>0.1.10</title>
+            <pubDate>Thu, 09 Jul 2026 16:40:49 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>10</sparkle:version>
-            <sparkle:shortVersionString>0.1.9</sparkle:shortVersionString>
+            <sparkle:version>11</sparkle:version>
+            <sparkle:shortVersionString>0.1.10</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.9
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 0.1.10
 
-- 回收箱支持按本周优先展示完成项。
-- 回收箱每条项目 hover 后可直接永久删除。
-- “查看全部”可打开完整回收箱记录，按周分组，并支持搜索和标签过滤。
+- 收藏条目操作更清爽，支持双击编辑、链接跳转和删除撤回。
+- 模型设置中的内置 FX 共享模型显示为“预设”，不暴露接口信息。
+- 检查更新无新版本时显示“你的应用已经是最新版本”，并只保留关闭按钮。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.9/todo-capsule-v0.1.9.dmg" length="2836719" type="application/octet-stream" sparkle:edSignature="eGAWhzazOHrcMMPYZGa7CB5AzTfy9QVmaTrGHzz6u6B4qACu18vNECzQ4R/TR8+MzWJoLfaqJO00Pr7TIyjGCA=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v0.1.10/todo-capsule-v0.1.10.dmg" length="2870004" type="application/octet-stream" sparkle:edSignature="hZgOKrsTyVnXLGcYg7ujwkH6JsfqN0PN8g6q1ZV0x6xQ5zsDtG1gcugHUtbqMgbr5NZAgcUY3gWyqUAag855Dg=="/>
         </item>
     </channel>
 </rss>

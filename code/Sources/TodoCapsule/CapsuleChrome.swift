@@ -38,8 +38,7 @@ enum CapsuleMetrics {
     static let panelW: CGFloat = 600         // 大面板更宽、更沉浸
 
     static func expandedH(count: Int) -> CGFloat {
-        if count == 0 { return 188 }
-        return min(452, 104 + CGFloat(count) * 38)
+        min(452, max(240, 104 + CGFloat(count) * 38))
     }
     static func panelH(active: Int, completed: Int) -> CGFloat {
         let base = 158 + CGFloat(active) * 40                       // 顶栏+tab+输入框+活跃行，减少底部留白

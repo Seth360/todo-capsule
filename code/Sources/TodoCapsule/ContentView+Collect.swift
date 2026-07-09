@@ -18,46 +18,87 @@ extension ContentView {
         }
     }
 
-    private var collectInputRow: some View {
-        HStack(alignment: .bottom, spacing: 8) {
-            Image(systemName: "plus.circle.fill").font(.tc(15)).foregroundStyle(txt3)
-                .padding(.bottom, 1)
-            ZStack(alignment: .topLeading) {
+    var collectInputRow: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "plus.circle.fill")
+                .font(.tc(15))
+                .foregroundStyle(collectInputActive ? accent : txt3)
+            ZStack(alignment: .leading) {
                 if state.collectDraft.isEmpty {
-                    Text("存一条…笔记 / 账号 / 密码（Enter 换行，⌘Enter 存）")
-                        .font(.tc(13)).foregroundStyle(txt3)
-                        .padding(.top, 1)
+                    Text("记一条…")
+                        .font(.tc(13))
+                        .foregroundStyle(txt3)
                 }
-                // 独立 NSTextView：Return=换行、⌘Return=存、随输入多行增长
-                GrowingTextView(text: $state.collectDraft, height: $collectInputHeight,
-                                focusTick: collectFocusTick, maxLines: 8,
-                                onSubmit: { doCollectSubmit() })
-                    .frame(height: collectInputHeight)
-            }
-            if !state.collectDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                Button { doCollectSubmit() } label: {
-                    Image(systemName: "return").font(.tc(12, weight: .semibold)).foregroundStyle(accent)
-                        .frame(width: 22, height: 22)
-                        .background(Circle().fill(accent.opacity(0.14)))
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .help("存（⌘Return）")
+                TextField("", text: $state.collectDraft)
+                    .textFieldStyle(.plain)
+                    .font(.tc(13))
+                    .foregroundStyle(txt)
+                    .tint(accent)
+                    .focused($collectInputFocused)
+                    .onSubmit { doCollectSubmit() }
             }
         }
         .padding(.horizontal, 9).padding(.vertical, 8)
-        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.white.opacity(0.04)))
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(collectInputActive ? accent.opacity(0.08) : subtleFill)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .strokeBorder(collectInputActive ? accent.opacity(0.6) : .clear, lineWidth: 1)
+        )
         .contentShape(Rectangle())
-        .onTapGesture { collectFocusTick &+= 1; state.onRequestKey?() }
+        .onTapGesture {
+            collectInputFocused = true
+            state.onRequestKey?()
+        }
     }
 
-    private var collectEmptyState: some View {
+    private var collectInputActive: Bool {
+        collectInputFocused && state.panelTab == .collect
+    }
+
+    var collectEmptyState: some View {
         VStack(spacing: 8) {
             Image(systemName: "bookmark").font(.tc(20)).foregroundStyle(txt3)
             Text("还没有收藏").font(.tc(13, weight: .semibold)).foregroundStyle(txt)
             Text("写点要存的 · 划词复制部分，或用复制按钮整条复制").font(.tc(11.5)).foregroundStyle(txt3)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity).padding(.vertical, 18)
+    }
+
+    func smallCollectRow(_ item: CollectItem) -> some View {
+        let revealed = revealedId == item.id
+        let masked = item.sensitive && !revealed
+        let display = masked ? "••••••••" : item.text
+        return HStack(alignment: .top, spacing: 10) {
+            Image(systemName: item.sensitive ? "lock.fill" : "bookmark")
+                .font(.tc(11))
+                .foregroundStyle(item.sensitive ? accent.opacity(0.85) : txt3)
+                .frame(width: 18, height: 22)
+            Text(linkedText(display))
+                .font(.tc(13))
+                .foregroundStyle(masked ? txt2 : txt)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.001)))
+        .onTapGesture { copy(item) }
+        .contextMenu {
+            Button("复制整条") { copy(item) }
+            if item.sensitive {
+                Button(revealed ? "隐藏" : "显示") {
+                    withAnimation(anim) { revealedId = revealed ? nil : item.id }
+                }
+            }
+            Button("删除", role: .destructive) {
+                withAnimation(anim) { state.deleteCollect(item.id) }
+            }
+        }
     }
 
     private func collectRow(_ item: CollectItem) -> some View {
@@ -147,7 +188,7 @@ extension ContentView {
         .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
-    private func copy(_ item: CollectItem) {
+    func copy(_ item: CollectItem) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(item.text, forType: .string)
         withAnimation(anim) { copiedFlash = item.id }
@@ -177,6 +218,9 @@ extension ContentView {
     private func doCollectSubmit() {
         guard !state.collectDraft.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         withAnimation(anim) { state.submitCollect() }
-        DispatchQueue.main.async { collectFocusTick &+= 1 }   // 连续存：存完保持聚焦
+        DispatchQueue.main.async {
+            collectInputFocused = true
+            state.onRequestKey?()
+        }
     }
 }

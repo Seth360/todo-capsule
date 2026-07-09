@@ -9,7 +9,7 @@ extension ContentView {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
                 smallListMenu
-                Text("\(state.count)")
+                Text("\(smallCurrentCount)")
                     .font(.tc(11.5, weight: .semibold)).foregroundStyle(accent)
                     .padding(.horizontal, 6).padding(.vertical, 1)
                     .background(Capsule().fill(accent.opacity(0.16)))
@@ -28,14 +28,8 @@ extension ContentView {
                 withAnimation(anim) { state.enterPanel() }
             })
             .simultaneousGesture(smallWindowDragGesture)
-            captureRow                                    // 常驻输入：清零后也能直接记（点它进 capture 聚焦）
-            if state.active.isEmpty {
-                emptyState
-            } else {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 1) { ForEach(state.active) { peekRow($0) } }
-                }
-            }
+            smallInputRow                                 // 常驻输入：跟随当前 tab 写入待办/收藏
+            smallWindowListContent
         }
         .padding(11)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

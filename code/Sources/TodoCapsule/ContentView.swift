@@ -9,6 +9,7 @@ struct ContentView: View {
     @EnvironmentObject var state: AppState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var inputFocused: Bool
+    @FocusState var collectInputFocused: Bool
     @FocusState var editFocused: Bool
     @State var editingId: UUID?
     @State var editText = ""
@@ -63,7 +64,8 @@ struct ContentView: View {
     }
     private var radius: CGFloat { state.mode == .idle ? CapsuleMetrics.idleW / 2 : 18 }
     private var capSize: CGSize {
-        CapsuleMetrics.size(mode: state.mode, active: state.count, completed: state.completed.count,
+        let smallCount = state.panelTab == .collect && state.mode != .panel ? state.collects.count : state.count
+        return CapsuleMetrics.size(mode: state.mode, active: smallCount, completed: state.completed.count,
                             collect: state.collects.count, tab: state.panelTab)
     }
 
@@ -73,16 +75,21 @@ struct ContentView: View {
             .padding(state.settings.position == .left ? .leading : .trailing, state.mode == .panel ? 32 : 0)
             .onChange(of: state.mode) { _, m in
                 if m == .panel {                                 // 大面板打开即聚焦当前 tab 的输入框
-                    if state.panelTab == .collect { collectFocusTick &+= 1 } else { inputFocused = true }
+                    if state.panelTab == .collect { collectInputFocused = true } else { inputFocused = true }
                 } else {
                     inputFocused = (m == .capture)
+                    collectInputFocused = false
                 }
                 if m == .idle { editingId = nil; editingCollectId = nil; state.isEditing = false }
             }
             .onChange(of: state.panelTab) { _, t in              // 切 tab → 焦点跟到对应输入框
                 guard state.mode == .panel else { return }
-                if t == .collect { collectFocusTick &+= 1; state.onRequestKey?() }
-                else { inputFocused = true }
+                if t == .collect {
+                    collectInputFocused = true
+                    state.onRequestKey?()
+                } else {
+                    inputFocused = true
+                }
             }
             .preferredColorScheme(preferredScheme)
     }
@@ -136,8 +143,8 @@ struct ContentView: View {
     private var expanded: some View {
         VStack(alignment: .leading, spacing: 7) {
             header
-            captureRow
-            if state.active.isEmpty { emptyState } else { list }
+            smallInputRow
+            smallWindowListContent
         }
         .padding(11)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -154,7 +161,7 @@ struct ContentView: View {
     private var header: some View {
         HStack(spacing: 8) {
             smallListMenu
-            Text("\(state.count)")
+            Text("\(smallCurrentCount)")
                 .font(.tc(11.5, weight: .semibold))
                 .foregroundStyle(accent)
                 .padding(.horizontal, 6).padding(.vertical, 1)
@@ -182,30 +189,54 @@ struct ContentView: View {
                 Button {
                     withAnimation(anim) { state.selectList(list.id) }
                 } label: {
-                    Label(list.name, systemImage: state.panelTab == .today && state.selectedListId == list.id ? "checkmark" : "list.bullet")
+                    smallMenuItem(
+                        title: list.name,
+                        systemImage: "list.bullet",
+                        isSelected: state.panelTab == .today && state.selectedListId == list.id
+                    )
                 }
             }
             Divider()
             Button {
                 withAnimation(anim) { state.setPanelTab(.collect) }
             } label: {
-                Label("收藏", systemImage: state.panelTab == .collect ? "checkmark" : "bookmark")
+                smallMenuItem(
+                    title: "收藏",
+                    systemImage: "bookmark",
+                    isSelected: state.panelTab == .collect
+                )
             }
         } label: {
             HStack(spacing: 4) {
-                Image(systemName: "chevron.down")
-                    .font(.tc(8, weight: .semibold))
-                    .foregroundStyle(txt2)
                 Text(state.panelTab == .collect ? "收藏" : state.currentList.name)
                     .font(.tc(13, weight: .semibold))
                     .foregroundStyle(txt)
                     .lineLimit(1)
+                Image(systemName: "chevron.down")
+                    .font(.tc(7, weight: .bold))
+                    .foregroundStyle(txt2.opacity(0.78))
             }
             .contentShape(Rectangle())
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+    }
+
+    @ViewBuilder
+    private func smallMenuItem(title: String, systemImage: String, isSelected: Bool) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .frame(width: 16)
+            Text(title)
+            Spacer(minLength: 12)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(isSelected ? accent.opacity(0.13) : Color.clear)
+        )
     }
 
     @ViewBuilder
@@ -308,6 +339,15 @@ struct ContentView: View {
     }
 
     @ViewBuilder
+    var smallInputRow: some View {
+        if state.panelTab == .collect {
+            collectInputRow
+        } else {
+            captureRow
+        }
+    }
+
+    @ViewBuilder
     private var tagSuggestionBar: some View {
         let suggestions = tagSuggestions(in: state.draft)
         if !suggestions.isEmpty {
@@ -362,6 +402,29 @@ struct ContentView: View {
                 ForEach(state.active) { todo in row(todo) }
             }
         }
+    }
+
+    @ViewBuilder
+    var smallWindowListContent: some View {
+        if state.panelTab == .collect {
+            if state.collects.isEmpty {
+                collectEmptyState
+            } else {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 1) {
+                        ForEach(state.collects) { item in smallCollectRow(item) }
+                    }
+                }
+            }
+        } else if state.active.isEmpty {
+            emptyState
+        } else {
+            list
+        }
+    }
+
+    var smallCurrentCount: Int {
+        state.panelTab == .collect ? state.collects.count : state.count
     }
 
     // MARK: 文本内 URL 识别 → 渲染为可点击链接（系统 NSDataDetector，点击用默认浏览器打开）

@@ -14,6 +14,8 @@ Todo Capsule 是一个 macOS 桌面边缘待办胶囊。它用 SwiftUI + AppKit 
 
 从 `v0.1.1` 开始，应用内已接入 Sparkle 自动更新。菜单栏图标中可选择“检查更新…”。
 
+发布新版本和自动更新源维护流程见 [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md)。换账号或换 Agent 工具时，先读这份文档，尤其注意不要提交 Sparkle 私钥，也不要在验证自动更新时覆盖 `/Applications/TodoCapsule.app`。
+
 ## 功能
 
 - 全局热键快速记录待办

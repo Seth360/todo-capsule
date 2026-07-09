@@ -31,7 +31,9 @@ open ./TodoCapsule.app
 
 ## 自动更新
 
-应用通过 Sparkle 检查 `https://raw.githubusercontent.com/Seth360/todo-capsule/main/appcast.xml`。发布新版本时，先打包 DMG，再用 `.build/artifacts/sparkle/Sparkle/bin/generate_appcast --account todo-capsule ...` 生成新的 `appcast.xml`，然后把 DMG 上传到同版本 GitHub Release。
+应用通过 Sparkle 检查 `https://raw.githubusercontent.com/Seth360/todo-capsule/main/appcast.xml`。完整发布流程、签名命令、GitHub Release 上传步骤和自动更新测试注意事项见 `../docs/RELEASE_PROCESS.md`。
+
+特别注意：验证自动更新时不要覆盖 `/Applications/TodoCapsule.app`，应保留旧版本，让 Sparkle 从 GitHub Release 下载新版本。
 
 ## 主要源码
 

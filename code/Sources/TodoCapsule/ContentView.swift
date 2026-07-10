@@ -216,7 +216,10 @@ struct ContentView: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 8, weight: .semibold))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 8, height: 8)
+                    .fontWeight(.semibold)
                     .foregroundStyle(txt2.opacity(0.55))
                 Text(state.panelTab == .collect ? "收藏" : state.currentList.name)
                     .font(.tc(13, weight: .semibold))

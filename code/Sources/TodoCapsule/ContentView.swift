@@ -65,7 +65,7 @@ struct ContentView: View {
     }
     private var radius: CGFloat { state.mode == .idle ? CapsuleMetrics.idleW / 2 : 18 }
     private var capSize: CGSize {
-        let smallCount = state.panelTab == .collect && state.mode != .panel ? state.collects.count : state.count
+        let smallCount = state.panelTab == .collect && state.mode != .panel ? state.collects.count : state.active.count
         return CapsuleMetrics.size(mode: state.mode, active: smallCount, completed: state.completed.count,
                             collect: state.collects.count, tab: state.panelTab)
     }
@@ -215,13 +215,13 @@ struct ContentView: View {
             }
         } label: {
             HStack(spacing: 4) {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 8, weight: .semibold))
+                    .foregroundStyle(txt2.opacity(0.55))
                 Text(state.panelTab == .collect ? "收藏" : state.currentList.name)
                     .font(.tc(13, weight: .semibold))
                     .foregroundStyle(txt)
                     .lineLimit(1)
-                Image(systemName: "chevron.down")
-                    .font(.tc(7, weight: .bold))
-                    .foregroundStyle(txt2.opacity(0.78))
             }
             .contentShape(Rectangle())
         }
@@ -434,7 +434,7 @@ struct ContentView: View {
     }
 
     var smallCurrentCount: Int {
-        state.panelTab == .collect ? state.collects.count : state.count
+        state.panelTab == .collect ? state.collects.count : state.active.count
     }
 
     // MARK: 文本内 URL 识别 → 渲染为可点击链接（系统 NSDataDetector，点击用默认浏览器打开）

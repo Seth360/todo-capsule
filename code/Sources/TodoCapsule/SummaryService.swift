@@ -232,7 +232,7 @@ enum SummaryService {
             return URL(string: base)
         }
         let trimmed = base.hasSuffix("/") ? String(base.dropLast()) : base
-        if trimmed.hasSuffix("/v1") {
+        if trimmed.hasSuffix("/v1") || trimmed.hasSuffix("/v4") {
             return URL(string: "\(trimmed)/chat/completions")
         }
         return URL(string: "\(trimmed)/v1/chat/completions")
@@ -319,7 +319,7 @@ enum ModelListService {
     private static func endpointURL(from base: String) -> URL? {
         let withoutChat = base.replacingOccurrences(of: "/chat/completions", with: "")
         let trimmed = withoutChat.hasSuffix("/") ? String(withoutChat.dropLast()) : withoutChat
-        if trimmed.hasSuffix("/v1") {
+        if trimmed.hasSuffix("/v1") || trimmed.hasSuffix("/v4") {
             return URL(string: "\(trimmed)/models")
         }
         return URL(string: "\(trimmed)/v1/models")

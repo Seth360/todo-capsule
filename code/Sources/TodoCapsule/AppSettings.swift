@@ -91,8 +91,8 @@ struct ModelConfig: Identifiable, Codable, Equatable {
     static let defaults: [ModelConfig] = [
         appPreset,
         ModelConfig(id: "openai-official", title: "OpenAI Official", providerName: "OpenAI", baseURL: "https://api.openai.com", apiKey: "", modelName: "gpt-4.1", supportsRouting: false),
-        ModelConfig(id: "deepseek", title: "DeepSeek", providerName: "DeepSeek", baseURL: "https://api.deepseek.com", apiKey: "", modelName: "deepseek-chat"),
-        ModelConfig(id: "qwen", title: "通义千问", providerName: "通义千问", baseURL: "https://dashscope.aliyuncs.com/compatible-mode", apiKey: "", modelName: "qwen-plus"),
+        ModelConfig(id: "deepseek", title: "DeepSeek", providerName: "DeepSeek", baseURL: "https://api.deepseek.com", apiKey: "", modelName: "deepseek-v4-flash"),
+        ModelConfig(id: "qwen", title: "通义千问", providerName: "通义千问", baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1", apiKey: "", modelName: "qwen-plus"),
         ModelConfig(id: "custom", title: "自定义 API", providerName: "Custom", baseURL: "", apiKey: "", modelName: "")
     ]
 }

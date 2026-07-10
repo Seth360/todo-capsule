@@ -3,21 +3,21 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>1.0.3</title>
-            <pubDate>Thu, 09 Jul 2026 20:45:12 +0800</pubDate>
+            <title>1.0.4</title>
+            <pubDate>Fri, 10 Jul 2026 12:30:41 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>15</sparkle:version>
-            <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
+            <sparkle:version>16</sparkle:version>
+            <sparkle:shortVersionString>1.0.4</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.3
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.4
 
-- 预设模型改为通过 fuxc.team 服务端代理调用，不在 App 内置模型 Key。
-- 模型设置页新增预设模型每周额度进度条、剩余次数和重置时间。
-- 预设模型每个用户每周可使用 20 次总结，周五 24 点重置；自建模型不受限制。
-- 总结模板提示词输入限制为 2000 字，并显示字数计数。
+- 修正胶囊高度和待办计数，将已完成项目排除在当前待办数量之外。
+- 优化模型新建流程，支持先选择常用模型或直接配置自定义 API。
+- 新增 Kimi 和智谱 GLM 预设，并更新 DeepSeek、通义千问的默认模型与接口地址。
+- 兼容以 `/v4` 结尾的模型服务接口。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.3/todo-capsule-v1.0.3.dmg" length="2978589" type="application/octet-stream" sparkle:edSignature="FyEe/4tK+8pu7rxNKvfR0N5+PVQBlS2ZL1vfhFrNphGDdXZxyteMjAhcBhio+m27WAmr7jJg4rXYMoomQrHlBA=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.4/todo-capsule-v1.0.4.dmg" length="2977719" type="application/octet-stream" sparkle:edSignature="9Vmi0YIhRnZoHpIc3E7LkGHk0kuoZ5bb5/EwuRQYrLKSiNbdRbVKSmwQmvgy2rDULK+xJsNGTytjM/ZUCaJyDA=="/>
         </item>
     </channel>
 </rss>

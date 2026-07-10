@@ -275,7 +275,7 @@ final class CapsuleController: NSObject {
     }
     private func expandedRect() -> NSRect {
         let cy = panel.frame.midY
-        let h = CapsuleMetrics.expandedH(count: state.count)
+        let h = CapsuleMetrics.expandedH(count: state.panelTab == .collect ? state.collects.count : state.active.count)
         if state.settings.position == .left {
             return NSRect(x: contentLeftX(), y: cy - h / 2,
                           width: CapsuleMetrics.expandedW, height: h)

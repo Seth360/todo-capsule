@@ -164,7 +164,7 @@ struct SettingsView: View {
         switch section {
         case .model:
             Button {
-                editingModel = ModelPreset.openAI.makeConfig()
+                editingModel = ModelConfig(title: "", providerName: "", baseURL: "", apiKey: "", modelName: "")
             } label: {
                 Label("新建", systemImage: "plus")
             }
@@ -665,15 +665,17 @@ private struct ModelCard: View {
         HStack(spacing: 14) {
             Image(systemName: "line.3.horizontal")
                 .foregroundStyle(.secondary.opacity(0.65))
-            ZStack {
-                RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.10))
-                Text(model.initial).font(.tc(13, weight: .semibold)).foregroundStyle(.secondary)
+            if !protected {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.10))
+                    Text(model.initial).font(.tc(13, weight: .semibold)).foregroundStyle(.secondary)
+                }
+                .frame(width: 36, height: 36)
             }
-            .frame(width: 36, height: 36)
             VStack(alignment: .leading, spacing: 5) {
                 Text(model.displayTitle).font(.tc(17, weight: .semibold))
                 if protected {
-                    Text("经由服务端代理调用共享模型，不会在 App 内置明文 Key。")
+                    Text("默认模型限制使用次数，可添加自有模型API")
                         .font(.tc(12))
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
@@ -806,10 +808,10 @@ private struct ModelEditorView: View {
     let onSave: (ModelConfig) -> Void
 
     init(initial: ModelConfig, onSave: @escaping (ModelConfig) -> Void) {
-        let preset = ModelPreset.matching(initial) ?? .custom
+        let presetId = ModelPreset.matching(initial)?.id ?? ""
         let currentModelName = initial.modelName.trimmingCharacters(in: .whitespacesAndNewlines)
         _model = State(initialValue: initial)
-        _selectedPresetId = State(initialValue: preset.id)
+        _selectedPresetId = State(initialValue: presetId)
         _availableModelNames = State(initialValue: currentModelName.isEmpty ? [] : [currentModelName])
         self.onSave = onSave
     }
@@ -820,6 +822,7 @@ private struct ModelEditorView: View {
             Form {
                 TextField("标题", text: $model.title)
                 Picker("常用模型", selection: presetSelection) {
+                    Text("请选择").tag("")
                     ForEach(ModelPreset.all) { preset in
                         Text(preset.title).tag(preset.id)
                     }
@@ -854,7 +857,8 @@ private struct ModelEditorView: View {
                 Button("保存") {
                     var saved = model
                     saved.customHeaders = ""
-                    if saved.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    if !selectedPresetId.isEmpty,
+                       saved.modelName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         saved.modelName = ModelPreset.defaultModelName(for: saved)
                     }
                     onSave(saved)
@@ -932,10 +936,10 @@ private struct ModelPreset: Identifiable, Equatable {
 
     static let deepSeek = ModelPreset(
         id: "deepseek",
-        title: "DeepSeek · deepseek-chat",
+        title: "DeepSeek · deepseek-v4-flash",
         providerName: "DeepSeek",
         baseURL: "https://api.deepseek.com",
-        modelName: "deepseek-chat",
+        modelName: "deepseek-v4-flash",
         supportsRouting: true
     )
 
@@ -943,8 +947,26 @@ private struct ModelPreset: Identifiable, Equatable {
         id: "qwen",
         title: "通义 · qwen-plus",
         providerName: "通义千问",
-        baseURL: "https://dashscope.aliyuncs.com/compatible-mode",
+        baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
         modelName: "qwen-plus",
+        supportsRouting: true
+    )
+
+    static let kimi = ModelPreset(
+        id: "kimi",
+        title: "Kimi · kimi-k2.6",
+        providerName: "Kimi",
+        baseURL: "https://api.moonshot.cn/v1",
+        modelName: "kimi-k2.6",
+        supportsRouting: true
+    )
+
+    static let glm = ModelPreset(
+        id: "glm",
+        title: "智谱 · glm-5.1",
+        providerName: "智谱 GLM",
+        baseURL: "https://open.bigmodel.cn/api/paas/v4",
+        modelName: "glm-5.1",
         supportsRouting: true
     )
 
@@ -957,7 +979,7 @@ private struct ModelPreset: Identifiable, Equatable {
         supportsRouting: true
     )
 
-    static let all: [ModelPreset] = [.openAI, .deepSeek, .qwen, .custom]
+    static let all: [ModelPreset] = [.openAI, .deepSeek, .qwen, .kimi, .glm, .custom]
 
     static func matching(_ model: ModelConfig) -> ModelPreset? {
         all.first { preset in
@@ -979,6 +1001,10 @@ private struct ModelPreset: Identifiable, Equatable {
         if hints.contains("deepseek") { return deepSeek.modelName }
         if hints.contains("dashscope") || hints.contains("aliyun") || hints.contains("qwen") || hints.contains("通义") {
             return qwen.modelName
+        }
+        if hints.contains("moonshot") || hints.contains("kimi") { return kimi.modelName }
+        if hints.contains("bigmodel") || hints.contains("zhipu") || hints.contains("glm") || hints.contains("智谱") {
+            return glm.modelName
         }
         return openAI.modelName
     }

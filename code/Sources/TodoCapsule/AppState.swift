@@ -52,6 +52,7 @@ final class AppState: ObservableObject {
     @Published var dismissedUpdateBannerVersion: String?
     @Published var presetQuota: PresetQuota?
     @Published var presetQuotaStatus: String?
+    @Published var isPresetActivated: Bool = PresetActivation.isActivated
     @Published var settings: AppSettings = AppSettingsStore.load() {
         didSet {
             AppSettingsStore.save(settings)
@@ -670,6 +671,11 @@ final class AppState: ObservableObject {
             presetQuotaStatus = nil
             return
         }
+        guard !isPresetActivated else {
+            presetQuota = nil
+            presetQuotaStatus = nil
+            return
+        }
         presetQuotaStatus = "正在获取预设模型额度..."
         SummaryService.fetchPresetQuota { [weak self] result in
             DispatchQueue.main.async {
@@ -683,6 +689,14 @@ final class AppState: ObservableObject {
                 }
             }
         }
+    }
+
+    func activatePreset(using code: String) -> Bool {
+        guard PresetActivation.activate(using: code) else { return false }
+        isPresetActivated = true
+        presetQuota = nil
+        presetQuotaStatus = nil
+        return true
     }
 
     private func showSummaryToast(_ message: String, autoHideAfter seconds: TimeInterval?) {

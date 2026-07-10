@@ -155,6 +155,7 @@ enum SummaryService {
             req.setValue(appToken, forHTTPHeaderField: "X-Todo-Capsule-Token")
         }
         req.setValue(PresetProxyIdentity.userId, forHTTPHeaderField: "X-Todo-Capsule-User")
+        PresetActivation.authorize(&req)
         req.httpBody = try? JSONEncoder().encode(PresetSummaryRequest(prompt: prompt))
 
         URLSession.shared.dataTask(with: req) { data, response, error in
@@ -205,6 +206,7 @@ enum SummaryService {
         if let appToken = ProxyAppToken.current {
             req.setValue(appToken, forHTTPHeaderField: "X-Todo-Capsule-Token")
         }
+        PresetActivation.authorize(&req)
         URLSession.shared.dataTask(with: req, completionHandler: completion).resume()
     }
 
@@ -244,6 +246,28 @@ enum SummaryService {
             guard parts.count == 2, !parts[0].isEmpty, !parts[1].isEmpty else { return nil }
             return (parts[0], parts[1])
         }
+    }
+}
+
+enum PresetActivation {
+    private static let activationCode = "FUXCNEWBEE"
+    private static let defaultsKey = "todoCapsule.presetActivation.v1"
+
+    static var isActivated: Bool {
+        UserDefaults.standard.bool(forKey: defaultsKey)
+    }
+
+    static func activate(using code: String) -> Bool {
+        let valid = code.trimmingCharacters(in: .whitespacesAndNewlines) == activationCode
+        if valid {
+            UserDefaults.standard.set(true, forKey: defaultsKey)
+        }
+        return valid
+    }
+
+    static func authorize(_ request: inout URLRequest) {
+        guard isActivated else { return }
+        request.setValue(activationCode, forHTTPHeaderField: "X-Todo-Capsule-Activation")
     }
 }
 

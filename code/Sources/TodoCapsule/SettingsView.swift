@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var editingModel: ModelConfig?
     @State private var editingSummary: SummaryTemplateConfig?
     @State private var recordingHotkey: HotkeyFieldKind?
+    @State private var showingPresetActivation = false
 
     private var preferredScheme: ColorScheme? {
         switch state.settings.theme {
@@ -32,6 +33,20 @@ struct SettingsView: View {
                 }
                 .padding(24)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if section == .model {
+                    Button {
+                        showingPresetActivation = true
+                    } label: {
+                        Label(state.isPresetActivated ? "已激活" : "一键激活", systemImage: state.isPresetActivated ? "checkmark.seal.fill" : "bolt.fill")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Color(hex: 0x32D158))
+                    .controlSize(.large)
+                    .disabled(state.isPresetActivated)
+                    .padding(24)
+                }
             }
         }
         .frame(minWidth: 760, minHeight: 520)
@@ -59,6 +74,12 @@ struct SettingsView: View {
                 }
             )
             .frame(width: 380, height: 230)
+        }
+        .sheet(isPresented: $showingPresetActivation) {
+            PresetActivationView { code in
+                state.activatePreset(using: code)
+            }
+            .frame(width: 430, height: 250)
         }
         .onAppear {
             if section == .model { state.refreshPresetQuota() }
@@ -349,12 +370,17 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             ForEach(state.settings.models) { model in
                 if model.isAppPreset && state.settings.activeModelId == model.id {
-                    PresetQuotaView(quota: state.presetQuota, status: state.presetQuotaStatus)
-                        .onAppear { state.refreshPresetQuota() }
+                    if state.isPresetActivated {
+                        PresetActivatedView()
+                    } else {
+                        PresetQuotaView(quota: state.presetQuota, status: state.presetQuotaStatus)
+                            .onAppear { state.refreshPresetQuota() }
+                    }
                 }
                 ModelCard(
                     model: model,
                     active: state.settings.activeModelId == model.id,
+                    presetActivated: state.isPresetActivated,
                     onEnable: { enableModel(model.id) },
                     onEdit: { editingModel = model },
                     onDuplicate: { duplicateModel(model) },
@@ -362,6 +388,7 @@ struct SettingsView: View {
                 )
             }
         }
+        .padding(.bottom, 58)
     }
 
     private var summarySection: some View {
@@ -654,6 +681,7 @@ private struct HotkeyCaptureView: NSViewRepresentable {
 private struct ModelCard: View {
     let model: ModelConfig
     let active: Bool
+    let presetActivated: Bool
     let onEnable: () -> Void
     let onEdit: () -> Void
     let onDuplicate: () -> Void
@@ -675,7 +703,7 @@ private struct ModelCard: View {
             VStack(alignment: .leading, spacing: 5) {
                 Text(model.displayTitle).font(.tc(17, weight: .semibold))
                 if protected {
-                    Text("默认模型限制使用次数，可添加自有模型API")
+                    Text(presetActivated ? "预设模型，不限制使用次数" : "默认模型限制使用次数，可添加自有模型API")
                         .font(.tc(12))
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
@@ -708,6 +736,84 @@ private struct ModelCard: View {
         .padding(18)
         .background(RoundedRectangle(cornerRadius: 10).fill(active ? activeGreen.opacity(0.08) : Color.clear))
         .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(active ? activeGreen.opacity(0.75) : Color.secondary.opacity(0.22), lineWidth: active ? 1.5 : 1))
+    }
+}
+
+private struct PresetActivatedView: View {
+    private let activeGreen = Color(hex: 0x32D158)
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundStyle(activeGreen)
+            Text("已激活，不限制使用次数")
+                .font(.tc(14, weight: .semibold))
+            Spacer()
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 8).fill(activeGreen.opacity(0.08)))
+        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(activeGreen.opacity(0.35)))
+    }
+}
+
+private struct PresetActivationView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var code = ""
+    @State private var errorText: String?
+    @FocusState private var isCodeFocused: Bool
+
+    let onSubmit: (String) -> Bool
+    private let activeGreen = Color(hex: 0x32D158)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(spacing: 10) {
+                Image(systemName: "bolt.circle.fill")
+                    .font(.tc(22))
+                    .foregroundStyle(activeGreen)
+                Text("一键激活")
+                    .font(.tc(20, weight: .semibold))
+            }
+
+            Text("激活后，使用预设模型将不再限制使用次数，无限畅饮！")
+                .font(.tc(14))
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading, spacing: 6) {
+                TextField("请输入激活码", text: $code)
+                    .textFieldStyle(.roundedBorder)
+                    .focused($isCodeFocused)
+                    .onSubmit(submit)
+                if let errorText {
+                    Text(errorText)
+                        .font(.tc(12))
+                        .foregroundStyle(.red)
+                }
+            }
+
+            Spacer(minLength: 0)
+            HStack {
+                Spacer()
+                Button("取消") { dismiss() }
+                    .keyboardShortcut(.cancelAction)
+                Button("提交", action: submit)
+                    .buttonStyle(.borderedProminent)
+                    .tint(activeGreen)
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        }
+        .padding(24)
+        .onAppear { isCodeFocused = true }
+    }
+
+    private func submit() {
+        guard !code.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        if onSubmit(code) {
+            dismiss()
+        } else {
+            errorText = "激活码不正确，请重新输入。"
+        }
     }
 }
 

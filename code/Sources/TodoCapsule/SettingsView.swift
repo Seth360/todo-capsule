@@ -306,6 +306,7 @@ struct SettingsView: View {
                     Image(systemName: "trash")
                 }
                 .buttonStyle(.borderless)
+                .help("删除清单")
             }
         }
         .padding(.horizontal, 12)
@@ -360,6 +361,7 @@ struct SettingsView: View {
                 Image(systemName: "trash")
             }
             .buttonStyle(.borderless)
+            .help("删除标签")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 9)
@@ -728,8 +730,11 @@ private struct ModelCard: View {
             }
             if !protected {
                 Button(action: onEdit) { Image(systemName: "square.and.pencil") }
+                    .help("编辑模型")
                 Button(action: onDuplicate) { Image(systemName: "square.on.square") }
+                    .help("复制模型")
                 Button(role: .destructive, action: onDelete) { Image(systemName: "trash") }
+                    .help("删除模型")
             }
         }
         .buttonStyle(.borderless)
@@ -895,7 +900,9 @@ private struct SummaryTemplateCard: View {
                 .tint(activeGreen)
             }
             Button(action: onEdit) { Image(systemName: "square.and.pencil") }
+                .help("编辑总结模板")
             Button(role: .destructive, action: onDelete) { Image(systemName: "trash") }
+                .help("删除总结模板")
         }
         .buttonStyle(.borderless)
         .padding(16)

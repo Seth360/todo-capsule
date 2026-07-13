@@ -7,7 +7,7 @@ Todo Capsule 是一个 macOS 桌面边缘待办胶囊。常驻屏幕边缘可快
 
 下载最新版 DMG：
 
-[todo-capsule-v1.0.6.dmg](https://github.com/Seth360/todo-capsule/releases/download/v1.0.6/todo-capsule-v1.0.6.dmg)
+[todo-capsule-v1.0.7.dmg](https://github.com/Seth360/todo-capsule/releases/download/v1.0.7/todo-capsule-v1.0.7.dmg)
 
 所有版本见 [GitHub Releases](https://github.com/Seth360/todo-capsule/releases)。
 

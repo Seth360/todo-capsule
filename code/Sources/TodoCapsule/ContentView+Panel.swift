@@ -40,6 +40,7 @@ extension ContentView {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .overlay(alignment: .bottomLeading) { smallFooterTools }
     }
 
     private func peekRow(_ todo: Todo) -> some View {
@@ -50,6 +51,7 @@ extension ContentView {
                     .frame(width: 18, height: 18).frame(width: 24, height: 24).contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .help("完成")
             .pointingHandCursor()
             if editing {
                 editTextArea(todo)
@@ -438,7 +440,7 @@ extension ContentView {
         .padding(.bottom, 12)
     }
 
-    private func footerIcon(_ symbol: String, help: String, action: @escaping () -> Void) -> some View {
+    func footerIcon(_ symbol: String, help: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.tc(12, weight: .semibold))
@@ -523,6 +525,7 @@ extension ContentView {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .help("完成")
             .pointingHandCursor()
 
             if editing {

@@ -156,6 +156,7 @@ extension ContentView {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .help("关闭更新提示")
             .pointingHandCursor()
         }
         .padding(.leading, 10)

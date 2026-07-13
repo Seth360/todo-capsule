@@ -162,6 +162,7 @@ struct ContentView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .overlay(alignment: .bottomLeading) { smallFooterTools }
     }
 
     private var header: some View {
@@ -231,6 +232,7 @@ struct ContentView: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .help("切换清单")
         .pointingHandCursor()
     }
 
@@ -468,7 +470,10 @@ struct ContentView: View {
 
     // 保留这个函数名，供面板和一瞥视图共用文本渲染。
     func taggedText(_ raw: String) -> some View {
-        Text(linkedText(raw)).textSelection(.enabled)
+        // 待办行本身支持双击进入行内编辑。开启 Text 的原生文本选择后，
+        // macOS 会优先把双击交给文本选择器，导致行级双击手势无法触发。
+        // 复制仍可通过编辑态文本框和右键菜单完成；链接属性不受影响。
+        Text(linkedText(raw)).textSelection(.disabled)
     }
 
     private func row(_ todo: Todo) -> some View {
@@ -486,6 +491,7 @@ struct ContentView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .help("完成")
             .pointingHandCursor()
 
             if editing {
@@ -597,6 +603,7 @@ struct ContentView: View {
                     tagPillLabel(tag, removable: true, color: tagColor(tag))
                 }
                 .buttonStyle(.plain)
+                .help("移除标签")
                 .pointingHandCursor()
             }
         }
@@ -632,6 +639,11 @@ struct ContentView: View {
 
     @ViewBuilder
     func todoActionMenuItems(_ todo: Todo) -> some View {
+        Button {
+            startEdit(todo)
+        } label: {
+            Label("编辑", systemImage: "pencil")
+        }
         Button {
             withAnimation(anim) { state.togglePin(todo) }
         } label: {
@@ -693,6 +705,19 @@ struct ContentView: View {
     private var shortText: String {
         let t = state.undoItemText
         return t.count > 8 ? String(t.prefix(8)) + "…" : t
+    }
+
+    var smallFooterTools: some View {
+        HStack(spacing: 8) {
+            footerIcon(state.showingArchive ? "arrow.3.trianglepath.circle.fill" : "arrow.3.trianglepath", help: "查看回收箱") {
+                withAnimation(anim) { state.toggleArchiveView() }
+            }
+            footerIcon("folder", help: "打开 Markdown 所在目录") {
+                state.openMarkdownFolder()
+            }
+        }
+        .padding(.leading, 18)
+        .padding(.bottom, 12)
     }
 
     func startEdit(_ todo: Todo) {

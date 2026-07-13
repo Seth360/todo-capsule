@@ -34,11 +34,12 @@ extension NSFont {
 enum CapsuleMetrics {
     static let idleW: CGFloat = 32
     static let idleH: CGFloat = 78
-    static let expandedW: CGFloat = 320      // peek / capture
+    static let expandedW: CGFloat = 400      // peek / capture
     static let panelW: CGFloat = 600         // 大面板更宽、更沉浸
 
     static func expandedH(count: Int) -> CGFloat {
-        min(452, max(240, 104 + CGFloat(count) * 38))
+        // 小窗默认高度 300；条目较多时继续按内容适度增高。
+        min(452, max(300, 104 + CGFloat(count) * 38))
     }
     static func panelH(active: Int, completed: Int) -> CGFloat {
         let base = 158 + CGFloat(active) * 40                       // 顶栏+tab+输入框+活跃行，减少底部留白

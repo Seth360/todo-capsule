@@ -100,6 +100,7 @@ struct ArchiveHistoryView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(txt3)
+                .help("关闭")
                 .pointingHandCursor()
             }
             .contentShape(Rectangle())

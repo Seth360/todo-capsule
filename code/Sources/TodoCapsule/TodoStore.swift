@@ -113,10 +113,6 @@ enum TagStore {
         return decoded
             .map { TodoTag(id: $0.id, name: $0.name, createdAt: $0.createdAt, pinned: $0.pinned) }
             .filter { !$0.name.isEmpty && seen.insert($0.name).inserted }
-            .sorted { lhs, rhs in
-                if lhs.pinned != rhs.pinned { return lhs.pinned }
-                return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
-            }
     }
 
     static func save(_ tags: [TodoTag]) {

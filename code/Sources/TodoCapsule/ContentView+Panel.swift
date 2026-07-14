@@ -279,6 +279,7 @@ extension ContentView {
                 .font(.tc(13))
                 .foregroundStyle(txt2)
                 .lineLimit(1)
+                .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
             tagPills(todo.tags)
             Button {
@@ -531,6 +532,7 @@ extension ContentView {
                 .font(.tc(13)).foregroundStyle(txt3)
                 .strikethrough(true, color: txt3)
                 .lineLimit(1)
+                .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 6).padding(.vertical, 3)

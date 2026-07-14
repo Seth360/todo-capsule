@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import UniformTypeIdentifiers
 
 final class WorkspaceOverlayState: ObservableObject {
     @Published var showingSummaryMenu = false
@@ -500,6 +501,16 @@ extension ContentView {
             }
         }
         .onHover { hoveredWorkspaceListID = $0 ? list.id : (hoveredWorkspaceListID == list.id ? nil : hoveredWorkspaceListID) }
+        .onDrag {
+            NSItemProvider(object: "workspace-list:\(list.id)" as NSString)
+        }
+        .onDrop(of: [UTType.text], delegate: WorkspaceSidebarDropDelegate(
+            targetID: list.id,
+            payloadPrefix: "workspace-list:",
+            onMove: { sourceID, targetID in
+                withAnimation(.snappy(duration: 0.18)) { state.moveList(sourceID, targetID) }
+            }
+        ))
         .pointingHandCursor()
     }
 
@@ -553,6 +564,16 @@ extension ContentView {
             }
         }
         .onHover { hoveredWorkspaceTagID = $0 ? tag.id : (hoveredWorkspaceTagID == tag.id ? nil : hoveredWorkspaceTagID) }
+        .onDrag {
+            NSItemProvider(object: "workspace-tag:\(tag.id)" as NSString)
+        }
+        .onDrop(of: [UTType.text], delegate: WorkspaceSidebarDropDelegate(
+            targetID: tag.id,
+            payloadPrefix: "workspace-tag:",
+            onMove: { sourceID, targetID in
+                withAnimation(.snappy(duration: 0.18)) { state.moveTag(sourceID, targetID) }
+            }
+        ))
         .pointingHandCursor()
     }
 
@@ -576,7 +597,7 @@ extension ContentView {
                 .padding(.horizontal, 28)
             }
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 40) {
                     workspaceTodoGroup(title: "进行中", todos: active, emptyText: "暂无进行中的待办")
                     workspaceTodoGroup(
                         title: "本周已完成",
@@ -826,6 +847,7 @@ extension ContentView {
                         .foregroundStyle(todo.done ? txt3 : txt)
                         .strikethrough(todo.done, color: txt3)
                         .lineLimit(2)
+                        .textSelection(.enabled)
                 }
                 Spacer(minLength: 8)
                 if editing {
@@ -842,14 +864,13 @@ extension ContentView {
         .overlay(alignment: .bottom) { Rectangle().fill(workspaceDivider).frame(height: 1).padding(.leading, 40) }
         .contentShape(Rectangle())
         .onHover { hoveredWorkspaceTodoID = $0 ? todo.id : (hoveredWorkspaceTodoID == todo.id ? nil : hoveredWorkspaceTodoID) }
-        .simultaneousGesture(TapGesture(count: 2).onEnded { startWorkspaceTodoEdit(todo) })
+        .highPriorityGesture(TapGesture(count: 2).onEnded { startWorkspaceTodoEdit(todo) })
         .contextMenu {
             Button(todo.pinned ? "取消置顶" : "置顶") { state.togglePin(todo) }
             Button("加到收藏") { state.moveToCollect(todo) }
             Divider()
             Button("删除", role: .destructive) { state.delete(todo) }
         }
-        .pointingHandCursor()
         .zIndex(editing ? 30 : 0)
     }
 
@@ -1099,6 +1120,7 @@ extension ContentView {
                     .font(.tc(14, weight: .medium))
                     .foregroundStyle(txt)
                     .lineLimit(2)
+                    .textSelection(.enabled)
                 HStack(spacing: 7) {
                     Text(workspaceCompletedTime(todo.completedAt ?? todo.createdAt))
                         .font(.tc(11))
@@ -1172,7 +1194,7 @@ extension ContentView {
                         ForEach(workspaceTrashItems) { item in
                             HStack(spacing: 10) {
                                 Image(systemName: "trash").foregroundStyle(txt3).frame(width: 22)
-                                Text(item.text).font(.tc(14)).foregroundStyle(txt2).lineLimit(2)
+                                Text(item.text).font(.tc(14)).foregroundStyle(txt2).lineLimit(2).textSelection(.enabled)
                                 Spacer()
                                 Button { state.restoreFromArchive(item) } label: {
                                     Text("恢复").font(.tc(12, weight: .semibold)).foregroundStyle(accent)
@@ -1245,6 +1267,7 @@ struct TagEditorSheet: View {
     let initial: String
     let onSave: (String) -> Void
     @State private var value: String
+    @FocusState private var isFocused: Bool
 
     init(initial: String, onSave: @escaping (String) -> Void) {
         self.initial = initial
@@ -1258,6 +1281,8 @@ struct TagEditorSheet: View {
             TextField("标签名称", text: $value)
                 .textFieldStyle(.plain)
                 .font(.tc(14))
+                .focused($isFocused)
+                .onSubmit(saveAndDismiss)
                 .padding(.horizontal, CapsuleDesign.Space.sm)
                 .frame(height: 38)
                 .background(RoundedRectangle(cornerRadius: CapsuleDesign.Radius.field).fill(Color.white.opacity(0.05)))
@@ -1267,7 +1292,7 @@ struct TagEditorSheet: View {
                 Button("取消") { dismiss() }
                     .buttonStyle(CapsuleSecondaryButtonStyle())
                     .keyboardShortcut(.cancelAction)
-                Button("保存") { onSave(value); dismiss() }
+                Button("保存", action: saveAndDismiss)
                     .buttonStyle(CapsulePrimaryButtonStyle())
                     .disabled(value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
@@ -1275,6 +1300,13 @@ struct TagEditorSheet: View {
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .frame(width: 380)
+        .onAppear { isFocused = true }
+    }
+
+    private func saveAndDismiss() {
+        guard !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        onSave(value)
+        dismiss()
     }
 }
 
@@ -1283,6 +1315,7 @@ struct ListEditorSheet: View {
     let initial: String
     let onSave: (String) -> Void
     @State private var value: String
+    @FocusState private var isFocused: Bool
 
     init(initial: String, onSave: @escaping (String) -> Void) {
         self.initial = initial
@@ -1296,6 +1329,8 @@ struct ListEditorSheet: View {
             TextField("清单名称", text: $value)
                 .textFieldStyle(.plain)
                 .font(.tc(14))
+                .focused($isFocused)
+                .onSubmit(saveAndDismiss)
                 .padding(.horizontal, CapsuleDesign.Space.sm)
                 .frame(height: 38)
                 .background(RoundedRectangle(cornerRadius: CapsuleDesign.Radius.field).fill(Color.white.opacity(0.05)))
@@ -1303,7 +1338,7 @@ struct ListEditorSheet: View {
             HStack {
                 Spacer()
                 Button("取消") { dismiss() }.buttonStyle(CapsuleSecondaryButtonStyle())
-                Button("保存") { onSave(value); dismiss() }
+                Button("保存", action: saveAndDismiss)
                     .buttonStyle(CapsulePrimaryButtonStyle())
                     .disabled(value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
@@ -1311,5 +1346,35 @@ struct ListEditorSheet: View {
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .frame(width: 380)
+        .onAppear { isFocused = true }
+    }
+
+    private func saveAndDismiss() {
+        guard !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        onSave(value)
+        dismiss()
+    }
+}
+
+private struct WorkspaceSidebarDropDelegate: DropDelegate {
+    let targetID: String
+    let payloadPrefix: String
+    let onMove: (String, String) -> Void
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        guard let provider = info.itemProviders(for: [UTType.text]).first else { return false }
+        provider.loadObject(ofClass: NSString.self) { object, _ in
+            guard let text = object as? NSString else { return }
+            let payload = text as String
+            guard payload.hasPrefix(payloadPrefix) else { return }
+            let sourceID = String(payload.dropFirst(payloadPrefix.count))
+            guard !sourceID.isEmpty, sourceID != targetID else { return }
+            DispatchQueue.main.async { onMove(sourceID, targetID) }
+        }
+        return true
     }
 }

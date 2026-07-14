@@ -298,21 +298,17 @@ enum ChecklistStore {
               let decoded = try? JSONDecoder().decode([Checklist].self, from: data) else {
             return [.todo]
         }
-        var lists = decoded.filter { !$0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-        lists.sort { lhs, rhs in
-            if lhs.pinned != rhs.pinned { return lhs.pinned }
-            return lhs.createdAt < rhs.createdAt
-        }
-        return lists
+        let lists = decoded.filter { !$0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        return lists.isEmpty ? [.todo] : lists
     }
 
     static func save(_ lists: [Checklist]) {
-        var normalized = lists
-        if !normalized.contains(where: { $0.id == defaultChecklistId }) {
-            normalized.insert(.todo, at: 0)
+        var ordered = lists
+        if !ordered.contains(where: { $0.id == defaultChecklistId }) {
+            ordered.insert(.todo, at: 0)
         }
         do {
-            let data = try JSONEncoder().encode(normalized)
+            let data = try JSONEncoder().encode(ordered)
             try data.write(to: fileURL, options: .atomic)
         } catch {
             NSLog("todo-capsule: 清单保存失败：\(error.localizedDescription)")

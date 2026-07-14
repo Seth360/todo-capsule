@@ -621,11 +621,22 @@ final class AppState: ObservableObject {
 
     func toggleTagPinned(id: String) {
         guard let index = tags.firstIndex(where: { $0.id == id }) else { return }
-        tags[index].pinned.toggle()
-        tags.sort { lhs, rhs in
-            if lhs.pinned != rhs.pinned { return lhs.pinned }
-            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
-        }
+        var tag = tags.remove(at: index)
+        tag.pinned.toggle()
+        let insertionIndex = tags.firstIndex(where: { !$0.pinned }) ?? tags.count
+        tags.insert(tag, at: insertionIndex)
+        persistAll()
+        relayout()
+    }
+
+    func moveTag(_ sourceID: String, _ targetID: String) {
+        guard let sourceIndex = tags.firstIndex(where: { $0.id == sourceID }),
+              let targetIndex = tags.firstIndex(where: { $0.id == targetID }),
+              sourceIndex != targetIndex else { return }
+        tags.move(
+            fromOffsets: IndexSet(integer: sourceIndex),
+            toOffset: targetIndex > sourceIndex ? targetIndex + 1 : targetIndex
+        )
         persistAll()
         relayout()
     }
@@ -656,13 +667,22 @@ final class AppState: ObservableObject {
 
     func toggleListPinned(id: String) {
         guard let index = lists.firstIndex(where: { $0.id == id }) else { return }
-        lists[index].pinned.toggle()
-        lists.sort { lhs, rhs in
-            if lhs.id == defaultChecklistId { return true }
-            if rhs.id == defaultChecklistId { return false }
-            if lhs.pinned != rhs.pinned { return lhs.pinned }
-            return lhs.createdAt < rhs.createdAt
-        }
+        var list = lists.remove(at: index)
+        list.pinned.toggle()
+        let insertionIndex = lists.firstIndex(where: { !$0.pinned }) ?? lists.count
+        lists.insert(list, at: insertionIndex)
+        persistAll()
+        relayout()
+    }
+
+    func moveList(_ sourceID: String, _ targetID: String) {
+        guard let sourceIndex = lists.firstIndex(where: { $0.id == sourceID }),
+              let targetIndex = lists.firstIndex(where: { $0.id == targetID }),
+              sourceIndex != targetIndex else { return }
+        lists.move(
+            fromOffsets: IndexSet(integer: sourceIndex),
+            toOffset: targetIndex > sourceIndex ? targetIndex + 1 : targetIndex
+        )
         persistAll()
         relayout()
     }
@@ -882,13 +902,11 @@ final class AppState: ObservableObject {
     }
 
     private func ensureTags(_ names: [String]) {
-        var byName = Dictionary(uniqueKeysWithValues: tags.map { ($0.name, $0) })
+        var existingNames = Set(tags.map(\.name))
         for name in names.map(TodoTag.normalize) where !name.isEmpty {
-            if byName[name] == nil { byName[name] = TodoTag(name: name) }
-        }
-        tags = byName.values.sorted { lhs, rhs in
-            if lhs.pinned != rhs.pinned { return lhs.pinned }
-            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+            if existingNames.insert(name).inserted {
+                tags.append(TodoTag(name: name))
+            }
         }
     }
 

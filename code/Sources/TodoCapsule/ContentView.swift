@@ -108,6 +108,9 @@ struct ContentView: View {
                     workspaceDraftFocused = false
                 }
                 if m == .idle {
+                    if let id = editingId {
+                        state.updateText(id, editText)
+                    }
                     editingId = nil; editingCollectId = nil; editingWorkspaceTodoID = nil; state.isEditing = false
                 }
             }
@@ -506,10 +509,7 @@ struct ContentView: View {
 
     // 保留这个函数名，供面板和一瞥视图共用文本渲染。
     func taggedText(_ raw: String) -> some View {
-        // 待办行本身支持双击进入行内编辑。开启 Text 的原生文本选择后，
-        // macOS 会优先把双击交给文本选择器，导致行级双击手势无法触发。
-        // 复制仍可通过编辑态文本框和右键菜单完成；链接属性不受影响。
-        Text(linkedText(raw)).textSelection(.disabled)
+        Text(linkedText(raw)).textSelection(.enabled)
     }
 
     private func row(_ todo: Todo) -> some View {
@@ -552,8 +552,9 @@ struct ContentView: View {
         .contentShape(Rectangle())
         .background(RoundedRectangle(cornerRadius: 8).fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001))))
         .onHover { h in hoveredRow = h ? todo.id : (hoveredRow == todo.id ? nil : hoveredRow) }
-        .simultaneousGesture(TapGesture(count: 2).onEnded { startEdit(todo) })
+        .highPriorityGesture(TapGesture(count: 2).onEnded { startEdit(todo) })
         .contextMenu { todoContextMenu(todo) }
+        .zIndex(editing ? 30 : 0)
     }
 
     @ViewBuilder

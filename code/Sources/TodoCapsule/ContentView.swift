@@ -153,6 +153,11 @@ struct ContentView: View {
             maxHeight: state.mode == .panel ? .infinity : nil
         )
         .modifier(CapsuleSurface(radius: radius, fill: state.mode == .idle ? cap : panel))
+        .overlayPreferenceValue(EditTagSuggestionAnchorKey.self) { anchors in
+            GeometryReader { proxy in
+                editTagSuggestionOverlay(anchors: anchors, proxy: proxy)
+            }
+        }
         .animation(anim, value: state.mode)
         .animation(anim, value: state.count)
         .animation(anim, value: state.completed.count)
@@ -538,6 +543,7 @@ struct ContentView: View {
                     .foregroundStyle(txt)
                     .lineLimit(2)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .highPriorityGesture(TapGesture(count: 2).onEnded { startEdit(todo) })
             }
 
             if editing {
@@ -585,19 +591,43 @@ struct ContentView: View {
             .tint(accent)
             .focused($editFocused)
             .onSubmit { commitEdit(todo) }
-            .onChange(of: editFocused) { _, f in if !f { commitEdit(todo) } }
-            .onExitCommand { cancelEdit() }
-            .overlay(alignment: .topLeading) {
-                let suggestions = tagSuggestions(in: editText).filter { !todo.tags.contains($0.name) }
-                if !suggestions.isEmpty {
-                    TagSuggestionDropdown(tags: suggestions, usesLightTheme: usesLightTheme) { tag in
-                        applyEditTagSuggestion(tag.name)
-                    }
-                    .offset(y: 24)
-                    .zIndex(30)
+            .onChange(of: editFocused) { _, focused in
+                guard !focused else { return }
+                // 标签点击与 FocusState 更新可能发生在同一事件周期；延迟保存，
+                // 让下拉选择动作先完成，避免菜单在 mouseDown 时提前消失。
+                DispatchQueue.main.async {
+                    if !editFocused { commitEdit(todo) }
                 }
             }
-        .frame(maxWidth: .infinity, alignment: .leading)
+            .onExitCommand { cancelEdit() }
+            .anchorPreference(key: EditTagSuggestionAnchorKey.self, value: .bounds) {
+                [todo.id: $0]
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func editTagSuggestionOverlay(
+        anchors: [UUID: Anchor<CGRect>],
+        proxy: GeometryProxy
+    ) -> some View {
+        if let id = editingId,
+           let todo = state.active.first(where: { $0.id == id }),
+           let anchor = anchors[id] {
+            let suggestions = tagSuggestions(in: editText).filter { !todo.tags.contains($0.name) }
+            if !suggestions.isEmpty {
+                let rect = proxy[anchor]
+                let menuHeight = CGFloat(min(suggestions.count, 5) * 34 + 8)
+                TagSuggestionDropdown(tags: suggestions, usesLightTheme: usesLightTheme) { tag in
+                    applyEditTagSuggestion(tag.name)
+                }
+                .position(
+                    x: min(max(rect.minX + 110, 118), proxy.size.width - 118),
+                    y: rect.maxY + 4 + menuHeight / 2
+                )
+                .zIndex(100)
+            }
+        }
     }
 
     private func applyEditTagSuggestion(_ name: String) {
@@ -675,6 +705,16 @@ struct ContentView: View {
         } label: {
             Label(todo.pinned ? "取消置顶" : "置顶", systemImage: todo.pinned ? "pin.slash" : "pin")
         }
+        todoTransferMenu(todo)
+        Button(role: .destructive) {
+            withAnimation(anim) { state.deleteImmediately(todo) }
+        } label: {
+            Label("删除", systemImage: "trash")
+        }
+    }
+
+    @ViewBuilder
+    func todoTransferMenu(_ todo: Todo) -> some View {
         Menu {
             let targets = state.lists.filter { $0.id != todo.listId }
             if targets.isEmpty {
@@ -690,11 +730,6 @@ struct ContentView: View {
             }
         } label: {
             Label("转移", systemImage: "folder")
-        }
-        Button(role: .destructive) {
-            withAnimation(anim) { state.deleteImmediately(todo) }
-        } label: {
-            Label("删除", systemImage: "trash")
         }
     }
 
@@ -785,6 +820,14 @@ struct ContentView: View {
     }
 }
 
+private struct EditTagSuggestionAnchorKey: PreferenceKey {
+    static var defaultValue: [UUID: Anchor<CGRect>] = [:]
+
+    static func reduce(value: inout [UUID: Anchor<CGRect>], nextValue: () -> [UUID: Anchor<CGRect>]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    }
+}
+
 struct TagSuggestionDropdown: View {
     let tags: [TodoTag]
     let usesLightTheme: Bool
@@ -819,6 +862,7 @@ struct TagSuggestionDropdown: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .focusable(false)
                 .onHover { hovering in
                     hoveredTagID = hovering ? tag.id : (hoveredTagID == tag.id ? nil : hoveredTagID)
                 }

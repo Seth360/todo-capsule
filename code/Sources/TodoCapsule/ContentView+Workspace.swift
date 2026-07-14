@@ -848,6 +848,7 @@ extension ContentView {
                         .strikethrough(todo.done, color: txt3)
                         .lineLimit(2)
                         .textSelection(.enabled)
+                        .highPriorityGesture(TapGesture(count: 2).onEnded { startWorkspaceTodoEdit(todo) })
                 }
                 Spacer(minLength: 8)
                 if editing {
@@ -868,6 +869,7 @@ extension ContentView {
         .contextMenu {
             Button(todo.pinned ? "取消置顶" : "置顶") { state.togglePin(todo) }
             Button("加到收藏") { state.moveToCollect(todo) }
+            todoTransferMenu(todo)
             Divider()
             Button("删除", role: .destructive) { state.delete(todo) }
         }

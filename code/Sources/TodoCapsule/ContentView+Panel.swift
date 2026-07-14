@@ -58,6 +58,7 @@ extension ContentView {
             } else {
                 taggedText(todo.text).font(.tc(13)).foregroundStyle(txt)
                     .lineLimit(1).frame(maxWidth: .infinity, alignment: .leading)
+                    .highPriorityGesture(TapGesture(count: 2).onEnded { startEdit(todo) })
             }
             if editing {
                 editableTagPills(todo)
@@ -568,6 +569,7 @@ extension ContentView {
                 taggedText(todo.text)
                     .font(.tc(13)).foregroundStyle(txt).lineLimit(2)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .highPriorityGesture(TapGesture(count: 2).onEnded { startEdit(todo) })
             }
 
             if editing {

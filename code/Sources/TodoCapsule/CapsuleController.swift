@@ -10,6 +10,7 @@ final class CapsuleController: NSObject {
     private lazy var updateController = UpdateController(state: state)
     private var panel: CapsulePanel!
     private var statusItem: NSStatusItem!
+    private var statusMenu: NSMenu?
     private var escMonitor: Any?
     private var outsideClickMonitor: Any?
     private var pollTimer: Timer?
@@ -23,6 +24,11 @@ final class CapsuleController: NSObject {
     private var panelDragStart: CGPoint?        // 拖标题挪窗口的起始原点
     private var panelDragStartMouse: NSPoint?   // 起始鼠标绝对位置(避免反馈抖动)
     private var snappedMidY: CGFloat?            // 小窗拖拽吸附后保留当前高度
+    private var floatingScreenID: UInt32?
+    private var largePanelRestoreFrame: NSRect?
+
+    private static let floatingScreenIDKey = "todoCapsule.floatingPosition.screenID.v1"
+    private static let floatingRelativeYKey = "todoCapsule.floatingPosition.relativeY.v1"
 
     // hover 轮询累计
     private var dwell: Double = 0
@@ -33,8 +39,8 @@ final class CapsuleController: NSObject {
     private var hoverCapture = false          // 清零 hover 被动进入的 capture（区别于热键/点击主动进入）
     private var hoverCaptureTouched = false   // 被动 capture 后用户是否已开始写/编辑
 
-    // 药丸/peek/capture 贴右屏缘(0)；大面板可拖动、浮空时需四周阴影余量(32)。须与 ContentView .padding(.trailing) 一致。
-    private func contentInsetRight(_ mode: CapsuleMode) -> CGFloat { mode == .panel ? 32 : 0 }
+    // 投影由透明 NSPanel 绘制在窗口边界外，内容本身无需预留右侧阴影空间。
+    private func contentInsetRight(_ mode: CapsuleMode) -> CGFloat { 0 }
 
     deinit {   // J: 对称卸载（单例当前不触发，但固化路径防未来重建时资源/回调堆积）
         pollTimer?.invalidate()
@@ -44,12 +50,14 @@ final class CapsuleController: NSObject {
     }
 
     func start() {
+        restoreFloatingPosition()
         let hosting = NSHostingView(rootView: ContentView().environmentObject(state))
         hosting.wantsLayer = true
-        hosting.layer?.backgroundColor = NSColor.clear.cgColor   // 真透明，杜绝矩形背景/投影
+        hosting.layer?.isOpaque = false
+        hosting.layer?.backgroundColor = NSColor.clear.cgColor   // 真透明，圆角外不留下窗口矩形底色
         panel = CapsulePanel(contentRect: windowFrame(mode: .idle))
         panel.contentView = hosting
-        panel.hasShadow = false                                  // 再确认：窗口不投矩形阴影，阴影只由 SwiftUI 圆角自绘
+        panel.hasShadow = true
         panel.acceptsMouseMovedEvents = true
         panel.ignoresMouseEvents = true            // idle 穿透
         panel.canBeginWindowDrag = { [weak self] point in self?.canBeginWindowDrag(at: point) ?? false }
@@ -57,10 +65,13 @@ final class CapsuleController: NSObject {
         panel.onHeaderDoubleClick = { [weak self] in self?.expandSmallWindowFromHeaderDoubleClick() }
         panel.onWindowDragChanged = { [weak self] in self?.windowDragChanged() }
         panel.onWindowDragEnded = { [weak self] in self?.endPanelDrag() }
+        panel.onCloseRequested = { [weak self] in self?.state.closePanel() }
+        panel.onMiniaturizeRequested = { [weak self] in self?.state.closePanel() }
         state.onLayout = { [weak self] mode in self?.applyLayout(mode: mode) }
         state.onPanelDragChanged = { [weak self] t in self?.movePanel(translation: t) }
         state.onPanelDragEnded = { [weak self] in self?.endPanelDrag() }
-        state.onRequestKey = { [weak self] in self?.panel.makeKeyAndOrderFront(nil) }
+        state.onRequestKey = { [weak self] in self?.requestPanelKey() }
+        state.onZoomPanel = { [weak self] in self?.toggleLargePanelZoom() }
         state.onPinnedChanged = { [weak self] pinned in self?.applyPinned(pinned) }
         state.onSettingsChanged = { [weak self] in
             self?.applyHotkeys()
@@ -120,6 +131,7 @@ final class CapsuleController: NSObject {
                                                object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in
                 guard let self = self else { return }
+                self.restoreFloatingPosition()
                 self.applyLayout(mode: self.state.mode)
             }
         }
@@ -289,25 +301,63 @@ final class CapsuleController: NSObject {
     private func windowFrame(mode: CapsuleMode) -> NSRect {
         let s = CapsuleMetrics.size(mode: mode, active: state.active.count, completed: state.completed.count,
                                     collect: state.collects.count, tab: state.panelTab)
-        let leftPad: CGFloat = 44                    // 左阴影呼吸(软阴影完整在窗内)
-        let ww = s.width + leftPad + contentInsetRight(mode)  // 窗宽随内容（面板更宽，阴影不被裁）
-        let wh = s.height + 80                        // 上下各 40 阴影呼吸（竖直远离屏缘不会被裁）
-        // 大面板已打开后的尺寸变化：锚定当前右上角(保留用户拖拽后的位置)，只改大小，不回弹右缘
+        let leftPad: CGFloat = mode == .panel ? 0 : 44
+        let ww = mode == .panel ? CapsuleMetrics.panelW : s.width + leftPad + contentInsetRight(mode)
+        let wh = mode == .panel ? CapsuleMetrics.panelHValue : s.height + 80
+        // 大面板已打开后的内容变化：保留用户拖拽后的窗口位置和尺寸，不回弹到默认 1000×800。
         if mode == .panel, lastMode == .panel, let cur = panel?.frame {
-            let anchored = NSRect(x: cur.maxX - ww, y: cur.maxY - wh, width: ww, height: wh)
-            // F: 锚定结果与所有在线屏都无交集（外接屏被拔/分辨率变化）→ 回退默认右缘布局，避免面板遗留屏外找不回
-            if NSScreen.screens.contains(where: { $0.visibleFrame.intersects(anchored) }) {
-                return anchored
+            // F: 当前窗口仍与在线屏相交就原样保留；外接屏被拔时才回退默认布局。
+            if NSScreen.screens.contains(where: { $0.visibleFrame.intersects(cur) }) {
+                return cur
             }
-            let rvf = (panel?.screen ?? NSScreen.main)?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+            let rvf = (panel?.screen ?? screenForPointer())?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
             return NSRect(x: rvf.maxX - ww, y: rvf.midY - wh / 2, width: ww, height: wh)
         }
-        let screen = panel?.screen ?? NSScreen.main
+        let screen = screenForFloatingPosition() ?? panel?.screen ?? screenForPointer()
         let vf = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
-        // 窗口右缘贴屏内右缘；idle/peek/capture inset 0=贴边(右阴影落屏外不可见、无悬空棱角)，大面板 inset 32 留浮空阴影余量
+        // 小窗贴屏幕左右边缘；投影由透明 NSPanel 在窗口边界外绘制。
         let x = state.settings.position == .left ? vf.minX : vf.maxX - ww
         let midY = clampedMidY(snappedMidY ?? vf.midY, height: wh, visibleFrame: vf)
         return NSRect(x: x, y: midY - wh / 2, width: ww, height: wh)
+    }
+
+    private func screenForPointer() -> NSScreen? {
+        let pointer = NSEvent.mouseLocation
+        return NSScreen.screens.first(where: { $0.visibleFrame.contains(pointer) })
+            ?? NSScreen.screens.max(by: { $0.visibleFrame.width * $0.visibleFrame.height < $1.visibleFrame.width * $1.visibleFrame.height })
+            ?? NSScreen.main
+    }
+
+    private func screenForFloatingPosition() -> NSScreen? {
+        guard let floatingScreenID else { return nil }
+        return NSScreen.screens.first { displayID(for: $0) == floatingScreenID }
+    }
+
+    private func displayID(for screen: NSScreen) -> UInt32? {
+        (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+    }
+
+    private func restoreFloatingPosition() {
+        let defaults = UserDefaults.standard
+        guard let relativeY = (defaults.object(forKey: Self.floatingRelativeYKey) as? NSNumber)?.doubleValue else { return }
+        let storedScreenID = (defaults.object(forKey: Self.floatingScreenIDKey) as? NSNumber)?.uint32Value
+        let screen = NSScreen.screens.first { displayID(for: $0) == storedScreenID } ?? screenForPointer()
+        guard let screen else { return }
+        floatingScreenID = displayID(for: screen)
+        let fraction = min(max(relativeY, 0), 1)
+        snappedMidY = screen.visibleFrame.minY + CGFloat(fraction) * screen.visibleFrame.height
+    }
+
+    private func persistFloatingPosition(on screen: NSScreen) {
+        let vf = screen.visibleFrame
+        guard vf.height > 0 else { return }
+        let fraction = min(max((panel.frame.midY - vf.minY) / vf.height, 0), 1)
+        let defaults = UserDefaults.standard
+        defaults.set(Double(fraction), forKey: Self.floatingRelativeYKey)
+        if let id = displayID(for: screen) {
+            floatingScreenID = id
+            defaults.set(Int(id), forKey: Self.floatingScreenIDKey)
+        }
     }
 
     /// 拖标题栏挪整个面板。用**绝对鼠标位置**算位移(NSEvent.mouseLocation)，
@@ -353,6 +403,19 @@ final class CapsuleController: NSObject {
         if state.mode == .panel { lastMode = .panel }
     }
 
+    private func toggleLargePanelZoom() {
+        guard state.mode == .panel else { return }
+        let visibleFrame = (panel.screen ?? NSScreen.main)?.visibleFrame
+            ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
+        if let restore = largePanelRestoreFrame {
+            panel.setFrame(restore, display: true, animate: true)
+            largePanelRestoreFrame = nil
+        } else {
+            largePanelRestoreFrame = panel.frame
+            panel.setFrame(visibleFrame, display: true, animate: true)
+        }
+    }
+
     private func endPanelDrag() {
         defer {
             panelDragStart = nil
@@ -363,6 +426,7 @@ final class CapsuleController: NSObject {
         let vf = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1440, height: 900)
         let side: CapsulePosition = panel.frame.midX < vf.midX ? .left : .right
         snappedMidY = clampedMidY(panel.frame.midY, height: panel.frame.height, visibleFrame: vf)
+        if let screen { persistFloatingPosition(on: screen) }
         guard state.settings.position != side else {
             applyLayout(mode: state.mode)
             return
@@ -383,23 +447,56 @@ final class CapsuleController: NSObject {
 
     private func applyLayout(mode: CapsuleMode) {
         if mode != .capture { hoverCapture = false }   // 离开 capture 即清被动标记
+        let enteringLargeWorkspace = mode == .panel && lastMode != .panel
+        panel.configurePresentation(largeWorkspace: mode == .panel)
+        if mode == .panel {
+            panel.minSize = CapsuleMetrics.panelMinSize
+            panel.maxSize = CapsuleMetrics.panelMaxSize
+            panel.contentMinSize = CapsuleMetrics.panelMinSize
+            panel.contentMaxSize = CapsuleMetrics.panelMaxSize
+        }
         panel.ignoresMouseEvents = (mode == .idle)
         let target = windowFrame(mode: mode)
         shrinkWork?.cancel()
         if target.height < panel.frame.height - 1 {   // 变矮(收起/删条) → 延迟收，等 SwiftUI spring 收完，避免裁剪
-            let w = DispatchWorkItem { [weak self] in self?.panel.setFrame(target, display: true) }
+            let w = DispatchWorkItem { [weak self] in
+                self?.panel.setFrame(target, display: true)
+                self?.panel.invalidateShadow()
+            }
             shrinkWork = w
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.42, execute: w)
         } else {
             panel.setFrame(target, display: true)      // 变高/同高 → 即时，内容随后 spring 充满
         }
+        DispatchQueue.main.async { [weak panel] in panel?.invalidateShadow() }
+        if enteringLargeWorkspace {
+            NSApp.activate(ignoringOtherApps: true)
+            panel.makeKeyAndOrderFront(nil)
+        }
         lastMode = mode
+    }
+
+    private func requestPanelKey() {
+        if state.mode == .panel {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        panel.makeKeyAndOrderFront(nil)
     }
 
     // MARK: 菜单栏
     private func buildStatusItem() {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "checklist", accessibilityDescription: "todo-capsule")
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        guard let button = statusItem.button else { return }
+        let icon = NSImage(systemSymbolName: "checklist", accessibilityDescription: "打开 Todo Capsule")
+        icon?.isTemplate = true
+        button.image = icon
+        button.imagePosition = .imageOnly
+        button.toolTip = "Todo Capsule"
+        button.target = self
+        button.action = #selector(statusItemClicked(_:))
+        button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        // 万一系统符号加载失败，保留可见的文字入口而不是留下空白状态项。
+        if icon == nil { button.title = "✓" }
         rebuildMenu()
     }
     private func rebuildMenu() {
@@ -422,7 +519,7 @@ final class CapsuleController: NSObject {
         menu.addItem(login)
         menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "退出 todo-capsule", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
-        statusItem.menu = menu
+        statusMenu = menu
     }
     private func applyHotkey() { applyHotkeys() }
     private func applyHotkeys() {
@@ -448,10 +545,30 @@ final class CapsuleController: NSObject {
             GlobalHotkey.shared.unregister(id: 2)
         }
     }
+    @objc private func statusItemClicked(_ sender: Any?) {
+        if NSApp.currentEvent?.type == .rightMouseUp,
+           let statusMenu,
+           let button = statusItem.button {
+            statusMenu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.height), in: button)
+            return
+        }
+        openLargePanel()
+    }
+
+    private func openLargePanel() {
+        state.enterPanel()
+        NSApp.activate(ignoringOtherApps: true)
+        panel.makeKeyAndOrderFront(nil)
+    }
+
+    func openLargePanelFromDock() {
+        openLargePanel()
+    }
+
     @objc private func captureAction() { state.enterCapture(); panel.makeKeyAndOrderFront(nil) }
-    @objc private func openPanelAction() { state.enterPanel(); panel.makeKeyAndOrderFront(nil) }
-    @objc private func settingsAction() { openSettingsWindow() }
-    @objc private func aboutAction() {
+    @objc private func openPanelAction() { openLargePanel() }
+    @objc func settingsAction() { openSettingsWindow() }
+    @objc func aboutAction() {
         NSApp.orderFrontStandardAboutPanel(options: [
             .applicationName: "Todo Capsule",
             .applicationVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
@@ -469,6 +586,11 @@ final class CapsuleController: NSObject {
     }
 
     private func applyPinned(_ pinned: Bool) {
+        guard state.mode != .panel else {
+            panel.level = .normal
+            panel.isFloatingPanel = false
+            return
+        }
         panel.level = pinned ? .statusBar : .floating
         panel.isFloatingPanel = true
         if pinned {

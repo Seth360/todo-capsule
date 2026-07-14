@@ -3,20 +3,21 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>1.0.7</title>
-            <pubDate>Mon, 13 Jul 2026 13:11:22 +0800</pubDate>
+            <title>1.0.8</title>
+            <pubDate>Tue, 14 Jul 2026 14:18:06 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>19</sparkle:version>
-            <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
+            <sparkle:version>20</sparkle:version>
+            <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.7
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.8
 
-- 小窗默认尺寸调整为 400×300。
-- 小窗新增回收箱和存放目录入口，并为图标操作补充悬停提示。
-- 待办支持右键编辑，双击文字可进入行内编辑。
+- 新增可缩放的双栏工作区，集中管理清单、标签、收藏、智能总结、已完成和垃圾桶。
+- 清单与标签支持置顶、编辑和删除，标签支持合并；已完成待办支持搜索、恢复和移入垃圾桶。
+- 优化小窗与大窗交互：记忆悬浮入口位置、完善窗口投影与系统应用菜单，并统一头部图标颜色。
+- 修复待办行内编辑失焦后内容丢失；编辑为空时自动清除该待办。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.7/todo-capsule-v1.0.7.dmg" length="3022831" type="application/octet-stream" sparkle:edSignature="mMibuIS5xqESH5wepO22QOMUgi3J9WMGfVFgm+zVaEuZZ14AsC0RAXXiEJ+xrgNkr7jMngVmXR4jEmss741iCA=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.8/todo-capsule-v1.0.8.dmg" length="3481885" type="application/octet-stream" sparkle:edSignature="XvP246DQV4zintUghxlDdrc4NJQONh/7epl+5FngNdeFOeXLeTlDiaoL3sSdkdnunwMbFQUzYAYSUG1+nSwoCA=="/>
         </item>
     </channel>
 </rss>

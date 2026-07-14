@@ -9,6 +9,7 @@ struct Todo: Identifiable, Codable, Equatable {
     var tags: [String] = []
     var done: Bool = false
     var pinned: Bool = false
+    var trashed: Bool = false
     var completedAt: Date? = nil
 
     init(text: String, listId: String = defaultChecklistId, tags: [String] = []) {
@@ -17,7 +18,7 @@ struct Todo: Identifiable, Codable, Equatable {
         self.tags = tags
     }
 
-    enum CodingKeys: String, CodingKey { case id, text, createdAt, listId, tags, done, pinned, completedAt }
+    enum CodingKeys: String, CodingKey { case id, text, createdAt, listId, tags, done, pinned, trashed, completedAt }
     // 宽松解码：缺/坏字段一律给默认（含 text），单条坏数据不致整盘解码失败。
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -28,6 +29,7 @@ struct Todo: Identifiable, Codable, Equatable {
         tags = (try? c.decode([String].self, forKey: .tags)) ?? []
         done = (try? c.decode(Bool.self, forKey: .done)) ?? false
         pinned = (try? c.decode(Bool.self, forKey: .pinned)) ?? false
+        trashed = (try? c.decode(Bool.self, forKey: .trashed)) ?? false
         completedAt = try? c.decode(Date.self, forKey: .completedAt)
     }
 }
@@ -36,12 +38,14 @@ struct TodoTag: Identifiable, Codable, Equatable {
     var id: String
     var name: String
     var createdAt: Date
+    var pinned: Bool = false
 
-    init(id: String = UUID().uuidString, name: String, createdAt: Date = Date()) {
+    init(id: String = UUID().uuidString, name: String, createdAt: Date = Date(), pinned: Bool = false) {
         let normalized = TodoTag.normalize(name)
         self.id = id
         self.name = normalized
         self.createdAt = createdAt
+        self.pinned = pinned
     }
 
     static func normalize(_ raw: String) -> String {
@@ -105,12 +109,19 @@ enum TagStore {
               let decoded = try? JSONDecoder().decode([TodoTag].self, from: data) else {
             return []
         }
-        return normalized(decoded.map(\.name))
+        var seen = Set<String>()
+        return decoded
+            .map { TodoTag(id: $0.id, name: $0.name, createdAt: $0.createdAt, pinned: $0.pinned) }
+            .filter { !$0.name.isEmpty && seen.insert($0.name).inserted }
+            .sorted { lhs, rhs in
+                if lhs.pinned != rhs.pinned { return lhs.pinned }
+                return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+            }
     }
 
     static func save(_ tags: [TodoTag]) {
         do {
-            let data = try JSONEncoder().encode(normalized(tags.map(\.name)))
+            let data = try JSONEncoder().encode(tags)
             try data.write(to: fileURL, options: .atomic)
         } catch {
             NSLog("todo-capsule: 标签保存失败：\(error.localizedDescription)")
@@ -176,7 +187,7 @@ enum MarkdownExporter {
             lines.append("")
         }
 
-        let completed = (todos.filter { $0.done } + completedArchive)
+        let completed = (todos.filter { $0.done && !$0.trashed } + completedArchive.filter { !$0.trashed })
             .sorted { ($0.completedAt ?? $0.createdAt) > ($1.completedAt ?? $1.createdAt) }
         lines.append("## 已完成")
         if completed.isEmpty {
@@ -186,6 +197,17 @@ enum MarkdownExporter {
                 let listName = lists.first(where: { $0.id == item.listId })?.name ?? "待办"
                 let date = df.string(from: item.completedAt ?? item.createdAt)
                 lines.append("- [x] \(escape(item.text))\(tagSuffix(item.tags)) `\(listName)` · \(date)")
+            }
+        }
+        lines.append("")
+
+        lines.append("## 垃圾桶")
+        let trashed = completedArchive.filter(\.trashed)
+        if trashed.isEmpty {
+            lines.append("- （空）")
+        } else {
+            for item in trashed {
+                lines.append("- \(escape(item.text))")
             }
         }
         lines.append("")

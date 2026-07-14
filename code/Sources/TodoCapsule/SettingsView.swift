@@ -3,11 +3,20 @@ import AppKit
 
 struct SettingsView: View {
     @EnvironmentObject var state: AppState
-    @State private var section: SettingsSection = .general
+    private let embeddedInWorkspace: Bool
+    @State private var section: SettingsSection
     @State private var editingModel: ModelConfig?
     @State private var editingSummary: SummaryTemplateConfig?
     @State private var recordingHotkey: HotkeyFieldKind?
     @State private var showingPresetActivation = false
+    @State private var pendingListDeletion: Checklist?
+    @State private var pendingTagDeletion: TodoTag?
+    @State private var showingNewListEditor = false
+
+    init(initialSection: SettingsSection = .general, embeddedInWorkspace: Bool = false) {
+        self.embeddedInWorkspace = embeddedInWorkspace
+        _section = State(initialValue: initialSection)
+    }
 
     private var preferredScheme: ColorScheme? {
         switch state.settings.theme {
@@ -20,12 +29,13 @@ struct SettingsView: View {
     var body: some View {
         HStack(spacing: 0) {
             sidebar
+                .fixedSize(horizontal: true, vertical: false)
             Divider()
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     HStack {
                         Text(section.title)
-                            .font(.tc(24, weight: .semibold))
+                            .font(.tc(16, weight: .medium))
                         Spacer()
                         headerAction
                     }
@@ -34,6 +44,8 @@ struct SettingsView: View {
                 .padding(24)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .layoutPriority(1)
             .overlay(alignment: .bottomTrailing) {
                 if section == .model {
                     Button {
@@ -42,15 +54,16 @@ struct SettingsView: View {
                         Label(state.isPresetActivated ? "已激活" : "一键激活", systemImage: state.isPresetActivated ? "checkmark.seal.fill" : "bolt.fill")
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(Color(hex: 0x32D158))
+                    .tint(CapsuleDesign.primary)
                     .controlSize(.large)
                     .disabled(state.isPresetActivated)
                     .padding(24)
                 }
             }
         }
-        .frame(minWidth: 760, minHeight: 520)
+        .frame(minWidth: embeddedInWorkspace ? 0 : 760, minHeight: 520)
         .preferredColorScheme(preferredScheme)
+        .tint(CapsuleDesign.primary)
         .sheet(item: $editingModel) { model in
             ModelEditorView(initial: model, onSave: saveModel)
                 .frame(width: 520, height: 520)
@@ -81,23 +94,42 @@ struct SettingsView: View {
             }
             .frame(width: 430, height: 250)
         }
+        .sheet(isPresented: $showingNewListEditor) {
+            ListEditorSheet(initial: "") { name in
+                state.addList(named: name)
+            }
+            .preferredColorScheme(preferredScheme)
+        }
+        .confirmationDialog(
+            "删除清单“\(pendingListDeletion?.name ?? "")”？",
+            isPresented: Binding(get: { pendingListDeletion != nil }, set: { if !$0 { pendingListDeletion = nil } })
+        ) {
+            Button("删除", role: .destructive) {
+                if let pendingListDeletion { state.deleteList(id: pendingListDeletion.id) }
+                pendingListDeletion = nil
+            }
+            Button("取消", role: .cancel) { pendingListDeletion = nil }
+        } message: {
+            Text("删除后，该清单和其中的待办将无法恢复。")
+        }
+        .confirmationDialog(
+            "删除标签“\(pendingTagDeletion?.name ?? "")”？",
+            isPresented: Binding(get: { pendingTagDeletion != nil }, set: { if !$0 { pendingTagDeletion = nil } })
+        ) {
+            Button("删除", role: .destructive) {
+                if let pendingTagDeletion { state.deleteTag(id: pendingTagDeletion.id) }
+                pendingTagDeletion = nil
+            }
+            Button("取消", role: .cancel) { pendingTagDeletion = nil }
+        } message: {
+            Text("删除标签会移除所有待办中的该标签。")
+        }
         .onAppear {
             if section == .model { state.refreshPresetQuota() }
         }
         .onChange(of: section) { _, newSection in
             if newSection == .model { state.refreshPresetQuota() }
         }
-    }
-
-    private var versionLabel: some View {
-        Text(appVersionText)
-            .font(.tc(11, weight: .medium))
-            .foregroundStyle(.secondary.opacity(0.72))
-            .lineLimit(1)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .allowsHitTesting(false)
     }
 
     private var appVersionText: String {
@@ -130,54 +162,10 @@ struct SettingsView: View {
                 .buttonStyle(.plain)
             }
             Spacer()
-            if state.shouldShowSettingsUpdateNotice {
-                settingsUpdateNotice
-            } else {
-                versionLabel
-            }
         }
         .padding(12)
         .frame(width: 180)
         .background(Color(nsColor: .windowBackgroundColor).opacity(0.92))
-    }
-
-    private var settingsUpdateNotice: some View {
-        Button {
-            state.openUpdateDialog()
-        } label: {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 8) {
-                    Image(systemName: "arrow.down.circle.fill")
-                        .foregroundStyle(Color(hex: 0x32D158))
-                    Text("发现新版本")
-                        .font(.tc(14, weight: .semibold))
-                    Spacer(minLength: 0)
-                }
-                if let version = settingsUpdateVersion {
-                    Text(version)
-                        .font(.tc(11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 11)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(Color(hex: 0x32D158).opacity(0.13))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .strokeBorder(Color(hex: 0x32D158).opacity(0.36), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var settingsUpdateVersion: String? {
-        guard let info = state.updateInfo, !info.version.isEmpty else { return nil }
-        return "版本 \(info.version)"
     }
 
     @ViewBuilder
@@ -214,23 +202,29 @@ struct SettingsView: View {
     }
 
     private var generalSection: some View {
-        Form {
+        settingsPlainRows {
             Toggle("开机自动启动", isOn: $state.settings.launchAtLogin)
-            Picker("语言", selection: $state.settings.language) {
-                ForEach(AppLanguage.allCases) { Text($0.title).tag($0) }
+            settingsPickerRow("语言", selection: $state.settings.language, options: AppLanguage.allCases, title: { $0.title })
+            settingsPickerRow("主题", selection: $state.settings.theme, options: AppTheme.allCases, title: { $0.title })
+            HStack(spacing: 8) {
+                Text("当前版本：")
+                Text(appVersionText.replacingOccurrences(of: "版本 ", with: ""))
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("检查更新") { state.checkForUpdates() }
+                    .buttonStyle(CapsuleSecondaryButtonStyle())
+                    .pointingHandCursor()
             }
-            Picker("主题", selection: $state.settings.theme) {
-                ForEach(AppTheme.allCases) { Text($0.title).tag($0) }
-            }
+            .padding(.vertical, 4)
             Text("小窗可直接拖动，松开后会自动吸附到屏幕左侧或右侧。")
                 .font(.tc(12))
                 .foregroundStyle(.secondary)
+                .padding(.vertical, 4)
         }
-        .formStyle(.grouped)
     }
 
     private var hotkeySection: some View {
-        Form {
+        settingsPlainRows {
             HotkeyPickerRow(
                 title: "唤起方式",
                 selection: Binding(
@@ -253,14 +247,11 @@ struct SettingsView: View {
                 .font(.tc(12))
                 .foregroundStyle(.secondary)
         }
-        .formStyle(.grouped)
     }
 
     private var listsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            listRow(name: "待办", icon: "list.bullet", isEditable: false, binding: .constant("待办"), onDelete: nil)
-            listRow(name: "收藏", icon: "bookmark", isEditable: false, binding: .constant("收藏"), onDelete: nil)
-            ForEach(state.lists.filter { $0.id != defaultChecklistId }) { list in
+            ForEach(state.lists) { list in
                 listRow(
                     name: list.name,
                     icon: "list.bullet",
@@ -269,11 +260,17 @@ struct SettingsView: View {
                         get: { list.name },
                         set: { state.renameList(id: list.id, to: $0) }
                     ),
-                    onDelete: { state.deleteList(id: list.id) }
+                    onDelete: {
+                        if state.listHasTodos(id: list.id) {
+                            pendingListDeletion = list
+                        } else {
+                            state.deleteList(id: list.id)
+                        }
+                    }
                 )
             }
             Button {
-                state.addList(named: "新清单")
+                showingNewListEditor = true
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "plus").frame(width: 18)
@@ -295,7 +292,10 @@ struct SettingsView: View {
             Image(systemName: icon).foregroundStyle(.secondary).frame(width: 18)
             if isEditable {
                 TextField("清单名称", text: binding)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(.plain)
+                    .padding(.horizontal, 8)
+                    .frame(height: 30)
+                    .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(Color.secondary.opacity(0.22)))
             } else {
                 Text(name)
                     .font(.tc(14, weight: .medium))
@@ -329,7 +329,7 @@ struct SettingsView: View {
                         get: { tag.name },
                         set: { state.renameTag(id: tag.id, to: $0) }
                     ),
-                    onDelete: { state.deleteTag(id: tag.id) }
+                    onDelete: { pendingTagDeletion = tag }
                 )
             }
             Button {
@@ -356,7 +356,10 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 18)
             TextField("标签名称", text: binding)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(.plain)
+                .padding(.horizontal, 8)
+                .frame(height: 30)
+                .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(Color.secondary.opacity(0.22)))
             Button(role: .destructive, action: onDelete) {
                 Image(systemName: "trash")
             }
@@ -410,7 +413,7 @@ struct SettingsView: View {
 
     private var exportSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Form {
+            settingsPlainRows {
                 HStack {
                     Text("Markdown 文件")
                     Spacer()
@@ -425,9 +428,35 @@ struct SettingsView: View {
                 }
                 Toggle("同步到 Mac 备忘录", isOn: $state.settings.syncAppleNotes)
             }
-            .formStyle(.grouped)
             Button("立即导出") { state.persistAll() }
         }
+    }
+
+    private func settingsPlainRows<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 14, content: content)
+            .frame(maxWidth: 620, alignment: .leading)
+    }
+
+    private func settingsPickerRow<T: Hashable & Identifiable>(
+        _ label: String,
+        selection: Binding<T>,
+        options: [T],
+        title: @escaping (T) -> String
+    ) -> some View {
+        HStack {
+            Text(label)
+            Spacer()
+            Menu {
+                ForEach(options) { item in
+                    Button(title(item)) { selection.wrappedValue = item }
+                }
+            } label: {
+                CapsuleDropdownLabel(title: title(selection.wrappedValue), minWidth: 132)
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+        }
+        .padding(.vertical, 4)
     }
 
     private func enableModel(_ id: String) {
@@ -560,20 +589,7 @@ private struct HotkeyPickerRow: View {
                     Label("自定义快捷键…", systemImage: "keyboard.badge.ellipsis")
                 }
             } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "keyboard")
-                        .font(.tc(12, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                    Text(selection.name)
-                        .font(.tc(13, weight: .semibold))
-                        .monospaced()
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.tc(10, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.horizontal, 9)
-                .padding(.vertical, 5)
-                .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Color.secondary.opacity(0.10)))
+                CapsuleDropdownLabel(title: selection.name, minWidth: 132)
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
@@ -606,7 +622,7 @@ private struct HotkeyRecorderSheet: View {
                 VStack(spacing: 8) {
                     Image(systemName: "keyboard")
                         .font(.tc(22, weight: .semibold))
-                        .foregroundStyle(Color(hex: 0x32D158))
+                        .foregroundStyle(CapsuleDesign.primary)
                     Text(captured?.name ?? "按下新的快捷键")
                         .font(.tc(18, weight: .semibold))
                         .monospaced()
@@ -643,6 +659,7 @@ private struct HotkeyRecorderSheet: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(CapsuleDesign.primary)
                 .disabled(captured == nil)
             }
         }
@@ -688,7 +705,7 @@ private struct ModelCard: View {
     let onEdit: () -> Void
     let onDuplicate: () -> Void
     let onDelete: () -> Void
-    private let activeGreen = Color(hex: 0x32D158)
+    private let activeGreen = CapsuleDesign.primary
 
     var body: some View {
         let protected = model.isAppPreset
@@ -745,7 +762,7 @@ private struct ModelCard: View {
 }
 
 private struct PresetActivatedView: View {
-    private let activeGreen = Color(hex: 0x32D158)
+    private let activeGreen = CapsuleDesign.primary
 
     var body: some View {
         HStack(spacing: 10) {
@@ -768,7 +785,7 @@ private struct PresetActivationView: View {
     @FocusState private var isCodeFocused: Bool
 
     let onSubmit: (String) -> Bool
-    private let activeGreen = Color(hex: 0x32D158)
+    private let activeGreen = CapsuleDesign.primary
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -786,7 +803,10 @@ private struct PresetActivationView: View {
 
             VStack(alignment: .leading, spacing: 6) {
                 TextField("请输入激活码", text: $code)
-                    .textFieldStyle(.roundedBorder)
+                    .textFieldStyle(.plain)
+                    .padding(.horizontal, 10)
+                    .frame(height: 34)
+                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.secondary.opacity(0.28)))
                     .focused($isCodeFocused)
                     .onSubmit(submit)
                 if let errorText {
@@ -825,7 +845,7 @@ private struct PresetActivationView: View {
 private struct PresetQuotaView: View {
     let quota: PresetQuota?
     let status: String?
-    private let activeGreen = Color(hex: 0x32D158)
+    private let activeGreen = CapsuleDesign.primary
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -873,7 +893,7 @@ private struct SummaryTemplateCard: View {
     let onEnable: () -> Void
     let onEdit: () -> Void
     let onDelete: () -> Void
-    private let activeGreen = Color(hex: 0x32D158)
+    private let activeGreen = CapsuleDesign.primary
 
     var body: some View {
         HStack(spacing: 14) {
@@ -934,11 +954,22 @@ private struct ModelEditorView: View {
             Text("模型配置").font(.tc(22, weight: .semibold))
             Form {
                 TextField("标题", text: $model.title)
-                Picker("常用模型", selection: presetSelection) {
-                    Text("请选择").tag("")
-                    ForEach(ModelPreset.all) { preset in
-                        Text(preset.title).tag(preset.id)
+                HStack {
+                    Text("常用模型")
+                    Spacer()
+                    Menu {
+                        Button("请选择") { presetSelection.wrappedValue = "" }
+                        ForEach(ModelPreset.all) { preset in
+                            Button(preset.title) { presetSelection.wrappedValue = preset.id }
+                        }
+                    } label: {
+                        CapsuleDropdownLabel(
+                            title: ModelPreset.all.first(where: { $0.id == selectedPresetId })?.title ?? "请选择",
+                            minWidth: 168
+                        )
                     }
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.hidden)
                 }
                 TextField("Base URL", text: $model.baseURL)
                 SecureField("API Key", text: $model.apiKey)
@@ -951,10 +982,18 @@ private struct ModelEditorView: View {
                     .disabled(isFetchingModels || model.baseURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
                 if !modelNameOptions.isEmpty {
-                    Picker("模型", selection: modelNameSelection) {
-                        ForEach(modelNameOptions, id: \.self) { name in
-                            Text(name).tag(name)
+                    HStack {
+                        Text("模型")
+                        Spacer()
+                        Menu {
+                            ForEach(modelNameOptions, id: \.self) { name in
+                                Button(name) { modelNameSelection.wrappedValue = name }
+                            }
+                        } label: {
+                            CapsuleDropdownLabel(title: modelNameSelection.wrappedValue, minWidth: 168)
                         }
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.hidden)
                     }
                 }
                 if let modelFetchStatus {
@@ -978,6 +1017,7 @@ private struct ModelEditorView: View {
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(CapsuleDesign.primary)
             }
         }
         .padding(22)
@@ -1167,8 +1207,18 @@ private struct SummaryTemplateEditorView: View {
             Text("总结模板").font(.tc(22, weight: .semibold))
             Form {
                 TextField("标题", text: $template.title)
-                Picker("总结周期", selection: $template.period) {
-                    ForEach(SummaryPeriod.allCases) { Text($0.title).tag($0) }
+                HStack {
+                    Text("总结周期")
+                    Spacer()
+                    Menu {
+                        ForEach(SummaryPeriod.allCases) { period in
+                            Button(period.title) { template.period = period }
+                        }
+                    } label: {
+                        CapsuleDropdownLabel(title: template.period.title, minWidth: 132)
+                    }
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.hidden)
                 }
                 Toggle("启用此模板", isOn: $template.isEnabled)
                 Section("总结范围") {
@@ -1202,6 +1252,7 @@ private struct SummaryTemplateEditorView: View {
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(CapsuleDesign.primary)
             }
         }
         .padding(22)
@@ -1235,7 +1286,7 @@ private extension Array where Element == String {
     }
 }
 
-private enum SettingsSection: String, CaseIterable, Identifiable {
+enum SettingsSection: String, CaseIterable, Identifiable {
     case general, hotkeys, lists, tags, model, summary, export
     var id: String { rawValue }
     var title: String {

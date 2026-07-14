@@ -29,7 +29,7 @@ struct UpdateDialogView: View {
             } else if state.updateInfo?.phase == .readyToRestart {
                 Text("新版已就绪，重启后生效。")
                     .font(.tc(14, weight: .medium))
-                    .foregroundStyle(Color(hex: 0x32D158))
+                    .foregroundStyle(CapsuleDesign.primary)
             } else if state.updateInfo?.phase == .checking {
                 ProgressView()
                     .controlSize(.small)
@@ -86,6 +86,7 @@ struct UpdateDialogView: View {
         }
         .padding(22)
         .frame(width: 480, height: 360)
+        .tint(CapsuleDesign.primary)
     }
 
     private var title: String {
@@ -114,7 +115,7 @@ struct UpdateDialogView: View {
     }
 
     private var iconColor: Color {
-        state.updateInfo?.phase == .error ? Color.orange : Color(hex: 0x32D158)
+        state.updateInfo?.phase == .error ? Color.orange : CapsuleDesign.primary
     }
 
     private var isBusy: Bool {

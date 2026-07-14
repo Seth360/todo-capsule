@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 打成正式 TodoCapsule.app（含 LSUIElement，无 Dock 图标）。开机自启需要这个 bundle。
+# 打成正式 TodoCapsule.app（显示 Dock 图标）。开机自启需要这个 bundle。
 set -euo pipefail
 cd "$(dirname "$0")"
 

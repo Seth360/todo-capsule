@@ -7,11 +7,23 @@ struct Checklist: Identifiable, Codable, Equatable {
     var id: String
     var name: String
     var createdAt: Date
+    var pinned: Bool = false
 
-    init(id: String = UUID().uuidString, name: String, createdAt: Date = Date()) {
+    init(id: String = UUID().uuidString, name: String, createdAt: Date = Date(), pinned: Bool = false) {
         self.id = id
         self.name = name
         self.createdAt = createdAt
+        self.pinned = pinned
+    }
+
+    enum CodingKeys: String, CodingKey { case id, name, createdAt, pinned }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
+        name = (try? c.decode(String.self, forKey: .name)) ?? "新清单"
+        createdAt = (try? c.decode(Date.self, forKey: .createdAt)) ?? Date()
+        pinned = (try? c.decode(Bool.self, forKey: .pinned)) ?? false
     }
 
     static let todo = Checklist(id: defaultChecklistId, name: "待办", createdAt: Date(timeIntervalSince1970: 0))
@@ -287,12 +299,8 @@ enum ChecklistStore {
             return [.todo]
         }
         var lists = decoded.filter { !$0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-        if !lists.contains(where: { $0.id == defaultChecklistId }) {
-            lists.insert(.todo, at: 0)
-        }
         lists.sort { lhs, rhs in
-            if lhs.id == defaultChecklistId { return true }
-            if rhs.id == defaultChecklistId { return false }
+            if lhs.pinned != rhs.pinned { return lhs.pinned }
             return lhs.createdAt < rhs.createdAt
         }
         return lists

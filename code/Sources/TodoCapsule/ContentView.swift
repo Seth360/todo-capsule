@@ -11,6 +11,8 @@ struct ContentView: View {
     @FocusState private var inputFocused: Bool
     @FocusState var collectInputFocused: Bool
     @FocusState var editFocused: Bool
+    @FocusState var workspaceDraftFocused: Bool
+    @FocusState var workspaceTodoEditFocused: UUID?
     @State var editingId: UUID?
     @State var editText = ""
     @State var hoveredRow: UUID?      // 大面板：hover 才出控件
@@ -25,6 +27,28 @@ struct ContentView: View {
     @State var copiedFlash: UUID?     // 刚复制 → 底部「已复制」提示
     @State var confirmingClearArchive = false
     @State var showingArchiveHistory = false
+    @State var workspaceDestination: WorkspaceDestination = .list(defaultChecklistId)
+    @State var selectedSummaryID: UUID?
+    @State var hoveredWorkspaceSummaryID: UUID?
+    @State var hoveredWorkspaceListID: String?
+    @State var hoveredWorkspaceTagID: String?
+    @State var hoveredWorkspaceNavTitle: String?
+    @State var workspaceListSectionHovered = false
+    @State var workspaceTagHeaderHovered = false
+    @State var mergingTag: TodoTag?
+    @State var editingWorkspaceTag: TodoTag?
+    @State var editingWorkspaceList: Checklist?
+    @State var creatingWorkspaceList = false
+    @State var pendingWorkspaceDeletion: WorkspaceDeletionTarget?
+    @State var hoveredWorkspaceTodoID: UUID?
+    @State var editingWorkspaceTodoID: UUID?
+    @State var workspaceTodoEditText = ""
+    @State var workspaceCompletedSearch = ""
+    @State var workspaceCompletedTag: String?
+    @State var hoveredWorkspaceCompletedID: UUID?
+    @StateObject var workspaceOverlayState = WorkspaceOverlayState()
+    @State var hoveredSummaryTemplateMenuID: String?
+    @State var workspaceTagSuggestionsDismissed = false
     // 拖拽重排（自定义 DragGesture：被拖行裸绑偏移跟手，其它行 spring 实时让位）
     @State var draggingId: UUID?
     @State var draggingFrom: Int?
@@ -52,7 +76,7 @@ struct ContentView: View {
     var txt: Color { usesLightTheme ? Color(hex: 0x1D1D1F) : Color(hex: 0xF2F2F4) }
     var txt2: Color { usesLightTheme ? Color(hex: 0x5C5C62) : Color(hex: 0x9B9BA1) }
     var txt3: Color { usesLightTheme ? Color(hex: 0x85858B) : Color(hex: 0x6E6E74) }
-    var accent: Color { Color(hex: 0x32D158) }
+    var accent: Color { CapsuleDesign.primary }
     var subtleFill: Color { usesLightTheme ? Color.black.opacity(0.045) : Color.white.opacity(0.04) }
 
     // 大面板/收藏夹 hover 控件在无真实鼠标的调试环境下强制展开（截图核对用）
@@ -73,15 +97,19 @@ struct ContentView: View {
     var body: some View {
         capsule
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: state.settings.position == .left ? .leading : .trailing)
-            .padding(state.settings.position == .left ? .leading : .trailing, state.mode == .panel ? 32 : 0)
+            .padding(state.settings.position == .left ? .leading : .trailing, 0)
             .onChange(of: state.mode) { _, m in
                 if m == .panel {                                 // 大面板打开即聚焦当前 tab 的输入框
                     if state.panelTab == .collect { collectInputFocused = true } else { inputFocused = true }
+                    DispatchQueue.main.async { workspaceDraftFocused = true }
                 } else {
                     inputFocused = (m == .capture)
                     collectInputFocused = false
+                    workspaceDraftFocused = false
                 }
-                if m == .idle { editingId = nil; editingCollectId = nil; state.isEditing = false }
+                if m == .idle {
+                    editingId = nil; editingCollectId = nil; editingWorkspaceTodoID = nil; state.isEditing = false
+                }
             }
             .onChange(of: state.panelTab) { _, t in              // 切 tab → 焦点跟到对应输入框
                 guard state.mode == .panel else { return }
@@ -93,6 +121,7 @@ struct ContentView: View {
                 }
             }
             .preferredColorScheme(preferredScheme)
+            .tint(CapsuleDesign.primary)
             .sheet(isPresented: $showingArchiveHistory) {
                 ArchiveHistoryView()
                     .environmentObject(state)
@@ -112,7 +141,14 @@ struct ContentView: View {
         .overlay(alignment: .center) {
             summaryToast
         }
-        .frame(width: capSize.width, height: capSize.height)
+        .frame(
+            width: state.mode == .panel ? nil : capSize.width,
+            height: state.mode == .panel ? nil : capSize.height
+        )
+        .frame(
+            maxWidth: state.mode == .panel ? .infinity : nil,
+            maxHeight: state.mode == .panel ? .infinity : nil
+        )
         .modifier(CapsuleSurface(radius: radius, fill: state.mode == .idle ? cap : panel))
         .animation(anim, value: state.mode)
         .animation(anim, value: state.count)
@@ -170,9 +206,9 @@ struct ContentView: View {
             smallListMenu
             Text("\(smallCurrentCount)")
                 .font(.tc(11.5, weight: .semibold))
-                .foregroundStyle(accent)
+                .foregroundStyle(txt2)
                 .padding(.horizontal, 6).padding(.vertical, 1)
-                .background(Capsule().fill(accent.opacity(0.16)))
+                .background(Capsule().fill(txt2.opacity(0.16)))
             Spacer()
             smallMoreMenu
             Button { withAnimation(anim) { state.enterPanel() } } label: {
@@ -221,7 +257,7 @@ struct ContentView: View {
                     .scaledToFit()
                     .frame(width: 8, height: 8)
                     .fontWeight(.semibold)
-                    .foregroundStyle(txt2.opacity(0.55))
+                    .foregroundStyle(txt2)
                 Text(state.panelTab == .collect ? "收藏" : state.currentList.name)
                     .font(.tc(13, weight: .semibold))
                     .foregroundStyle(txt)
@@ -231,6 +267,7 @@ struct ContentView: View {
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
+        .tint(txt2)
         .fixedSize()
         .help("切换清单")
         .pointingHandCursor()
@@ -255,11 +292,25 @@ struct ContentView: View {
     @ViewBuilder
     var summaryToast: some View {
         if state.mode != .idle, let message = state.summaryToast, !message.isEmpty {
-            Text(message)
-                .font(.tc(12, weight: .semibold))
-                .foregroundStyle(txt)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
+            HStack(spacing: 10) {
+                Text(message)
+                    .font(.tc(12, weight: .semibold))
+                    .foregroundStyle(txt)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                if message.hasPrefix("生成完成"), let summaryID = state.latestGeneratedSummaryID {
+                    Button("查看") {
+                        workspaceDestination = .summary
+                        selectedSummaryID = summaryID
+                        withAnimation(anim) { state.enterPanel() }
+                        state.onRequestKey?()
+                    }
+                    .buttonStyle(.plain)
+                    .font(.tc(12, weight: .semibold))
+                    .foregroundStyle(accent)
+                    .pointingHandCursor()
+                }
+            }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
                 .background(
@@ -299,6 +350,7 @@ struct ContentView: View {
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
+        .tint(txt2)
         .help("更多")
         .pointingHandCursor()
     }
@@ -314,26 +366,23 @@ struct ContentView: View {
     }
 
     var captureRow: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.tc(15))
-                    .foregroundStyle(captureInputActive ? accent : txt3)
-                ZStack(alignment: .leading) {
-                    // 自绘灰色占位（macOS TextField 原生 placeholder 不跟 foregroundStyle → 深底变黑字）
-                    if state.draft.isEmpty {
-                        Text("记一条…").font(.tc(13)).foregroundStyle(txt3)
-                    }
-                    TextField("", text: $state.draft)
-                        .textFieldStyle(.plain)
-                        .font(.tc(13))
-                        .foregroundStyle(txt)
-                        .tint(accent)
-                        .focused($inputFocused)
-                        .onSubmit { doSubmit() }
+        HStack(spacing: 8) {
+            Image(systemName: "plus.circle.fill")
+                .font(.tc(15))
+                .foregroundStyle(captureInputActive ? accent : txt3)
+            ZStack(alignment: .leading) {
+                // 自绘灰色占位（macOS TextField 原生 placeholder 不跟 foregroundStyle → 深底变黑字）
+                if state.draft.isEmpty {
+                    Text("记一条…").font(.tc(13)).foregroundStyle(txt3)
                 }
+                TextField("", text: $state.draft)
+                    .textFieldStyle(.plain)
+                    .font(.tc(13))
+                    .foregroundStyle(txt)
+                    .tint(accent)
+                    .focused($inputFocused)
+                    .onSubmit { doSubmit() }
             }
-            tagSuggestionBar
         }
         .padding(.horizontal, 9).padding(.vertical, 8)
         .background(
@@ -350,6 +399,17 @@ struct ContentView: View {
             inputFocused = true
             state.onRequestKey?()
         }  // 经 controller 抢 key，否则 nonactivating panel 上 TextField 收不到键盘
+        .overlay(alignment: .topLeading) {
+            let suggestions = tagSuggestions(in: state.draft)
+            if !suggestions.isEmpty {
+                TagSuggestionDropdown(tags: suggestions, usesLightTheme: usesLightTheme) { tag in
+                    applyTagSuggestion(tag.name)
+                }
+                .offset(x: 24, y: 34)
+                .zIndex(30)
+            }
+        }
+        .zIndex(tagSuggestions(in: state.draft).isEmpty ? 0 : 30)
     }
 
     @ViewBuilder
@@ -361,31 +421,7 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
-    private var tagSuggestionBar: some View {
-        let suggestions = tagSuggestions(in: state.draft)
-        if !suggestions.isEmpty {
-            HStack(spacing: 6) {
-                ForEach(suggestions) { tag in
-                    Button {
-                        applyTagSuggestion(tag.name)
-                    } label: {
-                        Text("#\(tag.name)")
-                            .font(.tc(11, weight: .semibold))
-                            .foregroundStyle(accent)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Capsule().fill(accent.opacity(0.14)))
-                    }
-                    .buttonStyle(.plain)
-                    .pointingHandCursor()
-                }
-            }
-            .padding(.leading, 24)
-        }
-    }
-
-    private func tagSuggestions(in text: String) -> [TodoTag] {
+    func tagSuggestions(in text: String) -> [TodoTag] {
         guard let query = tagQuery(in: text) else { return [] }
         return state.tags
             .filter { query.isEmpty || $0.name.localizedCaseInsensitiveContains(query) }
@@ -541,37 +577,26 @@ struct ContentView: View {
     }
 
     func editTextArea(_ todo: Todo) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
-            TextField("", text: $editText)
-                .textFieldStyle(.plain)
-                .font(.tc(13))
-                .foregroundStyle(txt)
-                .tint(accent)
-                .focused($editFocused)
-                .onSubmit { commitEdit(todo) }
-                .onChange(of: editFocused) { _, f in if !f { commitEdit(todo) } }
-                .onExitCommand { cancelEdit() }
-            editTagSuggestionBar(todo)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    @ViewBuilder
-    func editTagSuggestionBar(_ todo: Todo) -> some View {
-        let suggestions = tagSuggestions(in: editText).filter { !todo.tags.contains($0.name) }
-        if !suggestions.isEmpty {
-            HStack(spacing: 6) {
-                ForEach(suggestions) { tag in
-                    Button {
+        TextField("", text: $editText)
+            .textFieldStyle(.plain)
+            .font(.tc(13))
+            .foregroundStyle(txt)
+            .tint(accent)
+            .focused($editFocused)
+            .onSubmit { commitEdit(todo) }
+            .onChange(of: editFocused) { _, f in if !f { commitEdit(todo) } }
+            .onExitCommand { cancelEdit() }
+            .overlay(alignment: .topLeading) {
+                let suggestions = tagSuggestions(in: editText).filter { !todo.tags.contains($0.name) }
+                if !suggestions.isEmpty {
+                    TagSuggestionDropdown(tags: suggestions, usesLightTheme: usesLightTheme) { tag in
                         applyEditTagSuggestion(tag.name)
-                    } label: {
-                        tagPillLabel(tag.name, removable: false, color: tagColor(tag.name))
                     }
-                    .buttonStyle(.plain)
-                    .pointingHandCursor()
+                    .offset(y: 24)
+                    .zIndex(30)
                 }
             }
-        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func applyEditTagSuggestion(_ name: String) {
@@ -627,7 +652,7 @@ struct ContentView: View {
     }
 
     func tagColor(_ tag: String) -> Color {
-        let palette: [UInt32] = [0x32D158, 0x64D2FF, 0xBF8CFF, 0xFF9F0A, 0xFF5E7E, 0x5DE4C7]
+        let palette: [UInt32] = [0x0B9153, 0x64D2FF, 0xBF8CFF, 0xFF9F0A, 0xFF5E7E, 0x5DE4C7]
         let sum = tag.unicodeScalars.reduce(0) { $0 + Int($1.value) }
         return Color(hex: palette[sum % palette.count])
     }
@@ -709,8 +734,8 @@ struct ContentView: View {
 
     var smallFooterTools: some View {
         HStack(spacing: 8) {
-            footerIcon(state.showingArchive ? "arrow.3.trianglepath.circle.fill" : "arrow.3.trianglepath", help: "查看回收箱") {
-                withAnimation(anim) { state.toggleArchiveView() }
+            footerIcon("arrow.3.trianglepath", help: "查看已完成") {
+                openCompletedWorkspace()
             }
             footerIcon("folder", help: "打开 Markdown 所在目录") {
                 state.openMarkdownFolder()
@@ -718,6 +743,13 @@ struct ContentView: View {
         }
         .padding(.leading, 18)
         .padding(.bottom, 12)
+    }
+
+    func openCompletedWorkspace() {
+        state.showingArchive = false
+        workspaceDestination = .completed
+        withAnimation(anim) { state.enterPanel() }
+        state.onRequestKey?()
     }
 
     func startEdit(_ todo: Todo) {
@@ -749,5 +781,56 @@ struct ContentView: View {
         guard !state.draft.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         withAnimation(anim) { state.submit() }          // 新行 spring 入列(顶部)；submit 内清空 draft
         DispatchQueue.main.async { inputFocused = true } // 重新激活输入框，接着写
+    }
+}
+
+struct TagSuggestionDropdown: View {
+    let tags: [TodoTag]
+    let usesLightTheme: Bool
+    let onSelect: (TodoTag) -> Void
+    @State private var hoveredTagID: String?
+
+    private var background: Color {
+        usesLightTheme ? Color.white : Color(hex: 0x3A3A3A)
+    }
+
+    private var rowHover: Color {
+        usesLightTheme ? Color.black.opacity(0.10) : Color.white.opacity(0.10)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ForEach(tags.prefix(5)) { tag in
+                Button {
+                    onSelect(tag)
+                } label: {
+                    Text(tag.name)
+                        .font(.tc(13))
+                        .foregroundStyle(usesLightTheme ? Color(hex: 0x1D1D1F) : Color.white)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .frame(height: 34)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(hoveredTagID == tag.id ? rowHover : .clear)
+                        )
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .onHover { hovering in
+                    hoveredTagID = hovering ? tag.id : (hoveredTagID == tag.id ? nil : hoveredTagID)
+                }
+                .pointingHandCursor()
+            }
+        }
+        .padding(4)
+        .frame(width: 220)
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(background))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(usesLightTheme ? Color.black.opacity(0.08) : Color.white.opacity(0.10), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(usesLightTheme ? 0.16 : 0.28), radius: 12, y: 5)
     }
 }

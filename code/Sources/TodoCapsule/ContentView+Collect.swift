@@ -99,7 +99,7 @@ extension ContentView {
         .padding(.vertical, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .background(RoundedRectangle(cornerRadius: 8).fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001))))
+        .background(RoundedRectangle(cornerRadius: 8).fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.10) : Color.white.opacity(0.001))))
         .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }
         .onTapGesture { copy(item) }
         .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
@@ -109,7 +109,7 @@ extension ContentView {
         }
     }
 
-    private func collectRow(_ item: CollectItem) -> some View {
+    func collectRow(_ item: CollectItem) -> some View {
         let hovered = (hoveredRow == item.id) || (Self.forceHover && item.id == state.collects.first?.id)
         let editing = editingCollectId == item.id
         let revealed = revealedId == item.id
@@ -170,7 +170,7 @@ extension ContentView {
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
         .background(RoundedRectangle(cornerRadius: 8)
-            .fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.05) : Color.white.opacity(0.001))))
+            .fill(editing ? accent.opacity(0.10) : (hovered ? Color.white.opacity(0.10) : Color.white.opacity(0.001))))
         .onHover { h in hoveredRow = h ? item.id : (hoveredRow == item.id ? nil : hoveredRow) }
         .simultaneousGesture(TapGesture(count: 2).onEnded { startCollectEdit(item) })
         .pointingHandCursor()
@@ -248,11 +248,6 @@ extension ContentView {
 
     @ViewBuilder
     private func collectContextMenuItems(_ item: CollectItem, links: [URL], revealed: Bool) -> some View {
-        Button {
-            withAnimation(anim) { state.toggleCollectPin(item.id) }
-        } label: {
-            Label(item.pinned ? "取消置顶" : "置顶", systemImage: item.pinned ? "pin.slash" : "pin")
-        }
         Menu {
             ForEach(state.lists) { list in
                 Button {
@@ -262,7 +257,7 @@ extension ContentView {
                 }
             }
         } label: {
-            Label("转移", systemImage: "folder")
+            Label("转到其他清单", systemImage: "folder")
         }
         Divider()
         collectJumpMenuItems(links)

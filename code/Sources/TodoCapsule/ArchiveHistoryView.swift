@@ -72,7 +72,7 @@ struct ArchiveHistoryView: View {
     private var txt: Color { usesLightTheme ? Color(hex: 0x1D1D1F) : Color(hex: 0xF2F2F4) }
     private var txt2: Color { usesLightTheme ? Color(hex: 0x5C5C62) : Color(hex: 0x9B9BA1) }
     private var txt3: Color { usesLightTheme ? Color(hex: 0x85858B) : Color(hex: 0x6E6E74) }
-    private var accent: Color { Color(hex: 0x32D158) }
+    private var accent: Color { CapsuleDesign.primary }
     private var subtleFill: Color { usesLightTheme ? Color.black.opacity(0.045) : Color.white.opacity(0.04) }
 
     var body: some View {
@@ -287,7 +287,7 @@ struct ArchiveHistoryView: View {
     }
 
     private func tagColor(_ tag: String) -> Color {
-        let palette: [UInt32] = [0x32D158, 0x64D2FF, 0xBF8CFF, 0xFF9F0A, 0xFF5E7E, 0x5DE4C7]
+        let palette: [UInt32] = [0x0B9153, 0x64D2FF, 0xBF8CFF, 0xFF9F0A, 0xFF5E7E, 0x5DE4C7]
         let sum = tag.unicodeScalars.reduce(0) { $0 + Int($1.value) }
         return Color(hex: palette[sum % palette.count])
     }

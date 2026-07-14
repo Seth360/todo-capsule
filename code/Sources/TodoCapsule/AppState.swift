@@ -48,6 +48,7 @@ final class AppState: ObservableObject {
     @Published var summaryToast: String?
     @Published var showingArchive: Bool = false
     @Published var summaries: [SummaryRecord] = []
+    @Published var latestGeneratedSummaryID: UUID?
     @Published var updateInfo: AppUpdateInfo?
     @Published var dismissedUpdateBannerVersion: String?
     @Published var presetQuota: PresetQuota?
@@ -81,6 +82,7 @@ final class AppState: ObservableObject {
     var onPanelDragChanged: ((CGSize) -> Void)?
     var onPanelDragEnded: (() -> Void)?
     var onRequestKey: (() -> Void)?
+    var onZoomPanel: (() -> Void)?
     var onPinnedChanged: ((Bool) -> Void)?
     var onSettingsChanged: (() -> Void)?
     var onOpenSettings: (() -> Void)?
@@ -96,9 +98,9 @@ final class AppState: ObservableObject {
         selectedListId = lists.first?.id ?? defaultChecklistId
         todos = TodoStore.load().map { item in
             var copy = item
-            if !lists.contains(where: { $0.id == copy.listId }) { copy.listId = defaultChecklistId }
+            if !lists.contains(where: { $0.id == copy.listId }) { copy.listId = selectedListId }
             return copy
-        }.filter { !$0.done }
+        }.filter { !$0.done && !$0.trashed }
         completedArchive = CompletedTodoStore.load()
         tags = TagStore.load()
         syncTagsFromTodos()
@@ -121,7 +123,7 @@ final class AppState: ObservableObject {
     }
 
     func active(in listId: String) -> [Todo] {
-        todos.filter { !$0.done && $0.listId == listId }
+        todos.filter { !$0.done && !$0.trashed && $0.listId == listId }
             .enumerated()
             .sorted { l, r in
                 if l.element.pinned != r.element.pinned { return l.element.pinned }
@@ -131,7 +133,7 @@ final class AppState: ObservableObject {
     }
 
     var completed: [Todo] {
-        todos.filter { $0.done && $0.listId == selectedListId }
+        todos.filter { $0.done && !$0.trashed && $0.listId == selectedListId }
             .sorted { a, b in
                 let ca = a.completedAt ?? .distantPast, cb = b.completedAt ?? .distantPast
                 if ca != cb { return ca > cb }
@@ -140,7 +142,7 @@ final class AppState: ObservableObject {
     }
 
     var count: Int {
-        todos.filter { !$0.done }.count
+        todos.filter { !$0.done && !$0.trashed }.count
     }
 
     var hasUndo: Bool { _ = undoVersion; return pendingOrder.last.flatMap { pending[$0] } != nil }
@@ -179,6 +181,7 @@ final class AppState: ObservableObject {
     func closePanel() {
         setMode(.idle)
     }
+    func zoomPanel() { onZoomPanel?() }
     func collapseFromPeek() { guard mode == .peek else { return }; setMode(.idle) }
     func openSettings() { onOpenSettings?() }
     func openUpdateDialog() { onOpenUpdateDialog?() }
@@ -325,9 +328,9 @@ final class AppState: ObservableObject {
 
     func importClipboardToTodos() {
         guard !lastClipboardText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        addTodoLines(lastClipboardText, listId: defaultChecklistId)
+        addTodoLines(lastClipboardText, listId: selectedListId)
         panelTab = .today
-        selectedListId = defaultChecklistId
+        selectedListId = lists.first?.id ?? selectedListId
         mode = .panel
         relayout()
     }
@@ -341,6 +344,7 @@ final class AppState: ObservableObject {
     func complete(_ todo: Todo) {
         guard let i = todos.firstIndex(where: { $0.id == todo.id }), !todos[i].done else { return }
         todos[i].done = true
+        todos[i].trashed = false
         todos[i].completedAt = Date()
         arm(id: todo.id, kind: .completed, item: todos[i], afterId: i > 0 ? todos[i - 1].id : nil)
         persistAll()
@@ -349,7 +353,8 @@ final class AppState: ObservableObject {
 
     func delete(_ todo: Todo) {
         guard let i = todos.firstIndex(where: { $0.id == todo.id }) else { return }
-        let item = todos[i]
+        var item = todos[i]
+        item.trashed = true
         let after = i > 0 ? todos[i - 1].id : nil
         todos.remove(at: i)
         arm(id: item.id, kind: .deleted, item: item, afterId: after)
@@ -461,7 +466,11 @@ final class AppState: ObservableObject {
 
     func updateText(_ id: UUID, _ text: String) {
         let parsed = parseTodoLine(text)
-        guard !parsed.text.isEmpty, let i = todos.firstIndex(where: { $0.id == id }) else { return }
+        guard let i = todos.firstIndex(where: { $0.id == id }) else { return }
+        guard !parsed.text.isEmpty else {
+            deleteImmediately(todos[i])
+            return
+        }
         todos[i].text = parsed.text
         todos[i].tags = uniqueTags(todos[i].tags + parsed.tags)
         ensureTags(todos[i].tags)
@@ -569,7 +578,7 @@ final class AppState: ObservableObject {
         let newName = TodoTag.normalize(raw)
         guard !newName.isEmpty, let i = tags.firstIndex(where: { $0.id == id }) else { return }
         let oldName = tags[i].name
-        tags[i] = TodoTag(id: tags[i].id, name: newName, createdAt: tags[i].createdAt)
+        tags[i] = TodoTag(id: tags[i].id, name: newName, createdAt: tags[i].createdAt, pinned: tags[i].pinned)
         for idx in todos.indices {
             todos[idx].tags = todos[idx].tags.map { $0 == oldName ? newName : $0 }
         }
@@ -593,20 +602,87 @@ final class AppState: ObservableObject {
         relayout()
     }
 
+    func mergeTag(id: String, into rawTargetName: String) {
+        let targetName = TodoTag.normalize(rawTargetName)
+        guard let sourceIndex = tags.firstIndex(where: { $0.id == id }),
+              let target = tags.first(where: { $0.name == targetName }),
+              tags[sourceIndex].name != target.name else { return }
+        let sourceName = tags[sourceIndex].name
+        for index in todos.indices {
+            todos[index].tags = uniqueTags(todos[index].tags.map { $0 == sourceName ? target.name : $0 })
+        }
+        for index in completedArchive.indices {
+            completedArchive[index].tags = uniqueTags(completedArchive[index].tags.map { $0 == sourceName ? target.name : $0 })
+        }
+        tags.remove(at: sourceIndex)
+        persistAll()
+        relayout()
+    }
+
+    func toggleTagPinned(id: String) {
+        guard let index = tags.firstIndex(where: { $0.id == id }) else { return }
+        tags[index].pinned.toggle()
+        tags.sort { lhs, rhs in
+            if lhs.pinned != rhs.pinned { return lhs.pinned }
+            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+        }
+        persistAll()
+        relayout()
+    }
+
+    func completedItems(includeTrash: Bool = false) -> [Todo] {
+        let live = todos.filter { $0.done && (includeTrash || !$0.trashed) }
+        let archived = completedArchive.filter { includeTrash || !$0.trashed }
+        return (live + archived).sorted { ($0.completedAt ?? $0.createdAt) > ($1.completedAt ?? $1.createdAt) }
+    }
+
+    func trashedItems() -> [Todo] {
+        completedArchive.filter(\.trashed)
+            .sorted { ($0.completedAt ?? $0.createdAt) > ($1.completedAt ?? $1.createdAt) }
+    }
+
+    func updateSummaryTemplate(_ id: String) {
+        guard settings.summaryTemplates.contains(where: { $0.id == id }) else { return }
+        updateSettings { $0.activeSummaryTemplateId = id }
+    }
+
     func renameList(id: String, to raw: String) {
         let name = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard id != defaultChecklistId, !name.isEmpty, let i = lists.firstIndex(where: { $0.id == id }) else { return }
+        guard !name.isEmpty, let i = lists.firstIndex(where: { $0.id == id }) else { return }
         lists[i].name = name
         persistAll()
         relayout()
     }
 
+    func toggleListPinned(id: String) {
+        guard let index = lists.firstIndex(where: { $0.id == id }) else { return }
+        lists[index].pinned.toggle()
+        lists.sort { lhs, rhs in
+            if lhs.id == defaultChecklistId { return true }
+            if rhs.id == defaultChecklistId { return false }
+            if lhs.pinned != rhs.pinned { return lhs.pinned }
+            return lhs.createdAt < rhs.createdAt
+        }
+        persistAll()
+        relayout()
+    }
+
+    func listHasTodos(id: String) -> Bool {
+        todos.contains { $0.listId == id } || completedArchive.contains { $0.listId == id }
+    }
+
     func deleteList(id: String) {
-        guard id != defaultChecklistId else { return }
+        guard lists.contains(where: { $0.id == id }) else { return }
         lists.removeAll { $0.id == id }
         todos.removeAll { $0.listId == id }
         completedArchive.removeAll { $0.listId == id }
-        if selectedListId == id { selectedListId = defaultChecklistId }
+        if lists.isEmpty {
+            let replacement = Checklist(name: "新清单")
+            lists = [replacement]
+            selectedListId = replacement.id
+        } else if selectedListId == id {
+            selectedListId = lists[0].id
+        }
         var updated = settings
         updated.summaryListIds.removeAll { $0 == id }
         for i in updated.summaryTemplates.indices {
@@ -653,10 +729,12 @@ final class AppState: ObservableObject {
                         self.presetQuotaStatus = nil
                     }
                     self.copyToClipboard(result.text)
-                    self.summaries.insert(SummaryRecord(text: result.text), at: 0)
+                    let summary = SummaryRecord(text: result.text)
+                    self.summaries.insert(summary, at: 0)
+                    self.latestGeneratedSummaryID = summary.id
                     SummaryRecordStore.save(self.summaries)
                     self.summaryStatus = nil
-                    self.showSummaryToast("总结已复制到剪贴板", autoHideAfter: 3)
+                    self.showSummaryToast("生成完成，已复制剪贴板", autoHideAfter: 5)
                     self.persistAll()
                 case .failure(let error):
                     self.summaryStatus = nil
@@ -720,6 +798,7 @@ final class AppState: ObservableObject {
         guard let i = completedArchive.firstIndex(where: { $0.id == todo.id }) else { return }
         var restored = completedArchive.remove(at: i)
         restored.done = false
+        restored.trashed = false
         restored.completedAt = nil
         if !lists.contains(where: { $0.id == restored.listId }) {
             restored.listId = defaultChecklistId
@@ -728,6 +807,29 @@ final class AppState: ObservableObject {
         selectedListId = restored.listId
         panelTab = .today
         showingArchive = false
+        persistAll()
+        relayout()
+    }
+
+    func restoreCompleted(_ todo: Todo) {
+        if let index = todos.firstIndex(where: { $0.id == todo.id }) {
+            todos[index].done = false
+            todos[index].completedAt = nil
+            persistAll()
+            relayout()
+        } else {
+            restoreFromArchive(todo)
+        }
+    }
+
+    func moveCompletedToTrash(_ todo: Todo) {
+        if let index = todos.firstIndex(where: { $0.id == todo.id }) {
+            var trashed = todos.remove(at: index)
+            trashed.trashed = true
+            completedArchive.insert(trashed, at: 0)
+        } else if let index = completedArchive.firstIndex(where: { $0.id == todo.id }) {
+            completedArchive[index].trashed = true
+        }
         persistAll()
         relayout()
     }
@@ -780,8 +882,14 @@ final class AppState: ObservableObject {
     }
 
     private func ensureTags(_ names: [String]) {
-        let merged = tags.map(\.name) + names
-        tags = TagStore.normalized(merged)
+        var byName = Dictionary(uniqueKeysWithValues: tags.map { ($0.name, $0) })
+        for name in names.map(TodoTag.normalize) where !name.isEmpty {
+            if byName[name] == nil { byName[name] = TodoTag(name: name) }
+        }
+        tags = byName.values.sorted { lhs, rhs in
+            if lhs.pinned != rhs.pinned { return lhs.pinned }
+            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+        }
     }
 
     private func syncTagsFromTodos() {

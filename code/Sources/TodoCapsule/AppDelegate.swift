@@ -2,19 +2,46 @@ import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var controller: CapsuleController?
+    private var didReceiveInitialActivation = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        installEditMenu()      // accessory app 无主菜单 → ⌘C/⌘V/⌘X/⌘A 失灵；装标准 Edit 菜单让文本框/收藏支持复制粘贴
         controller = CapsuleController()
+        installMainMenu()
         controller?.start()
     }
 
-    /// LSUIElement + nonactivatingPanel 不会显示菜单栏，但主菜单里的 Edit 项会为 key 窗口的文本框派发标准编辑快捷键。
-    private func installEditMenu() {
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        controller?.openLargePanelFromDock()
+        return true
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        // 跳过首次启动激活；之后从 Dock 回到本应用时统一打开大窗。
+        guard didReceiveInitialActivation else {
+            didReceiveInitialActivation = true
+            return
+        }
+        controller?.openLargePanelFromDock()
+    }
+
+    /// 安装标准 App / Edit 菜单；Edit 菜单也让 nonactivatingPanel 中的文本框支持系统编辑快捷键。
+    private func installMainMenu() {
         let mainMenu = NSMenu()
-        // 第 0 项惯例是 App 菜单（即使 accessory 也保留占位，避免 Edit 被当成 App 菜单）
+
+        let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "todo-capsule"
         let appItem = NSMenuItem()
-        appItem.submenu = NSMenu()
+        let appMenu = NSMenu(title: appName)
+        let about = NSMenuItem(title: "关于 " + appName, action: #selector(CapsuleController.aboutAction), keyEquivalent: "")
+        about.target = controller
+        appMenu.addItem(about)
+        let settings = NSMenuItem(title: "设置…", action: #selector(CapsuleController.settingsAction), keyEquivalent: ",")
+        settings.target = controller
+        appMenu.addItem(settings)
+        appMenu.addItem(.separator())
+        let quit = NSMenuItem(title: "退出 " + appName, action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        quit.target = NSApp
+        appMenu.addItem(quit)
+        appItem.submenu = appMenu
         mainMenu.addItem(appItem)
 
         let editItem = NSMenuItem()

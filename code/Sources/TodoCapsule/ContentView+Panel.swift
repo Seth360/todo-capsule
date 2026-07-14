@@ -73,38 +73,19 @@ extension ContentView {
         .contextMenu { todoContextMenu(todo) }
     }
 
-    // MARK: 大面板（持久，点击打开、✕/Esc/点外关）—— 今天/收藏 双 tab
+    // MARK: 大面板（持久，点击打开、✕/Esc/点外关）—— 1000×800 双栏工作区
     var bigPanel: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            panelHeader                                    // 顶栏(可拖) + 清单下拉 + 工具按钮
-            Group {
-                if state.panelTab == .today { todayPanelBody } else { collectPanelBody }
-            }
-            .padding(.horizontal, 16)                      // 输入框/列表内缩 16
-        }
-        .padding(.bottom, 16)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .overlay(alignment: .bottomLeading) {
-            if state.mode == .panel { panelFooterTools }
-        }
-        .overlay(alignment: .bottom) {
-            if state.mode == .panel, state.panelTab == .today, state.showingArchive {
-                archiveFloatingPanel
-            }
-        }
+        largeWorkspace
+        .frame(
+            minWidth: CapsuleMetrics.panelMinSize.width,
+            minHeight: CapsuleMetrics.panelMinSize.height
+        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {
             if state.hasUndo {
                 undoBar.zIndex(6)
             }
-            else if state.panelTab == .collect, copiedFlash != nil { copiedToast }
-        }
-        .overlay(alignment: .bottom) {
-            if state.shouldShowUpdateBanner {
-                updateNoticeBanner
-                    .padding(.bottom, state.hasUndo ? 38 : 0)
-                    .zIndex(7)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
+            else if copiedFlash != nil { copiedToast }
         }
         .alert("清空回收箱？", isPresented: $confirmingClearArchive) {
             Button("取消", role: .cancel) {}
@@ -113,6 +94,57 @@ extension ContentView {
             }
         } message: {
             Text("确定后会删除回收箱里的已完成项目。")
+        }
+        .sheet(item: $mergingTag) { tag in
+            MergeTagSheet(source: tag, tags: state.tags) { target in
+                state.mergeTag(id: tag.id, into: target)
+            }
+            .preferredColorScheme(preferredScheme)
+        }
+        .sheet(item: $editingWorkspaceTag) { tag in
+            TagEditorSheet(initial: tag.name) { name in
+                if tag.id == "__new__" {
+                    state.addTag(named: name)
+                } else {
+                    state.renameTag(id: tag.id, to: name)
+                }
+            }
+            .preferredColorScheme(preferredScheme)
+        }
+        .sheet(item: $editingWorkspaceList) { list in
+            ListEditorSheet(initial: list.name) { name in
+                state.renameList(id: list.id, to: name)
+            }
+            .preferredColorScheme(preferredScheme)
+        }
+        .sheet(isPresented: $creatingWorkspaceList) {
+            ListEditorSheet(initial: "") { name in
+                state.addList(named: name)
+                workspaceDestination = .list(state.selectedListId)
+            }
+            .preferredColorScheme(preferredScheme)
+        }
+        .confirmationDialog(
+            "删除\(pendingWorkspaceDeletion?.title ?? "")？",
+            isPresented: Binding(
+                get: { pendingWorkspaceDeletion != nil },
+                set: { if !$0 { pendingWorkspaceDeletion = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("删除", role: .destructive) {
+                switch pendingWorkspaceDeletion {
+                case .list(let list):
+                    state.deleteList(id: list.id)
+                    workspaceDestination = .list(state.selectedListId)
+                case .tag(let tag): state.deleteTag(id: tag.id)
+                case nil: break
+                }
+                pendingWorkspaceDeletion = nil
+            }
+            Button("取消", role: .cancel) { pendingWorkspaceDeletion = nil }
+        } message: {
+            Text("删除后，该目录及其关联内容将无法恢复。")
         }
         .onChange(of: draggingId) { _, d in if d != nil { hoveredRow = nil } }   // 拖拽时清 hover，防控件残留错行
     }
@@ -429,8 +461,8 @@ extension ContentView {
 
     private var panelFooterTools: some View {
         HStack(spacing: 8) {
-            footerIcon(state.showingArchive ? "arrow.3.trianglepath.circle.fill" : "arrow.3.trianglepath", help: "查看回收箱") {
-                withAnimation(anim) { state.toggleArchiveView() }
+            footerIcon("arrow.3.trianglepath", help: "查看已完成") {
+                openCompletedWorkspace()
             }
             footerIcon("folder", help: "打开 Markdown 所在目录") {
                 state.openMarkdownFolder()

@@ -3,24 +3,21 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>1.0.8</title>
-            <pubDate>Tue, 14 Jul 2026 15:22:04 +0800</pubDate>
+            <title>1.0.9</title>
+            <pubDate>Wed, 15 Jul 2026 20:05:15 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>22</sparkle:version>
-            <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
+            <sparkle:version>23</sparkle:version>
+            <sparkle:shortVersionString>1.0.9</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.8
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.9
 
-- 新增可缩放的双栏工作区，集中管理清单、标签、收藏、智能总结、已完成和垃圾桶。
-- 清单与标签支持置顶、编辑、删除和拖动排序，标签支持合并；新建或编辑弹窗可按回车保存。
-- 已完成待办支持搜索、恢复和移入垃圾桶，并优化“进行中”与“本周已完成”的模块间距。
-- 优化小窗与大窗交互：记忆悬浮入口位置、完善窗口投影与系统应用菜单，并统一头部图标颜色。
-- 完善待办行内编辑：失焦自动保存、内容为空自动清除、文字支持鼠标拖选，并修复标签建议被列表遮挡的问题。
-- 修复小窗编辑时标签下拉点击穿透，确保标签可正常选择并保持编辑焦点。
-- 统一大小窗待办交互：双击文字优先进入编辑，大窗右键补充“转移”并与小窗保持一致。
+- 完善项目行内编辑：点击编辑框外的按钮、标签或空白区域时自动保存。
+- 切换到其他应用、点击桌面或收起窗口时，自动保存大小窗待办和收藏编辑内容。
+- 保留标签选择的完整点击流程，标签操作完成后再结束编辑并保存。
+- 统一大小窗待办的方形完成勾选框样式。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.8/todo-capsule-v1.0.8.dmg" length="3536934" type="application/octet-stream" sparkle:edSignature="IACeZqA/hCHRVSUCnwPvnwbI9tdrfcLTJRBYeaaEBQy1rqW5sP8zKCYm1IZx867BZBdw6XtdR7MIh/l1Q3NeCA=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.9/todo-capsule-v1.0.9.dmg" length="3525216" type="application/octet-stream" sparkle:edSignature="cUlgOMTECho1Qhnxzh7AMHw2MvX7iZYYBhVU/xnNQJCNfBmFfmVYjxnDqzoE84OBz04hf4MSoSKmbslnF//DBQ=="/>
         </item>
     </channel>
 </rss>

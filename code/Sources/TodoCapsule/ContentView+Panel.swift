@@ -47,8 +47,11 @@ extension ContentView {
         let editing = editingId == todo.id
         return HStack(spacing: 10) {
             Button { withAnimation(anim) { state.complete(todo) } } label: {
-                Circle().strokeBorder(txt3, lineWidth: 1.6)
-                    .frame(width: 18, height: 18).frame(width: 24, height: 24).contentShape(Rectangle())
+                Image(systemName: "square")
+                    .font(.tc(16, weight: .regular))
+                    .foregroundStyle(txt3)
+                    .frame(width: 22, height: 22)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .help("完成")
@@ -554,9 +557,10 @@ extension ContentView {
         let editing = editingId == todo.id
         return HStack(spacing: 10) {
             Button { withAnimation(anim) { state.complete(todo) } } label: {
-                Circle().strokeBorder(txt3, lineWidth: 1.6)
-                    .frame(width: 18, height: 18)
-                    .frame(width: 24, height: 24)
+                Image(systemName: "square")
+                    .font(.tc(16, weight: .regular))
+                    .foregroundStyle(txt3)
+                    .frame(width: 22, height: 22)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)

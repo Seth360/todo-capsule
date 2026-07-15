@@ -111,6 +111,12 @@ struct ContentView: View {
                     if let id = editingId {
                         state.updateText(id, editText)
                     }
+                    if let id = editingWorkspaceTodoID {
+                        state.updateText(id, workspaceTodoEditText)
+                    }
+                    if let id = editingCollectId {
+                        state.updateCollectText(id, editCollectText)
+                    }
                     editingId = nil; editingCollectId = nil; editingWorkspaceTodoID = nil; state.isEditing = false
                 }
             }
@@ -521,14 +527,14 @@ struct ContentView: View {
         let editing = editingId == todo.id
         let hovered = hoveredRow == todo.id || (Self.forceHover && todo.id == state.active.first?.id)
         return HStack(spacing: 10) {
-            // 勾选框：整块 18×18 可点（contentShape 修掉"点不动"）
+            // 与大窗一致的方形 checkbox。
             Button {
                 withAnimation(anim) { state.complete(todo) }
             } label: {
-                Circle()
-                    .strokeBorder(txt3, lineWidth: 1.6)
-                    .frame(width: 18, height: 18)
-                    .frame(width: 26, height: 26)    // 命中区放大
+                Image(systemName: "square")
+                    .font(.tc(16, weight: .regular))
+                    .foregroundStyle(txt3)
+                    .frame(width: 22, height: 22)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)

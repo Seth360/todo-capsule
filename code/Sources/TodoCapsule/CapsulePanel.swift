@@ -10,6 +10,7 @@ final class CapsulePanel: NSPanel, NSWindowDelegate {
     var onWindowDragEnded: (() -> Void)?
     var onCloseRequested: (() -> Void)?
     var onMiniaturizeRequested: (() -> Void)?
+    var shouldEndInlineEditingAfterClick: (() -> Bool)?
 
     private(set) var isLargeWorkspace = false
 
@@ -201,8 +202,23 @@ final class CapsulePanel: NSPanel, NSWindowDelegate {
             } else {
                 super.sendEvent(event)
             }
+            endInlineEditingIfClickEndedOutsideFieldEditor(event)
+        case .rightMouseUp:
+            super.sendEvent(event)
+            endInlineEditingIfClickEndedOutsideFieldEditor(event)
         default:
             super.sendEvent(event)
         }
+    }
+
+    /// SwiftUI 的 FocusState 在 macOS 上不会因点击普通按钮或空白区域稳定失焦。
+    /// 等 mouseUp 完整分发后再撤销 field editor，既能让标签/菜单点击先执行，
+    /// 也能让 TextField 的失焦回调统一走现有自动保存流程。
+    private func endInlineEditingIfClickEndedOutsideFieldEditor(_ event: NSEvent) {
+        guard shouldEndInlineEditingAfterClick?() == true,
+              let editor = firstResponder as? NSTextView else { return }
+        let editorRect = editor.convert(editor.bounds, to: nil).insetBy(dx: -2, dy: -2)
+        guard !editorRect.contains(event.locationInWindow) else { return }
+        makeFirstResponder(nil)
     }
 }

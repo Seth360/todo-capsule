@@ -67,6 +67,7 @@ final class CapsuleController: NSObject {
         panel.onWindowDragEnded = { [weak self] in self?.endPanelDrag() }
         panel.onCloseRequested = { [weak self] in self?.state.closePanel() }
         panel.onMiniaturizeRequested = { [weak self] in self?.state.closePanel() }
+        panel.shouldEndInlineEditingAfterClick = { [weak self] in self?.state.isEditing == true }
         state.onLayout = { [weak self] mode in self?.applyLayout(mode: mode) }
         state.onPanelDragChanged = { [weak self] t in self?.movePanel(translation: t) }
         state.onPanelDragEnded = { [weak self] in self?.endPanelDrag() }

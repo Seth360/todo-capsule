@@ -217,7 +217,14 @@ final class CapsulePanel: NSPanel, NSWindowDelegate {
     private func endInlineEditingIfClickEndedOutsideFieldEditor(_ event: NSEvent) {
         guard shouldEndInlineEditingAfterClick?() == true,
               let editor = firstResponder as? NSTextView else { return }
-        let editorRect = editor.convert(editor.bounds, to: nil).insetBy(dx: -2, dy: -2)
+        // field editor 是窗口共享的 NSTextView；它自身的 bounds 可能覆盖远大于当前 TextField 的区域，
+        // 会把点击空白处误判成“仍在编辑框内”。优先使用其委托控件的真实窗口坐标。
+        let editorRect: NSRect
+        if let field = editor.delegate as? NSView, field.window === self {
+            editorRect = field.convert(field.bounds, to: nil).insetBy(dx: -2, dy: -2)
+        } else {
+            editorRect = editor.convert(editor.bounds, to: nil).insetBy(dx: -2, dy: -2)
+        }
         guard !editorRect.contains(event.locationInWindow) else { return }
         makeFirstResponder(nil)
     }

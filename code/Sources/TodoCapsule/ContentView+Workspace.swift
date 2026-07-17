@@ -128,6 +128,11 @@ extension ContentView {
                 }
             }
         }
+        .onChange(of: workspaceDestination) { _, _ in
+            if let id = editingWorkspaceTodoID {
+                commitWorkspaceTodoEdit(id)
+            }
+        }
         .onChange(of: workspaceDraftFocused) { oldValue, newValue in
             guard oldValue, !newValue else { return }
             DispatchQueue.main.async {
@@ -613,8 +618,8 @@ extension ContentView {
                 .padding(.bottom, 34)
             }
             .onTapGesture {
-                if editingWorkspaceTodoID != nil {
-                    cancelWorkspaceTodoEdit()
+                if let id = editingWorkspaceTodoID {
+                    commitWorkspaceTodoEdit(id)
                 }
             }
         }
@@ -891,6 +896,9 @@ extension ContentView {
     }
 
     private func startWorkspaceTodoEdit(_ todo: Todo) {
+        if let currentID = editingWorkspaceTodoID, currentID != todo.id {
+            commitWorkspaceTodoEdit(currentID)
+        }
         editingWorkspaceTodoID = todo.id
         workspaceTodoEditText = todo.text
         state.isEditing = true
@@ -1089,6 +1097,11 @@ extension ContentView {
                 .padding(.top, 18)
                 .padding(.bottom, 34)
             }
+            .onTapGesture {
+                if let id = editingWorkspaceTodoID {
+                    commitWorkspaceTodoEdit(id)
+                }
+            }
         }
     }
 
@@ -1107,6 +1120,7 @@ extension ContentView {
 
     private func workspaceCompletedRow(_ todo: Todo) -> some View {
         let hovered = hoveredWorkspaceCompletedID == todo.id
+        let editing = editingWorkspaceTodoID == todo.id
         return HStack(spacing: 12) {
             Button { state.restoreCompleted(todo) } label: {
                 Image(systemName: "arrow.uturn.backward.circle")
@@ -1118,16 +1132,32 @@ extension ContentView {
             .help("恢复到待办")
             .pointingHandCursor()
             VStack(alignment: .leading, spacing: 4) {
-                Text(todo.text)
-                    .font(.tc(14, weight: .medium))
-                    .foregroundStyle(txt)
-                    .lineLimit(2)
-                    .textSelection(.enabled)
+                if editing {
+                    TextField("待办内容，可输入 # 添加标签", text: $workspaceTodoEditText)
+                        .textFieldStyle(.plain)
+                        .font(.tc(14, weight: .medium))
+                        .foregroundStyle(txt)
+                        .focused($workspaceTodoEditFocused, equals: todo.id)
+                        .onSubmit { commitWorkspaceTodoEdit(todo.id) }
+                        .onExitCommand { cancelWorkspaceTodoEdit() }
+                        .anchorPreference(key: WorkspaceOverlayAnchorKey.self, value: .bounds) { [.todoTags(todo.id): $0] }
+                } else {
+                    Text(todo.text)
+                        .font(.tc(14, weight: .medium))
+                        .foregroundStyle(txt)
+                        .lineLimit(2)
+                        .textSelection(.enabled)
+                        .highPriorityGesture(TapGesture(count: 2).onEnded { startWorkspaceTodoEdit(todo) })
+                }
                 HStack(spacing: 7) {
                     Text(workspaceCompletedTime(todo.completedAt ?? todo.createdAt))
                         .font(.tc(11))
                         .foregroundStyle(txt3)
-                    tagPills(todo.tags)
+                    if editing {
+                        editableTagPills(todo)
+                    } else {
+                        tagPills(todo.tags)
+                    }
                 }
             }
             Spacer(minLength: 8)
@@ -1145,10 +1175,12 @@ extension ContentView {
         }
         .padding(.horizontal, 14)
         .frame(minHeight: 60)
-        .background(RoundedRectangle(cornerRadius: 10).fill(hovered ? workspaceRowHoverFill : (usesLightTheme ? Color.black.opacity(0.045) : Color.white.opacity(0.07))))
-        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(workspaceDivider))
+        .background(RoundedRectangle(cornerRadius: 10).fill(editing ? accent.opacity(0.10) : (hovered ? workspaceRowHoverFill : (usesLightTheme ? Color.black.opacity(0.045) : Color.white.opacity(0.07)))))
+        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(editing ? accent.opacity(0.55) : workspaceDivider))
         .contentShape(Rectangle())
         .onHover { hoveredWorkspaceCompletedID = $0 ? todo.id : (hoveredWorkspaceCompletedID == todo.id ? nil : hoveredWorkspaceCompletedID) }
+        .highPriorityGesture(TapGesture(count: 2).onEnded { startWorkspaceTodoEdit(todo) })
+        .zIndex(editing ? 30 : 0)
     }
 
     private var workspaceCompletedTags: [String] {

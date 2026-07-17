@@ -466,22 +466,41 @@ final class AppState: ObservableObject {
 
     func updateText(_ id: UUID, _ text: String) {
         let parsed = parseTodoLine(text)
-        guard let i = todos.firstIndex(where: { $0.id == id }) else { return }
-        guard !parsed.text.isEmpty else {
-            deleteImmediately(todos[i])
+        if let i = todos.firstIndex(where: { $0.id == id }) {
+            guard !parsed.text.isEmpty else {
+                deleteImmediately(todos[i])
+                return
+            }
+            todos[i].text = parsed.text
+            todos[i].tags = uniqueTags(todos[i].tags + parsed.tags)
+            ensureTags(todos[i].tags)
+            persistAll()
             return
         }
-        todos[i].text = parsed.text
-        todos[i].tags = uniqueTags(todos[i].tags + parsed.tags)
-        ensureTags(todos[i].tags)
+
+        guard let i = completedArchive.firstIndex(where: { $0.id == id }) else { return }
+        guard !parsed.text.isEmpty else {
+            completedArchive[i].trashed = true
+            persistAll()
+            relayout()
+            return
+        }
+        completedArchive[i].text = parsed.text
+        completedArchive[i].tags = uniqueTags(completedArchive[i].tags + parsed.tags)
+        ensureTags(completedArchive[i].tags)
         persistAll()
     }
 
     func removeTagFromTodo(_ id: UUID, tag: String) {
-        guard let i = todos.firstIndex(where: { $0.id == id }) else { return }
-        todos[i].tags.removeAll { $0 == tag }
-        persistAll()
-        relayout()
+        if let i = todos.firstIndex(where: { $0.id == id }) {
+            todos[i].tags.removeAll { $0 == tag }
+            persistAll()
+            relayout()
+        } else if let i = completedArchive.firstIndex(where: { $0.id == id }) {
+            completedArchive[i].tags.removeAll { $0 == tag }
+            persistAll()
+            relayout()
+        }
     }
 
     func moveActiveItem(_ id: UUID, to toIndex: Int) {

@@ -3,21 +3,21 @@
     <channel>
         <title>TodoCapsule</title>
         <item>
-            <title>1.0.9</title>
-            <pubDate>Wed, 15 Jul 2026 20:05:15 +0800</pubDate>
+            <title>1.0.10</title>
+            <pubDate>Fri, 17 Jul 2026 19:24:10 +0800</pubDate>
             <link>https://github.com/Seth360/todo-capsule</link>
-            <sparkle:version>23</sparkle:version>
-            <sparkle:shortVersionString>1.0.9</sparkle:shortVersionString>
+            <sparkle:version>24</sparkle:version>
+            <sparkle:shortVersionString>1.0.10</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.9
+            <description sparkle:format="markdown"><![CDATA[# Todo Capsule 1.0.10
 
-- 完善项目行内编辑：点击编辑框外的按钮、标签或空白区域时自动保存。
-- 切换到其他应用、点击桌面或收起窗口时，自动保存大小窗待办和收藏编辑内容。
-- 保留标签选择的完整点击流程，标签操作完成后再结束编辑并保存。
-- 统一大小窗待办的方形完成勾选框样式。
+- 大窗模式的进行中、本周已完成和全部已完成项目均支持双击行内编辑。
+- 编辑后按回车、切换焦点、点击空白区域或切换页面时自动保存。
+- 已归档完成项的文字与标签修改现在会正确持久化。
+- 修正 macOS 共享 field editor 命中范围过大导致空白点击无法结束编辑的问题。
 ]]></description>
-            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.9/todo-capsule-v1.0.9.dmg" length="3525216" type="application/octet-stream" sparkle:edSignature="cUlgOMTECho1Qhnxzh7AMHw2MvX7iZYYBhVU/xnNQJCNfBmFfmVYjxnDqzoE84OBz04hf4MSoSKmbslnF//DBQ=="/>
+            <enclosure url="https://github.com/Seth360/todo-capsule/releases/download/v1.0.10/todo-capsule-v1.0.10.dmg" length="3557402" type="application/octet-stream" sparkle:edSignature="+5CHNTMBhCiNaOyHv2+wl9c3R6p1eV2bzYX104Aml6KFba9XsQp7DK2Y8LfTXqeyyI6afgWjHL+xz+dwq2PKAw=="/>
         </item>
     </channel>
 </rss>
